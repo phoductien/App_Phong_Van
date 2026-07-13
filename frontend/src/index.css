@@ -1,0 +1,75 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+/* Apply modern typography globally */
+* {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif !important;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #f8fafc;
+  color: #0f172a;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+/* Override Cloudscape theme CSS properties for premium violet/purple design system of X-Interview */
+:root {
+  --color-brand-primary: #6366f1 !important;
+  --color-border-item-focused: #6366f1 !important;
+  --color-background-item-selected: #e0e7ff !important;
+  --color-text-link-default: #4f46e5 !important;
+  --color-text-link-hover: #4338ca !important;
+  --color-background-button-normal-active: #e2e8f0 !important;
+  
+  /* Soft corners */
+  --border-radius-container: 16px !important;
+  --border-radius-popover: 12px !important;
+  --border-radius-dropdown: 12px !important;
+  --border-radius-tabs: 8px !important;
+  --border-radius-input: 8px !important;
+  --border-radius-button: 30px !important; /* Pill style buttons matching X-Interview */
+}
+
+/* Custom styles for SideNavigation to match X-Interview */
+.awsui_link_156c4_1400m_361:hover,
+[class*="side-navigation"] a:hover {
+  background-color: #f1f5f9 !important;
+  border-radius: 8px !important;
+  color: #4f46e5 !important;
+}
+
+[class*="side-navigation"] [class*="active"] a,
+[class*="side-navigation"] [class*="selected"] a {
+  background-color: #eef2ff !important;
+  color: #4f46e5 !important;
+  font-weight: 600 !important;
+  border-radius: 8px !important;
+  border-left: 4px solid #6366f1 !important;
+}
+
+/* Pill-shaped badges */
+[class*="badge"] {
+  border-radius: 12px !important;
+  padding: 4px 10px !important;
+  font-weight: 500 !important;
+}
+
+/* Cards & Container soft drop-shadows */
+[class*="container"], [class*="card"] {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03) !important;
+  border: 1px solid #f1f5f9 !important;
+}
+
+/* Custom animations for interactions */
+button, a, [class*="card"] {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+[class*="card"]:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04) !important;
+}
