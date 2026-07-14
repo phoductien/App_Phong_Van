@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Container,
   Header,
@@ -9,7 +9,8 @@ import {
   Badge,
   ProgressBar,
   Grid,
-  Box
+  Box,
+  Spinner
 } from '@cloudscape-design/components';
 
 const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:5000';
@@ -29,11 +30,57 @@ export default function InterviewRoom({ session, onLeaveSession }) {
   const [errorMsg, setErrorMsg] = useState('');
   const [completed, setCompleted] = useState(false);
   
+  // Recruiter gated timer states
+  const [recruiterJoined, setRecruiterJoined] = useState(false);
+  const [timeLeft, setTimeLeft] = useState(1800); // 30 minutes
+
   // Advanced X-Interview Score breakdowns
   const [technicalScores, setTechnicalScores] = useState([]);
   const [communicationScores, setCommunicationScores] = useState([]);
   const [confidenceScores, setConfidenceScores] = useState([]);
   const [latestFeedback, setLatestFeedback] = useState(null);
+
+  // Poll recruiter presence status
+  useEffect(() => {
+    if (recruiterJoined) return;
+    const checkStatus = async () => {
+      try {
+        const res = await fetch(`${API_BASE}/api/sessions/status/${sessionId}`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data.recruiterJoined) {
+            setRecruiterJoined(true);
+          }
+        }
+      } catch (err) {
+        console.error("Error checking session status:", err);
+      }
+    };
+    checkStatus();
+    const interval = setInterval(checkStatus, 1500);
+    return () => clearInterval(interval);
+  }, [sessionId, recruiterJoined]);
+
+  // Handle countdown clock when recruiter is inside the room
+  useEffect(() => {
+    if (!recruiterJoined || completed || timeLeft <= 0) return;
+    const timer = setInterval(() => {
+      setTimeLeft(prev => {
+        if (prev <= 1) {
+          setCompleted(true);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [recruiterJoined, completed, timeLeft]);
+
+  const formatTime = (seconds) => {
+    const m = Math.floor(seconds / 60).toString().padStart(2, '0');
+    const s = (seconds % 60).toString().padStart(2, '0');
+    return `${m}:${s}`;
+  };
 
   const handleSubmitAnswer = async () => {
     if (!answerInput.trim()) return;
@@ -137,14 +184,49 @@ export default function InterviewRoom({ session, onLeaveSession }) {
           </Header>
         }
       >
-        <Grid gridDefinition={[{ colspan: 7 }, { colspan: 5 }]}>
-          <div>
-            <SpaceBetween size="m" direction="vertical">
-              <Box variant="awsui-key-label">
-                Độ khó buổi phỏng vấn: <Badge color={level === 'hard' ? 'red' : level === 'medium' ? 'blue' : 'green'}>
-                  {level.toUpperCase()}
-                </Badge>
+        <div style={{ position: 'relative', minHeight: '520px' }}>
+          {!recruiterJoined && (
+            <div style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              background: 'rgba(255, 255, 255, 0.97)',
+              zIndex: 1000,
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '16px',
+              borderRadius: '12px'
+            }}>
+              <div style={{ fontSize: '48px', animation: 'pulse 1.5s infinite' }}>⏳</div>
+              <Box variant="h2" style={{ fontWeight: 'bold', color: '#0f172a', textAlign: 'center' }}>
+                Đang chờ Người tuyển dụng tham gia phòng...
               </Box>
+              <Box variant="p" color="text-muted" style={{ maxWidth: '480px', textAlign: 'center', lineHeight: '1.6' }}>
+                Phòng thi đang được bảo mật. Khi Người tuyển dụng tham gia từ Bảng quản trị, buổi phỏng vấn và đồng hồ đếm ngược 30 phút sẽ chính thức bắt đầu.
+              </Box>
+              <div style={{ marginTop: '10px' }}>
+                <Spinner size="large" />
+              </div>
+            </div>
+          )}
+
+          <Grid gridDefinition={[{ colspan: 7 }, { colspan: 5 }]}>
+            <div>
+              <SpaceBetween size="m" direction="vertical">
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#f8fafc', padding: '10px 16px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+                  <Box variant="awsui-key-label">
+                    Độ khó: <Badge color={level === 'hard' ? 'red' : level === 'medium' ? 'blue' : 'green'}>
+                      {level.toUpperCase()}
+                    </Badge>
+                  </Box>
+                  <Box style={{ fontWeight: 'bold', color: '#334155' }}>
+                    ⏱️ Thời gian còn lại: <Badge color={timeLeft < 300 ? 'red' : 'blue'}>{formatTime(timeLeft)}</Badge>
+                  </Box>
+                </div>
 
               <ProgressBar
                 value={(currentIndex / totalQuestions) * 100}
@@ -287,7 +369,8 @@ export default function InterviewRoom({ session, onLeaveSession }) {
             </SpaceBetween>
           </div>
         </Grid>
-      </Container>
-    </SpaceBetween>
-  );
+      </div>
+    </Container>
+  </SpaceBetween>
+);
 }

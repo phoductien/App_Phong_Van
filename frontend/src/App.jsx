@@ -23,17 +23,24 @@ import CVProfile from './components/CVProfile';
 
 function App() {
   const [user, setUser] = useState(null);
+  const [role, setRole] = useState('candidate'); // 'candidate' or 'interviewer'
   const [activeTab, setActiveTab] = useState('home');
   const [activeSession, setActiveSession] = useState(null);
 
-  const navigationItems = [
+  const navigationItems = role === 'candidate' ? [
     { type: 'link', text: '🏠 Trang chủ', id: 'home' },
     { type: 'link', text: '📖 Ngân hàng câu hỏi', id: 'question_bank' },
     { type: 'link', text: '📹 Luyện tập phỏng vấn', id: 'candidate' },
     { type: 'link', text: '💼 Việc làm', id: 'jobs' },
     { type: 'link', text: '📄 Hồ sơ CV', id: 'cv_profile' },
     { type: 'divider' },
-    { type: 'link', text: '🏢 Dành cho Doanh nghiệp', id: 'interviewer' },
+    { type: 'link', text: '🏢 Chế độ: Nhà tuyển dụng 🔄', id: 'switch_to_interviewer' },
+    { type: 'divider' },
+    { type: 'link', text: '🚪 Đăng xuất', id: 'logout' }
+  ] : [
+    { type: 'link', text: '🏢 Bảng quản trị Tuyển dụng', id: 'interviewer' },
+    { type: 'divider' },
+    { type: 'link', text: '👤 Chế độ: Ứng viên 🔄', id: 'switch_to_candidate' },
     { type: 'divider' },
     { type: 'link', text: '🚪 Đăng xuất', id: 'logout' }
   ];
@@ -241,14 +248,21 @@ function App() {
       navigation={
         <SideNavigation
           activeHref={activeTab}
-          header={{ href: '#', text: `VietInterview AI — ${user.full_name || 'User'}` }}
+          header={{ href: '#', text: `VietInterview AI — ${role === 'candidate' ? 'Ứng viên' : 'Nhà tuyển dụng'}` }}
           onFollow={({ detail }) => {
             if (detail.id === 'logout') {
               if (confirm('Bạn có chắc chắn muốn đăng xuất tài khoản?')) {
                 setUser(null);
                 setActiveSession(null);
                 setActiveTab('home');
+                setRole('candidate');
               }
+            } else if (detail.id === 'switch_to_interviewer') {
+              setRole('interviewer');
+              setActiveTab('interviewer');
+            } else if (detail.id === 'switch_to_candidate') {
+              setRole('candidate');
+              setActiveTab('home');
             } else if (activeTab === 'interview_session') {
               if (confirm('Bạn có chắc chắn muốn rời khỏi phòng phỏng vấn? Tiến trình chưa hoàn tất sẽ mất.')) {
                 setActiveSession(null);

@@ -551,6 +551,121 @@ app.get('/api/sessions', async (req, res) => {
   }));
 });
 
+// Initialize global tracker for recruiter presence
+if (!global.recruiterJoinedSessions) {
+  global.recruiterJoinedSessions = {};
+}
+
+// API: Get status of a session (check if recruiter joined)
+app.get('/api/sessions/status/:id', (req, res) => {
+  const { id } = req.params;
+  const joined = !!global.recruiterJoinedSessions[id];
+  return res.json({ recruiterJoined: joined });
+});
+
+// API: Recruiter joins an active session
+app.post('/api/sessions/join-recruiter', (req, res) => {
+  const { sessionId } = req.body;
+  if (!sessionId) return res.status(400).json({ error: "Missing sessionId" });
+  global.recruiterJoinedSessions[sessionId] = true;
+  return res.json({ success: true, recruiterJoined: true });
+});
+
+// API: Get list of active ongoing sessions
+app.get('/api/sessions/active', async (req, res) => {
+  if (isMock) {
+    const list = Object.values(mockSessions).filter(s => s.status === 'ongoing');
+    return res.json(list.map(s => {
+      const comp = mockCompanies.find(c => c.id === s.question_bank.company_id);
+      return {
+        id: s.id,
+        created_at: new Date().toISOString(),
+        status: s.status,
+        company_name: comp ? comp.name : "Doanh nghiệp đối tác",
+        title: s.question_bank.title || "Lập trình viên",
+        level: s.question_bank.level || "medium",
+        recruiterJoined: !!global.recruiterJoinedSessions[s.id]
+      };
+    }));
+  }
+
+  const { data, error } = await supabase
+    .from('interview_sessions')
+    .select('*, question_banks(*, companies(*))')
+    .eq('status', 'ongoing')
+    .order('created_at', { ascending: false });
+
+  if (error) return res.status(400).json(error);
+
+  return res.json(data.map(s => ({
+    id: s.id,
+    created_at: s.created_at,
+    status: s.status,
+    company_name: s.question_banks && s.question_banks.companies ? s.question_banks.companies.name : "Doanh nghiệp đối tác",
+    title: s.question_banks ? s.question_banks.title : "Lập trình viên",
+    level: s.question_banks ? s.question_banks.level : "medium",
+    recruiterJoined: !!global.recruiterJoinedSessions[s.id]
+  })));
+});
+
+// API: Get list of completed sessions (Interviewer view)
+app.get('/api/sessions/completed', async (req, res) => {
+  if (isMock) {
+    const list = Object.values(mockSessions).filter(s => s.status === 'completed');
+    return res.json(list.map(s => {
+      const comp = mockCompanies.find(c => c.id === s.question_bank.company_id);
+      const evaluations = s.chat_history.filter(h => h.role === 'ai_evaluation');
+      const avgScore = evaluations.reduce((acc, curr) => acc + (curr.score || 0), 0) / (evaluations.length || 1);
+      return {
+        id: s.id,
+        created_at: new Date().toISOString(),
+        status: s.status,
+        company_name: comp ? comp.name : "Doanh nghiệp đối tác",
+        title: s.question_bank.title || "Lập trình viên",
+        score: evaluations.length > 0 ? avgScore.toFixed(1) : "0.0",
+        chat_history: s.chat_history
+      };
+    }));
+  }
+
+  const { data, error } = await supabase
+    .from('interview_sessions')
+    .select('*, question_banks(*, companies(*))')
+    .eq('status', 'completed')
+    .order('created_at', { ascending: false });
+
+  if (error) return res.status(400).json(error);
+
+  return res.json(data.map(s => {
+    const evaluations = s.chat_history ? s.chat_history.filter(h => h.role === 'ai_evaluation') : [];
+    const avgScore = evaluations.reduce((acc, curr) => acc + (curr.score || 0), 0) / (evaluations.length || 1);
+    return {
+      id: s.id,
+      created_at: s.created_at,
+      status: s.status,
+      company_name: s.question_banks && s.question_banks.companies ? s.question_banks.companies.name : "Doanh nghiệp đối tác",
+      title: s.question_banks ? s.question_banks.title : "Lập trình viên",
+      score: evaluations.length > 0 ? avgScore.toFixed(1) : "0.0",
+      chat_history: s.chat_history
+    };
+  }));
+});
+
+// API: Get list of candidate CVs
+app.get('/api/cvs', async (req, res) => {
+  if (isMock) {
+    return res.json(mockCvs);
+  }
+
+  const { data, error } = await supabase
+    .from('cv_vault')
+    .select('*')
+    .order('uploaded_at', { ascending: false });
+
+  if (error) return res.status(400).json(error);
+  return res.json(data);
+});
+
 // Seed initial jobs matching the VietInterview AI jobs list
 // Seed initial jobs matching the VietInterview AI jobs list (Strictly IT vacancies in Vietnam)
 const seedJobs = [
