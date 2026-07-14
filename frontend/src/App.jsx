@@ -84,13 +84,14 @@ function App() {
       setActiveTab('candidate');
     } else if (actionType === 'interview') {
       try {
-        const res = await fetch('http://localhost:5000/api/sessions/start', {
+        const res = await fetch('http://localhost:5000/api/questions/generate-from-jd', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            candidateId: '00000000-0000-0000-0000-000000000000',
-            cvId: null,
-            companyId: job.companyId,
+            candidateId: user?.id || '00000000-0000-0000-0000-000000000000',
+            companyName: job.company,
+            positionTitle: job.title,
+            jobDescription: job.desc,
             level: job.level
           })
         });
@@ -105,7 +106,7 @@ function App() {
             level: job.level
           });
         } else {
-          alert('Không tìm thấy bộ đề phù hợp cho công ty này.');
+          alert('Không thể khởi tạo bộ câu hỏi tự động cho công việc này.');
         }
       } catch (err) {
         console.error(err);
@@ -129,6 +130,7 @@ function App() {
             }
           >
             <HomeDashboard
+              user={user}
               onNavigateToTab={(tabId) => setActiveTab(tabId)}
               onStartQuickInterview={handleStartQuickInterview}
             />

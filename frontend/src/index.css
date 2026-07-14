@@ -73,11 +73,3 @@ button, a, [class*="card"] {
   transform: translateY(-2px);
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04) !important;
 }
-
-/* Allow text wrapping in table headers and cells to avoid horizontal scrollbar overflow */
-[class*="table"] th, 
-[class*="table"] td, 
-[class*="table"] [class*="cell"] {
-  white-space: normal !important;
-  word-break: break-word !important;
-}

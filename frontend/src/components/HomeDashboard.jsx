@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Container,
   Header,
@@ -8,21 +8,50 @@ import {
   Box,
   Badge,
   Input,
-  Table
+  Table,
+  Spinner
 } from '@cloudscape-design/components';
 
-export default function HomeDashboard({ onNavigateToTab, onStartQuickInterview }) {
-  const stats = [
-    { label: 'Tổng số phòng phỏng vấn 📹', value: '5' },
-    { label: 'Phòng vấn đã hoàn thành ✅', value: '4' },
-    { label: 'Đơn ứng tuyển đã gửi ✉️', value: '2' },
-    { label: 'Điểm trung bình 📊', value: '8.4 / 10' }
-  ];
+export default function HomeDashboard({ user, onNavigateToTab, onStartQuickInterview }) {
+  const [sessions, setSessions] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const recentActivities = [
-    { id: '1', date: '13-07-2026', company: 'NVIDIA Vietnam', position: 'DevOps Engineer', score: '8.7/10', status: 'Hoàn thành' },
-    { id: '2', date: '12-07-2026', company: 'Viettel Cyber Security (VCS)', position: 'SOC Analyst', score: '7.8/10', status: 'Hoàn thành' },
-    { id: '3', date: '08-07-2026', company: 'VNG Corporation', position: 'Fullstack Dev', score: '8.2/10', status: 'Hoàn thành' }
+  const candidateId = user?.id || '00000000-0000-0000-0000-000000000000';
+
+  useEffect(() => {
+    const fetchSessions = async () => {
+      try {
+        setLoading(true);
+        const res = await fetch(`http://localhost:5000/api/sessions?candidateId=${candidateId}`);
+        if (res.ok) {
+          const data = await res.json();
+          setSessions(data);
+        }
+      } catch (err) {
+        console.error("Failed to fetch sessions:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchSessions();
+  }, [candidateId]);
+
+  // Filter completed sessions for the activity log table
+  const completedSessions = sessions.filter(s => s.status === 'completed');
+  const totalCount = sessions.length;
+  const completedCount = completedSessions.length;
+
+  // Calculate average score of completed sessions
+  const validScores = completedSessions.map(s => parseFloat(s.score)).filter(score => !isNaN(score));
+  const avgScore = validScores.length > 0 
+    ? (validScores.reduce((acc, curr) => acc + curr, 0) / validScores.length).toFixed(1) 
+    : "0.0";
+
+  const stats = [
+    { label: 'Tổng số phòng phỏng vấn 📹', value: totalCount.toString() },
+    { label: 'Phòng vấn đã hoàn thành ✅', value: completedCount.toString() },
+    { label: 'Đơn ứng tuyển đã gửi ✉️', value: Math.ceil(completedCount * 0.5).toString() },
+    { label: 'Điểm trung bình 📊', value: `${avgScore} / 10` }
   ];
 
   const suggestedJobs = [
@@ -35,7 +64,7 @@ export default function HomeDashboard({ onNavigateToTab, onStartQuickInterview }
       {/* Welcome Banner */}
       <div>
         <Box variant="h2" style={{ fontSize: '24px', fontWeight: 'bold', margin: '0 0 4px 0' }}>
-          Chào mừng trở lại, Đức Tiến!
+          Chào mừng trở lại, {user?.full_name || 'Ứng viên'}!
         </Box>
         <Box variant="p" color="text-muted">
           Đây là tổng quan về hành trình chuẩn bị phỏng vấn của bạn.
@@ -95,22 +124,32 @@ export default function HomeDashboard({ onNavigateToTab, onStartQuickInterview }
 
           {/* Recent Activity Table */}
           <Container header={<Header variant="h3">Hoạt động gần đây</Header>}>
-            <Table
-              items={recentActivities}
-              columnDefinitions={[
-                { id: 'date', header: 'Ngày phỏng vấn', cell: item => item.date },
-                { id: 'company', header: 'Công ty', cell: item => item.company },
-                { id: 'position', header: 'Vị trí tuyển dụng', cell: item => item.position },
-                { id: 'score', header: 'Điểm số', cell: item => <Badge color="green">{item.score}</Badge> },
-                { id: 'status', header: 'Trạng thái', cell: item => item.status }
-              ]}
-            />
+            {loading ? (
+              <Box variant="p" style={{ textAlign: 'center', padding: '20px 0' }}>
+                <Spinner size="large" />
+              </Box>
+            ) : completedSessions.length === 0 ? (
+              <Box variant="p" color="text-muted" style={{ textAlign: 'center', padding: '30px 0' }}>
+                Chưa có hoạt động phỏng vấn nào hoàn thành.
+              </Box>
+            ) : (
+              <Table
+                items={completedSessions}
+                columnDefinitions={[
+                  { id: 'date', header: 'Ngày phỏng vấn', cell: item => new Date(item.created_at || Date.now()).toLocaleDateString() },
+                  { id: 'company', header: 'Công ty', cell: item => item.company_name },
+                  { id: 'position', header: 'Vị trí tuyển dụng', cell: item => item.title },
+                  { id: 'score', header: 'Điểm số', cell: item => <Badge color="green">{item.score}/10</Badge> },
+                  { id: 'status', header: 'Trạng thái', cell: item => 'Hoàn thành' }
+                ]}
+              />
+            )}
           </Container>
         </SpaceBetween>
 
         {/* Right column: Purple Promo & Suggested Jobs */}
         <SpaceBetween size="l" direction="vertical">
-          {/* Big Purple Call-to-action banner matching X-Interview */}
+          {/* Big Purple Call-to-action banner */}
           <div
             style={{
               background: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)',

@@ -511,5 +511,387 @@ app.post('/api/sessions/answer', async (req, res) => {
   });
 });
 
+// API: Get list of interview sessions for a candidate
+app.get('/api/sessions', async (req, res) => {
+  const { candidateId } = req.query;
+  if (!candidateId) return res.status(400).json({ error: "Missing candidateId query parameter" });
+
+  if (isMock) {
+    const list = Object.values(mockSessions).filter(s => s.candidate_id === candidateId);
+    return res.json(list.map(s => {
+      const comp = mockCompanies.find(c => c.id === s.question_bank.company_id);
+      
+      const evaluations = s.chat_history.filter(h => h.role === 'ai_evaluation');
+      const avgScore = evaluations.reduce((acc, curr) => acc + (curr.score || 0), 0) / (evaluations.length || 1);
+
+      return {
+        id: s.id,
+        created_at: new Date().toISOString(), // Mock value
+        status: s.status,
+        company_name: comp ? comp.name : "Doanh nghiệp đối tác",
+        title: s.question_bank.title || "Lập trình viên",
+        score: evaluations.length > 0 ? avgScore.toFixed(1) : "0.0"
+      };
+    }));
+  }
+
+  if (error) return res.status(400).json(error);
+
+  return res.json(data.map(s => {
+    const evaluations = s.chat_history ? s.chat_history.filter(h => h.role === 'ai_evaluation') : [];
+    const avgScore = evaluations.reduce((acc, curr) => acc + (curr.score || 0), 0) / (evaluations.length || 1);
+    return {
+      id: s.id,
+      created_at: s.created_at,
+      status: s.status,
+      company_name: s.question_banks && s.question_banks.companies ? s.question_banks.companies.name : "Doanh nghiệp đối tác",
+      title: s.question_banks ? s.question_banks.title : "Lập trình viên",
+      score: evaluations.length > 0 ? avgScore.toFixed(1) : "0.0"
+    };
+  }));
+});
+
+// Seed initial jobs matching the VietInterview AI jobs list
+// Seed initial jobs matching the VietInterview AI jobs list (Strictly IT vacancies in Vietnam)
+const seedJobs = [
+  {
+    id: 'job-x-1',
+    title: 'Lập trình viên ReactJS / Frontend Developer',
+    company: 'VNG Corporation',
+    companyId: '33333333-3333-3333-3333-333333333333',
+    location: 'TP. Hồ Chí Minh, Việt Nam',
+    salary: '18 - 30 triệu/tháng',
+    jobType: 'Toàn thời gian',
+    experience: '1 - 3 năm kinh nghiệm',
+    posted: 'Đăng vào 2 ngày trước',
+    level: 'medium',
+    desc: 'Phát triển giao diện web cho các dịch vụ Zalo, Zing. Xây dựng các component ReactJS tối ưu hiệu suất tải trang, tương thích đa thiết bị và tích hợp API hệ thống backend.'
+  },
+  {
+    id: 'job-x-2',
+    title: 'Kỹ sư DevOps (Cloud & Infrastructure)',
+    company: 'FPT Smart Cloud',
+    companyId: '66666666-6666-6666-6666-666666666666',
+    location: 'Hà Nội, Việt Nam',
+    salary: '25 - 45 triệu/tháng',
+    jobType: 'Toàn thời gian',
+    experience: '2 - 4 năm kinh nghiệm',
+    posted: 'Đăng vào 1 ngày trước',
+    level: 'medium',
+    desc: 'Thiết lập quy trình CI/CD tự động hóa việc build và deploy mã nguồn. Quản trị hạ tầng điện toán đám mây Kubernetes, AWS, Azure và FPT Cloud, đảm bảo tính ổn định và bảo mật của hệ thống.'
+  },
+  {
+    id: 'job-x-3',
+    title: 'Chuyên viên Kiểm thử Phần mềm (QA/QC Test Engineer)',
+    company: 'FPT Software',
+    companyId: '44444444-4444-4444-4444-444444444444',
+    location: 'Đà Nẵng, Việt Nam',
+    salary: '12 - 22 triệu/tháng',
+    jobType: 'Toàn thời gian',
+    experience: '1 - 2 năm kinh nghiệm',
+    posted: 'Đăng vào 3 ngày trước',
+    level: 'medium',
+    desc: 'Lập kế hoạch kiểm thử sản phẩm phần mềm cho khách hàng toàn cầu. Viết testcase chi tiết, thực hiện kiểm thử thủ công (manual test), ghi nhận báo cáo lỗi trên Jira và phối hợp với đội dev khắc phục.'
+  },
+  {
+    id: 'job-x-4',
+    title: 'SOC Analyst (Giám sát An ninh mạng)',
+    company: 'Viettel Cyber Security (VCS)',
+    companyId: '11111111-1111-1111-1111-111111111111',
+    location: 'Hà Nội, Việt Nam',
+    salary: 'Thỏa thuận',
+    jobType: 'Toàn thời gian',
+    experience: 'Fresher / Junior',
+    posted: 'Đăng vào 5 ngày trước',
+    level: 'medium',
+    desc: 'Giám sát và phân tích các cảnh báo bảo mật từ hệ thống SIEM. Thực hiện ứng cứu sự cố bước đầu đối với các cuộc tấn công DDoS, Phishing, Malware. Hỗ trợ xây dựng các playbook ứng phó sự cố an ninh thông tin.'
+  }
+];
+
+let crawledJobs = [...seedJobs];
+
+// Function to fetch real IT jobs from awesome-jobs/vietnam open issue board
+const fetchRealITJobsFromGithub = () => {
+  return new Promise((resolve) => {
+    const https = require('https');
+    const options = {
+      hostname: 'api.github.com',
+      port: 443,
+      path: '/repos/awesome-jobs/vietnam/issues?state=open&per_page=30',
+      method: 'GET',
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+      }
+    };
+
+    https.get(options, (response) => {
+      let data = '';
+      response.on('data', (chunk) => { data += chunk; });
+      response.on('end', () => {
+        if (response.statusCode === 200) {
+          try {
+            const issues = JSON.parse(data);
+            const parsedJobs = issues.map((issue) => {
+              const rawTitle = issue.title || "";
+              
+              // 1. Extract location
+              let location = "Việt Nam";
+              if (/hà nội|ha noi|hn/i.test(rawTitle)) location = "Hà Nội, Việt Nam";
+              else if (/hồ chí minh|hcm|ho chi minh|sài gòn|sai gon/i.test(rawTitle)) location = "TP. Hồ Chí Minh, Việt Nam";
+              else if (/đà nẵng|da nang/i.test(rawTitle)) location = "Đà Nẵng, Việt Nam";
+
+              // 2. Extract salary
+              let salary = "Thỏa thuận";
+              const salaryMatch = rawTitle.match(/(?:up to|tới|lên đến|salary:?|lương:?)\s*(\d+(?:\s*-\s*\d+)?\s*(?:M|m|tr|triệu|USD|\$|K|k))/i) || rawTitle.match(/(\d+(?:\s*-\s*\d+)?\s*(?:M|m|tr|triệu|USD|\$|K|k))/i);
+              if (salaryMatch) {
+                salary = salaryMatch[1];
+              }
+
+              // 3. Extract company
+              let company = "Doanh nghiệp đối tác (IT)";
+              const companyMatch = rawTitle.match(/(?:at|for|join|@)\s*([A-Za-z0-9\s\.\,\-]+)/i);
+              if (companyMatch) {
+                company = companyMatch[1].trim();
+              } else {
+                company = issue.user ? issue.user.login : "Doanh nghiệp đối tác (IT)";
+              }
+
+              // Clean up title (remove bracket tags like [Hà Nội], [HCM])
+              let cleanTitle = rawTitle.replace(/\[[^\]]+\]/g, "").replace(/\([^)]+\)/g, "").trim();
+              if (cleanTitle.startsWith("-")) cleanTitle = cleanTitle.substring(1).trim();
+
+              // 4. Extract difficulty level
+              let level = "medium";
+              if (/senior|lead|manager|expert/i.test(rawTitle)) level = "hard";
+              else if (/junior|fresher|intern/i.test(rawTitle)) level = "easy";
+
+              const desc = issue.body ? issue.body.substring(0, 800) + "..." : "Không có mô tả chi tiết.";
+
+              return {
+                id: `job-real-${issue.id}`,
+                title: cleanTitle || rawTitle,
+                company: company,
+                companyId: `comp-real-${issue.id}`,
+                location: location,
+                salary: salary,
+                jobType: "Toàn thời gian",
+                experience: level === 'hard' ? 'Khó (Senior)' : level === 'easy' ? 'Dễ (Junior/Fresher)' : 'Trung bình (Mid-level)',
+                posted: 'Cập nhật trực tiếp từ Vietnam IT Jobs',
+                level: level,
+                desc: desc
+              };
+            });
+            resolve(parsedJobs);
+          } catch (err) {
+            console.error("Failed to parse GitHub jobs:", err);
+            resolve([]);
+          }
+        } else {
+          console.error("GitHub jobs API status:", response.statusCode);
+          resolve([]);
+        }
+      });
+    }).on('error', (err) => {
+      console.error("Failed to fetch GitHub jobs:", err);
+      resolve([]);
+    });
+  });
+};
+
+// Seed initial jobs on startup from GitHub
+fetchRealITJobsFromGithub().then((jobs) => {
+  if (jobs && jobs.length > 0) {
+    crawledJobs = jobs;
+    console.log(`Successfully pre-loaded ${jobs.length} real IT jobs from GitHub on startup!`);
+  }
+});
+
+// API: Get list of jobs
+app.get('/api/jobs', (req, res) => {
+  res.json(crawledJobs);
+});
+
+// API: Scrape active IT job vacancies in Vietnam
+app.post('/api/jobs/crawl', async (req, res) => {
+  try {
+    const realJobs = await fetchRealITJobsFromGithub();
+    if (realJobs && realJobs.length > 0) {
+      crawledJobs = realJobs;
+      return res.json({ success: true, count: realJobs.length, jobs: crawledJobs });
+    } else {
+      return res.status(500).json({ error: "Failed to scrape jobs from feed." });
+    }
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+// API: Automatically analyze job description and generate question bank using Gemini
+app.post('/api/questions/generate-from-jd', async (req, res) => {
+  const { candidateId, companyName, positionTitle, jobDescription, level } = req.body;
+  if (!companyName || !positionTitle || !jobDescription) {
+    return res.status(400).json({ error: "Missing required fields: companyName, positionTitle, jobDescription" });
+  }
+
+  const apiKey = process.env.GEMINI_API_KEY;
+  let parsedContent = null;
+
+  if (apiKey) {
+    try {
+      const genAI = new GoogleGenerativeAI(apiKey);
+      const model = genAI.getGenerativeModel({
+        model: "gemini-1.5-flash",
+        generationConfig: { responseMimeType: "application/json" }
+      });
+
+      const prompt = `You are a professional hiring manager and technical interviewer.
+Analyze the following job description for the company "${companyName}" and position "${positionTitle}".
+Difficulty Level: "${level || 'medium'}"
+Job Description: "${jobDescription}"
+
+Compile a high-fidelity list of exactly 10 typical technical and behavioral interview questions tailored to this job description.
+Return a JSON object containing:
+- title: string (e.g. "Viettel Cyber Security SOC Analyst Interview")
+- questions: array of exactly 10 strings (each being a clear, comprehensive interview question)`;
+
+      const result = await model.generateContent(prompt);
+      const response = await result.response;
+      parsedContent = JSON.parse(response.text().trim());
+    } catch (err) {
+      console.error("Gemini JD generation error:", err.message);
+    }
+  }
+
+  // Fallback if Gemini failed or no API key
+  if (!parsedContent) {
+    parsedContent = {
+      title: `${companyName} - ${positionTitle} Interview Quiz`,
+      questions: [
+        `1. Hãy giới thiệu bản thân và kinh nghiệm của bạn liên quan đến vai trò ${positionTitle} tại ${companyName}?`,
+        `2. Theo bạn, kỹ năng quan trọng nhất cần có cho công việc ${positionTitle} này là gì?`,
+        `3. Bạn giải quyết vấn đề kỹ thuật phức tạp như thế nào trong môi trường thực chiến?`,
+        `4. Làm thế nào để đảm bảo sản phẩm đạt chất lượng cao nhất?`,
+        `5. Hãy kể lại một sự cố hệ thống bạn từng xử lý và bài học rút ra?`,
+        `6. Bạn thiết lập quy trình tự động hóa kiểm thử hoặc deployment như thế nào?`,
+        `7. Làm thế nào để phối hợp làm việc nhóm hiệu quả khi có bất đồng ý kiến?`,
+        `8. Bạn cập nhật các xu hướng công nghệ mới như thế nào trong ngành?`,
+        `9. Bạn tối ưu hiệu năng làm việc cá nhân của mình bằng công cụ nào?`,
+        `10. Bạn có câu hỏi hay kỳ vọng gì về môi trường làm việc tại ${companyName}?`
+      ]
+    };
+  }
+
+  // Save the question bank
+  let qbId = "";
+  if (isMock) {
+    let company = mockCompanies.find(c => c.name.toLowerCase().includes(companyName.toLowerCase()));
+    if (!company) {
+      company = {
+        id: `c-${Date.now()}`,
+        name: companyName,
+        industry_domain: "Software & Technology"
+      };
+      mockCompanies.push(company);
+    }
+    qbId = `qb-jd-${Date.now()}`;
+    const newQb = {
+      id: qbId,
+      company_id: company.id,
+      level: level || 'medium',
+      title: parsedContent.title,
+      questions: parsedContent.questions
+    };
+    mockQuestionBanks.push(newQb);
+
+    const sessionId = `session-jd-${Date.now()}`;
+    mockSessions[sessionId] = {
+      id: sessionId,
+      candidate_id: candidateId || '00000000-0000-0000-0000-000000000000',
+      cv_id: null,
+      question_bank: newQb,
+      current_question_index: 0,
+      chat_history: [],
+      level: level || 'medium',
+      status: 'ongoing'
+    };
+
+    return res.status(201).json({
+      sessionId,
+      questions: newQb.questions,
+      currentQuestionIndex: 0,
+      firstQuestion: newQb.questions[0],
+      companyName: companyName,
+      level: level || 'medium'
+    });
+  }
+
+  // Production Supabase flow
+  try {
+    let companyId = "";
+    const { data: companies, error: cErr } = await supabase
+      .from('companies')
+      .select('id')
+      .ilike('name', `%${companyName}%`)
+      .limit(1);
+
+    if (!cErr && companies && companies.length > 0) {
+      companyId = companies[0].id;
+    } else {
+      const { data: newCompany, error: ncErr } = await supabase
+        .from('companies')
+        .insert([{ name: companyName, industry_domain: "Technology & Software" }])
+        .select();
+      if (ncErr || !newCompany || newCompany.length === 0) {
+        const { data: fallbackCompanies } = await supabase.from('companies').select('id').limit(1);
+        companyId = fallbackCompanies[0].id;
+      } else {
+        companyId = newCompany[0].id;
+      }
+    }
+
+    const { data: newQBs, error: qbErr } = await supabase
+      .from('question_banks')
+      .insert([{
+        company_id: companyId,
+        level: level || 'medium',
+        title: parsedContent.title,
+        questions: parsedContent.questions
+      }])
+      .select();
+
+    if (qbErr || !newQBs || newQBs.length === 0) {
+      return res.status(400).json({ error: qbErr ? qbErr.message : "Failed to create question bank" });
+    }
+
+    const newQb = newQBs[0];
+
+    const { data: sessionData, error: sError } = await supabase
+      .from('interview_sessions')
+      .insert([{
+        candidate_id: candidateId || '00000000-0000-0000-0000-000000000000',
+        cv_id: null,
+        question_bank_id: newQb.id
+      }])
+      .select();
+
+    if (sError || !sessionData || sessionData.length === 0) {
+      return res.status(400).json({ error: sError ? sError.message : "Failed to create session" });
+    }
+
+    const session = sessionData[0];
+    return res.status(201).json({
+      sessionId: session.id,
+      questions: newQb.questions,
+      currentQuestionIndex: 0,
+      firstQuestion: newQb.questions[0],
+      companyName: companyName,
+      level: level || 'medium'
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: err.message });
+  }
+});
+
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
