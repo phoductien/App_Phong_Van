@@ -1,6 +1,6 @@
-# 🚀 X-Interview Pro — Hệ Thống Giả Lập Phỏng Vấn AI Thông Minh
+# 🚀 VietInterview AI — Hệ Thống Giả Lập Phỏng Vấn AI Thông Minh
 
-**X-Interview Pro** là nền tảng luyện tập phỏng vấn và đánh giá năng lực lập trình chuyên sâu dành cho ứng viên công nghệ, tích hợp trợ lý ảo thông minh (Google Gemini AI), giao diện đám mây cấp doanh nghiệp (Cloudscape Design System), và cơ sở dữ liệu thời gian thực (Supabase).
+**VietInterview AI** là nền tảng luyện tập phỏng vấn và đánh giá năng lực lập trình chuyên sâu dành cho ứng viên công nghệ, tích hợp trợ lý ảo thông minh (Google Gemini AI), giao diện đám mây cấp doanh nghiệp (Cloudscape Design System), và cơ sở dữ liệu thời gian thực (Supabase).
 
 Dự án được tối ưu hóa theo mô hình **Fullstack Local-development** nhanh với Frontend React/Vite và Backend Node.js Express.
 
@@ -50,9 +50,9 @@ Truy cập ngay trình duyệt tại địa chỉ mặc định: **`http://local
 
 ---
 
-## 🌟 Chức Năng Nổi Bật Giao Diện (X-Interview UI Replica)
+## 🌟 Chức Năng Nổi Bật Giao Diện (VietInterview AI UI Replica)
 
-Hệ thống được thiết kế tỉ mỉ mô phỏng giao diện của **X-Interview** với các phân hệ chính sau:
+Hệ thống được thiết kế tỉ mỉ mô phỏng giao diện của **VietInterview AI** với các phân hệ chính sau:
 
 1.  **🏠 Trang chủ (Dashboard):** Xem chỉ số tổng hợp của ứng viên (Số phòng vấn đã thi, điểm số trung bình, hoạt động phỏng vấn gần đây) và danh sách việc làm đề xuất.
 2.  **📖 Ngân hàng câu hỏi:** Tra cứu danh mục câu hỏi tuyển dụng chính thức của các tập đoàn (Viettel VCS, VNG, NVIDIA, FPT Smart Cloud, NCS...).
@@ -90,7 +90,7 @@ App_Phong_Van/
 │   └── package.json             # Khai báo thư viện dependencies (Express, Supabase, GenAI)
 └── frontend/                    # Giao diện React/Vite (Cổng 5173)
     ├── src/App.jsx              # Quản lý điều phối giao diện, thanh SideNavigation & chuyển Tab
-    ├── src/index.css            # Nền tảng thiết kế màu sắc, phông chữ Inter và bo góc X-Interview
+    ├── src/index.css            # Nền tảng thiết kế màu sắc, phông chữ Inter và bo góc VietInterview AI
     └── src/components/          # Các phân hệ chức năng giao diện
         ├── Auth.jsx             # Giao diện Đăng nhập Google & Bộ chọn tài khoản
         ├── HomeDashboard.jsx    # Màn hình Trang chủ tổng quan chỉ số

@@ -122,7 +122,7 @@ export default function Auth({ onLoginSuccess }) {
             {/* Header logo / title */}
             <div style={{ textAlign: 'center', marginBottom: '10px' }}>
               <Box variant="h1" style={{ fontSize: '32px', color: '#4f46e5', fontWeight: 'bold', margin: '0 0 6px 0' }}>
-                X-Interview
+                VietInterview AI
               </Box>
               <Box variant="p" color="text-muted">
                 {isSignUp ? 'Đăng ký tài khoản để bắt đầu' : 'Đăng nhập để luyện phỏng vấn cùng AI'}
@@ -271,7 +271,7 @@ export default function Auth({ onLoginSuccess }) {
               <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
             </svg>
             <span style={{ fontSize: '18px', fontWeight: 'bold' }}>Chọn tài khoản</span>
-            <span style={{ fontSize: '13px', color: '#5f6368', marginTop: '4px' }}>để tiếp tục đến X-Interview Pro</span>
+            <span style={{ fontSize: '13px', color: '#5f6368', marginTop: '4px' }}>để tiếp tục đến VietInterview AI</span>
           </div>
         }
       >
@@ -376,7 +376,7 @@ export default function Auth({ onLoginSuccess }) {
           )}
 
           <div style={{ fontSize: '11px', color: '#5f6368', textAlign: 'justify', lineHeight: '1.4', marginTop: '10px' }}>
-            Để tiếp tục, Google sẽ chia sẻ tên, địa chỉ email, tùy chọn ngôn ngữ và ảnh hồ sơ của bạn với X-Interview Pro. Hãy xem Chính sách bảo mật để biết thêm chi tiết.
+            Để tiếp tục, Google sẽ chia sẻ tên, địa chỉ email, tùy chọn ngôn ngữ và ảnh hồ sơ của bạn với VietInterview AI. Hãy xem Chính sách bảo mật để biết thêm chi tiết.
           </div>
         </SpaceBetween>
       </Modal>

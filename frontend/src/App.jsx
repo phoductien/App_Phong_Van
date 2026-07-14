@@ -213,7 +213,7 @@ function App() {
         return (
           <ContentLayout
             header={
-              <Header variant="h1" description="Đang phỏng vấn trực tiếp cùng X-Interview AI Bot.">
+              <Header variant="h1" description="Đang phỏng vấn trực tiếp cùng VietInterview AI Bot.">
                 Phòng Phỏng Vấn AI
               </Header>
             }
@@ -239,7 +239,7 @@ function App() {
       navigation={
         <SideNavigation
           activeHref={activeTab}
-          header={{ href: '#', text: `X-Interview — ${user.full_name || 'User'}` }}
+          header={{ href: '#', text: `VietInterview AI — ${user.full_name || 'User'}` }}
           onFollow={({ detail }) => {
             if (detail.id === 'logout') {
               if (confirm('Bạn có chắc chắn muốn đăng xuất tài khoản?')) {

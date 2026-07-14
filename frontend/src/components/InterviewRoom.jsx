@@ -78,7 +78,7 @@ export default function InterviewRoom({ session, onLeaveSession }) {
           setCompleted(true);
           newLogs.push({
             role: 'ai',
-            content: 'Chúc mừng bạn đã hoàn tất 10 câu hỏi của phiên phỏng vấn thử nghiệm X-Interview. Bạn có thể xem bảng phân tích đánh giá tổng quan ở bảng bên phải.'
+            content: 'Chúc mừng bạn đã hoàn tất các câu hỏi của phiên phỏng vấn thử nghiệm VietInterview AI. Bạn có thể xem bảng phân tích đánh giá tổng quan ở bảng bên phải.'
           });
           setChatLog(newLogs);
         } else {
