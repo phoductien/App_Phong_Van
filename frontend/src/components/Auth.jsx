@@ -46,8 +46,8 @@ export default function Auth({ onLoginSuccess }) {
     const saved = localStorage.getItem('x_google_accounts');
     if (saved) return JSON.parse(saved);
     return [
-      { id: '1', name: 'Đức Tiến', email: 'ductien.dev@gmail.com', avatar: '🍀', role: 'candidate' },
-      { id: '2', name: 'Hoàng Interviewer', email: 'hoang.interviewer@gmail.com', avatar: '🎓', role: 'interviewer' }
+      { id: '1', name: 'Đức Tiến', email: 'ductien.dev@gmail.com', avatar: '🍀', role: 'candidate', tier: 'free' },
+      { id: '2', name: 'Hoàng Interviewer', email: 'hoang.interviewer@gmail.com', avatar: '🎓', role: 'interviewer', tier: 'free' }
     ];
   });
 
@@ -179,7 +179,8 @@ export default function Auth({ onLoginSuccess }) {
             id: 'user-' + Date.now(),
             email: userMatch.email,
             full_name: userMatch.fullName,
-            role: userMatch.role
+            role: userMatch.role,
+            tier: userMatch.tier || 'free'
           });
         }, 1000);
       } else {
@@ -191,7 +192,8 @@ export default function Auth({ onLoginSuccess }) {
             id: 'user-' + Date.now(),
             email: email,
             full_name: email.split('@')[0],
-            role: email.includes('interviewer') ? 'interviewer' : 'candidate'
+            role: email.includes('interviewer') ? 'interviewer' : 'candidate',
+            tier: 'free'
           });
         }, 1000);
       }
@@ -665,7 +667,8 @@ export default function Auth({ onLoginSuccess }) {
                     id: '00000000-0000-0000-0000-000000000000',
                     email: 'guest@vietinterview.com',
                     full_name: 'Đức Tiến',
-                    role: 'candidate'
+                    role: 'candidate',
+                    tier: 'free'
                   });
                   setShowGoogleChooser(false);
                 }}

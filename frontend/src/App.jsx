@@ -214,7 +214,7 @@ function App() {
         );
       case 'pricing':
         return (
-          <Pricing />
+          <Pricing user={user} onUpgradeTier={(newTier) => setUser(prev => ({ ...prev, tier: newTier }))} />
         );
       case 'cv_profile':
         return (
@@ -319,8 +319,16 @@ function App() {
                   🍀
                 </div>
                 <div className="min-w-0 leading-tight">
-                  <div className="text-xs font-bold text-slate-800 truncate">{user.full_name || 'Đức Tiến'}</div>
-                  <div className="text-[10px] text-slate-400 truncate">{user.email}</div>
+                  <div className="text-xs font-bold text-slate-800 truncate flex items-center gap-1.5">
+                    {user?.full_name || 'Đức Tiến'}
+                    {user?.tier === 'pro' && (
+                      <span className="px-1.5 py-0.5 text-[8px] font-extrabold bg-gradient-to-r from-amber-500 to-amber-600 text-white rounded-md tracking-wider uppercase shadow-sm">Pro</span>
+                    )}
+                    {user?.tier === 'enterprise' && (
+                      <span className="px-1.5 py-0.5 text-[8px] font-extrabold bg-gradient-to-r from-purple-500 to-indigo-600 text-white rounded-md tracking-wider uppercase shadow-sm">Enterprise</span>
+                    )}
+                  </div>
+                  <div className="text-[10px] text-slate-400 truncate">{user?.email}</div>
                 </div>
               </div>
               <button
