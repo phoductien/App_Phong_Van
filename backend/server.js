@@ -1099,6 +1099,63 @@ Return a JSON object containing:
   }
 });
 
+// API: Generate questions only (for recruiter review)
+app.post('/api/questions/generate-only', async (req, res) => {
+  const { companyName, positionTitle, jobDescription, level } = req.body;
+  if (!companyName || !positionTitle || !jobDescription) {
+    return res.status(400).json({ error: "Missing required fields" });
+  }
+
+  const apiKey = process.env.GEMINI_API_KEY;
+  let parsedContent = null;
+
+  if (apiKey) {
+    try {
+      const genAI = new GoogleGenerativeAI(apiKey);
+      const model = genAI.getGenerativeModel({
+        model: "gemini-1.5-flash",
+        generationConfig: { responseMimeType: "application/json" }
+      });
+
+      const prompt = `You are a professional hiring manager and technical interviewer.
+Analyze the following job description for the company "${companyName}" and position "${positionTitle}".
+Difficulty Level: "${level || 'medium'}"
+Job Description: "${jobDescription}"
+
+Compile a list of exactly 10 typical technical and behavioral interview questions tailored to this job description.
+Return a JSON object containing:
+- title: string (e.g. "Viettel Cyber Security SOC Analyst Interview")
+- questions: array of exactly 10 strings (each being a clear, comprehensive interview question)`;
+
+      const result = await model.generateContent(prompt);
+      const response = await result.response;
+      parsedContent = JSON.parse(response.text().trim());
+    } catch (err) {
+      console.error("Gemini JD generation error:", err.message);
+    }
+  }
+
+  if (!parsedContent) {
+    parsedContent = {
+      title: `${companyName} - ${positionTitle} Interview Quiz`,
+      questions: [
+        `Hãy giới thiệu bản thân và kinh nghiệm của bạn liên quan đến vai trò ${positionTitle} tại ${companyName}?`,
+        `Theo bạn, kỹ năng quan trọng nhất cần có cho công việc ${positionTitle} này là gì?`,
+        `Bạn giải quyết vấn đề kỹ thuật phức tạp như thế nào trong môi trường thực chiến?`,
+        `Làm thế nào để đảm bảo sản phẩm đạt chất lượng cao nhất?`,
+        `Hãy kể lại một sự cố hệ thống bạn từng xử lý và bài học rút ra?`,
+        `Bạn thiết lập quy trình tự động hóa kiểm thử hoặc deployment như thế nào?`,
+        `Làm thế nào để phối hợp làm việc nhóm hiệu quả khi có bất đồng ý kiến?`,
+        `Bạn cập nhật các xu hướng công nghệ mới như thế nào trong ngành?`,
+        `Bạn tối ưu hiệu năng làm việc cá nhân của mình bằng công cụ nào?`,
+        `Bạn có câu hỏi hay kỳ vọng gì về môi trường làm việc tại ${companyName}?`
+      ]
+    };
+  }
+
+  return res.json(parsedContent);
+});
+
 // API: Crawl and parse JD from URL
 app.post('/api/crawl-jd', async (req, res) => {
   const { url } = req.body;

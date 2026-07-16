@@ -21,9 +21,15 @@ import {
 
 const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:5000';
 
-export default function InterviewerDashboard({ interviewerId = '00000000-0000-0000-0000-000000000000' }) {
+export default function InterviewerDashboard({ 
+  interviewerId = '00000000-0000-0000-0000-000000000000',
+  activeTabId: externalTabId,
+  onTabChange
+}) {
   // Tabs state
-  const [activeTabId, setActiveTabId] = useState('question_banks');
+  const [internalTabId, setInternalTabId] = useState('live_rooms');
+  const activeTabId = externalTabId || internalTabId;
+  const setActiveTabId = onTabChange || setInternalTabId;
 
   // Existing Question Bank Creation states
   const [companies, setCompanies] = useState([]);
@@ -34,6 +40,71 @@ export default function InterviewerDashboard({ interviewerId = '00000000-0000-00
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
+
+  const [crawlUrl, setCrawlUrl] = useState('');
+  const [crawlingJd, setCrawlingJd] = useState(false);
+
+  const handleCrawlAndGenerate = async () => {
+    if (!crawlUrl.trim()) {
+      alert('Vui lòng dán liên kết tuyển dụng.');
+      return;
+    }
+    try {
+      setCrawlingJd(true);
+      setErrorMsg('');
+      setSuccessMsg('');
+      
+      const crawlRes = await fetch(`${API_BASE}/api/crawl-jd`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: crawlUrl })
+      });
+      
+      if (!crawlRes.ok) {
+        throw new Error('Lỗi cào liên kết tuyển dụng.');
+      }
+      
+      const crawlData = await crawlRes.json();
+      const parsedJd = crawlData.data;
+
+      const matchingCompany = companies.find(c => c.label.toLowerCase().includes(parsedJd.company_name.toLowerCase()));
+      if (matchingCompany) {
+        setSelectedCompany(matchingCompany);
+      }
+      
+      setTitle(`${parsedJd.company_name} - ${parsedJd.job_title}`);
+      setLevel({
+        label: parsedJd.level === 'hard' ? 'Senior (hard)' : parsedJd.level === 'easy' ? 'Intern / Fresher (easy)' : 'Junior / Mid (medium)',
+        value: parsedJd.level
+      });
+
+      const genRes = await fetch(`${API_BASE}/api/questions/generate-only`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          companyName: parsedJd.company_name,
+          positionTitle: parsedJd.job_title,
+          jobDescription: parsedJd.desc || parsedJd.requirements.join('\n'),
+          level: parsedJd.level
+        })
+      });
+
+      if (!genRes.ok) {
+        throw new Error('Lỗi tự động sinh câu hỏi bằng AI.');
+      }
+
+      const genData = await genRes.json();
+      if (genData.questions && genData.questions.length === 10) {
+        setQuestions(genData.questions);
+        setSuccessMsg('Đã cào tin và tự động điền 10 câu hỏi phỏng vấn bằng AI thành công! Hãy kiểm tra và chỉnh sửa trước khi lưu.');
+      }
+    } catch (err) {
+      console.error(err);
+      setErrorMsg(err.message || 'Lỗi khi cào tin tuyển dụng.');
+    } finally {
+      setCrawlingJd(false);
+    }
+  };
 
   // Recruiter Dashboard dynamic data states
   const [cvs, setCvs] = useState([]);
@@ -437,6 +508,24 @@ export default function InterviewerDashboard({ interviewerId = '00000000-0000-00
                   }
                 >
                   <SpaceBetween direction="vertical" size="l">
+                    <div style={{ padding: '16px', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '10px', display: 'flex', gap: '12px', alignItems: 'flex-end' }}>
+                      <div style={{ flex: 1 }}>
+                        <FormField label="Dán link tuyển dụng thực tế (TopCV, LinkedIn,...) để AI tự động cào và tạo 10 câu hỏi:">
+                          <Input
+                            value={crawlUrl}
+                            onChange={({ detail }) => setCrawlUrl(detail.value)}
+                            placeholder="https://www.topcv.vn/viec-lam/frontend-developer..."
+                          />
+                        </FormField>
+                      </div>
+                      <Button
+                        variant="normal"
+                        loading={crawlingJd}
+                        onClick={handleCrawlAndGenerate}
+                      >
+                        🕷️ Cào & Tạo Đề Thi
+                      </Button>
+                    </div>
                     <Grid gridDefinition={[{ colspan: 4 }, { colspan: 4 }, { colspan: 4 }]}>
                       <FormField label="Chọn Công Ty">
                         <Select

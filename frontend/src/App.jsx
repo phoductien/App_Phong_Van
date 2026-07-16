@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import '@cloudscape-design/global-styles/index.css';
 import {
   AppLayout,
@@ -23,6 +23,14 @@ function App() {
   const [role, setRole] = useState('candidate'); // 'candidate' or 'interviewer'
   const [activeTab, setActiveTab] = useState('home');
   const [activeSession, setActiveSession] = useState(null);
+  const [recruiterTab, setRecruiterTab] = useState('live_rooms');
+
+  useEffect(() => {
+    if (user && user.role) {
+      setRole(user.role);
+      setActiveTab(user.role === 'interviewer' ? 'interviewer' : 'home');
+    }
+  }, [user]);
 
   const handleStartSession = (sessionInfo) => {
     setActiveSession(sessionInfo);
@@ -114,7 +122,7 @@ function App() {
           </Header>
         }
       >
-        <InterviewerDashboard interviewerId={user?.id} />
+        <InterviewerDashboard interviewerId={user?.id} activeTabId={recruiterTab} onTabChange={setRecruiterTab} />
       </ContentLayout>
     );
   };
@@ -290,7 +298,7 @@ function App() {
       headerSelector="#top-nav-placeholder"
       navigation={
         <SideNavigation
-          activeHref={activeTab}
+          activeHref={activeTab === 'interviewer' ? recruiterTab : activeTab}
           header={{ href: '#', text: `X-Interview — Nhà tuyển dụng` }}
           onFollow={({ detail }) => {
             if (detail.id === 'logout') {
@@ -303,12 +311,21 @@ function App() {
             } else if (detail.id === 'switch_to_candidate') {
               setRole('candidate');
               setActiveTab('home');
+            } else if (detail.id.startsWith('recruiter_')) {
+              setActiveTab('interviewer');
+              if (detail.id === 'recruiter_dashboard') setRecruiterTab('live_rooms');
+              if (detail.id === 'recruiter_jobs_new') setRecruiterTab('question_banks');
+              if (detail.id === 'recruiter_questions') setRecruiterTab('question_banks');
+              if (detail.id === 'recruiter_candidates') setRecruiterTab('results');
             } else {
               setActiveTab(detail.id);
             }
           }}
           items={[
-            { type: 'link', text: '🏢 Bảng quản trị Tuyển dụng', id: 'interviewer' },
+            { type: 'link', text: '🏢 Trang chủ Quản trị', id: 'recruiter_dashboard' },
+            { type: 'link', text: '📝 Đăng tin tuyển dụng', id: 'recruiter_jobs_new' },
+            { type: 'link', text: '📚 Ngân hàng câu hỏi tuyển dụng', id: 'recruiter_questions' },
+            { type: 'link', text: '👥 Danh sách ứng viên', id: 'recruiter_candidates' },
             { type: 'divider' },
             { type: 'link', text: '👤 Chế độ: Ứng viên 🔄', id: 'switch_to_candidate' },
             { type: 'divider' },
@@ -316,7 +333,7 @@ function App() {
           ]}
         />
       }
-      content={renderContent()}
+      content={renderRecruiterContent()}
       toolsHide={true}
     />
   );
