@@ -1,6 +1,6 @@
-# 🚀 X-Interview — Hệ Thống Giả Lập Phỏng Vấn AI MVP Thông Minh
+# 🚀 Viet-Interview — Hệ Thống Giả Lập Phỏng Vấn AI MVP Thông Minh
 
-**X-Interview** là nền tảng luyện tập phỏng vấn giả lập và đánh giá năng lực lập trình chuyên sâu dành cho ứng viên công nghệ, tích hợp trợ lý ảo thông minh (Google Gemini AI), giao diện quản trị doanh nghiệp (Cloudscape Design System), trang chủ ứng viên custom (Tailwind CSS), và cơ sở dữ liệu thời gian thực (Supabase).
+**Viet-Interview** là nền tảng luyện tập phỏng vấn giả lập và đánh giá năng lực lập trình chuyên sâu dành cho ứng viên công nghệ, tích hợp trợ lý ảo thông minh (Google Gemini AI), giao diện quản trị doanh nghiệp (Cloudscape Design System), trang chủ ứng viên custom (Tailwind CSS), và cơ sở dữ liệu thời gian thực (Supabase).
 
 Dự án được phát triển theo mô hình **Fullstack Local-development** với Frontend React/Vite và Backend Node.js Express.
 
@@ -30,7 +30,16 @@ SUPABASE_URL=your_supabase_project_url
 SUPABASE_KEY=your_supabase_anon_key
 ```
 
-### Bước 2: Khởi động Backend API Server
+### Bước 2: Thiết lập biến môi trường cho Frontend (Tùy chọn cho Google Login thật)
+Tạo tệp `.env` trong thư mục [frontend/](file:///d:/ThucTapDN/App_Phong_Van/frontend/) (sao chép từ `.env.example`):
+```env
+VITE_API_BASE=http://localhost:5000
+VITE_SUPABASE_URL=your_supabase_project_url
+VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+```
+*(Nếu không điền thông tin Supabase ở Frontend, hệ thống sẽ tự động chuyển đổi sang giao diện Mock Google Chooser để bạn test thử nghiệm nhanh chóng)*.
+
+### Bước 3: Khởi động Backend API Server
 Mở terminal tại thư mục [backend/](file:///d:/ThucTapDN/App_Phong_Van/backend/) và chạy:
 ```bash
 npm install
@@ -38,7 +47,7 @@ npm start
 ```
 Server backend sẽ chạy tại: **`http://localhost:5000`** 🚀
 
-### Bước 3: Khởi động Frontend Client (React)
+### Bước 4: Khởi động Frontend Client (React)
 Mở một cửa sổ terminal mới độc lập tại thư mục [frontend/](file:///d:/ThucTapDN/App_Phong_Van/frontend/):
 ```bash
 npm install
@@ -48,15 +57,19 @@ Truy cập ngay trình duyệt tại địa chỉ mặc định: **`http://local
 
 ---
 
-## 🌟 Chức Năng Nổi Bật Giao Diện (X-Interview MVP Features)
+## 🌟 Chức Năng Nổi Bật Giao Diện (Viet-Interview MVP Features)
 
-1.  **🔐 Giao Diện Đăng ký / Đăng nhập Custom:** Thiết kế hiện đại bằng Tailwind CSS, hỗ trợ ẩn/hiện mật khẩu, đồng ý điều khoản sử dụng và cơ chế giả lập đăng nhập nhanh qua Google.
-2.  **🏠 Trang chủ Ứng viên (Candidate Dashboard):** Xem chỉ số tổng hợp (Số lượt phỏng vấn, phòng vấn đã hoàn thành, đơn ứng tuyển đã gửi, điểm trung bình) và danh sách việc làm đề xuất.
-3.  **📖 Ngân hàng câu hỏi:** Tra cứu danh mục câu hỏi tuyển dụng chính thức của các tập đoàn (Viettel VCS, VNG, NVIDIA, FPT Smart Cloud...).
-4.  **📹 Luyện tập phỏng vấn & Khóa Phòng Chờ:** Cấu hình phòng phỏng vấn thử, tải lên CV. Đồng hồ đếm ngược 30 phút sẽ chỉ kích hoạt chạy khi phát hiện Nhà tuyển dụng nhấn nút tham gia phòng từ Dashboard của họ.
-5.  **💼 Việc làm & Smart Scraping:** Giao diện chia đôi màn hình. Đặc biệt, hỗ trợ dán liên kết tuyển dụng bất kỳ từ web và sử dụng Cheerio + Gemini AI bóc tách thông tin JD tự động để tạo đề thi phỏng vấn ngay lập tức.
-6.  **🏆 Gói dịch vụ & 📝 Blog:** Trang hiển thị các gói thành viên (Cơ bản, Chuyên nghiệp, Doanh nghiệp) và trang chia sẻ cẩm nang phỏng vấn IT hữu ích.
-7.  **🏢 Dành cho Doanh nghiệp (Recruiter):** Bảng giám sát các phòng live, xem webcam phân tích biểu cảm hành vi AI (Gaze Context), quản lý danh sách CV và tạo ngân hàng câu hỏi.
+1.  **🔐 Giao Diện Đăng ký / Đăng nhập Custom:** Thiết kế chia đôi màn hình (split-screen) cao cấp bằng Tailwind CSS. Cột trái giới thiệu thương hiệu **Viet-Interview** sang trọng, bản quyền **© 2026 HKT Software**. Cột phải là Form điền thông tin, hỗ trợ toggle ẩn/hiện mật khẩu, **chọn vai trò đăng ký (Ứng viên / Nhà tuyển dụng)** chống trùng lặp email và nút Đăng nhập Google với logo 4 màu chuẩn xác.
+2.  **📁 Tải lên CV từ thiết bị (Local Device File Upload):** Hỗ trợ chọn file trực tiếp từ máy tính/thiết bị của bạn (.pdf, .doc, .docx). Frontend mã hóa Base64 và backend tự động giải mã, ghi file vật lý vào ổ đĩa và liên kết vào hệ thống phỏng vấn lập tức.
+3.  **🏠 Trang chủ Ứng viên (Candidate Dashboard):** Xem chỉ số tổng hợp (Số lượt phỏng vấn, phòng vấn đã hoàn thành, đơn ứng tuyển đã gửi, điểm trung bình) và danh sách việc làm đề xuất.
+4.  **📖 Ngân hàng câu hỏi:** Tra cứu danh mục câu hỏi tuyển dụng chính thức của các tập đoàn (Viettel VCS, VNG, NVIDIA, FPT Smart Cloud...).
+5.  **📹 Luyện tập phỏng vấn & Khóa Phòng Chờ:** Cấu hình phòng phỏng vấn thử, tải lên CV. Đồng hồ đếm ngược 30 phút sẽ chỉ kích hoạt chạy khi phát hiện Nhà tuyển dụng nhấn nút tham gia phòng từ Dashboard của họ.
+6.  **🏆 Gói dịch vụ & Cổng thanh toán giả lập (Simulated SaaS Paywall):**
+    *   Trang trí các gói dịch vụ (Free, Pro, Enterprise). Tích hợp cổng thanh toán Sandbox mô phỏng chuyển khoản QR, Thẻ Visa/Mastercard hoặc Ví MoMo.
+    *   Thanh toán thành công sẽ cấp huy hiệu **`PRO`** hoặc **`ENTERPRISE`** sang trọng cạnh tên người dùng ở Sidebar.
+    *   **Khóa mờ (Blur lock)**: Nếu tài khoản là Free, biểu đồ 3 trục điểm số chi tiết và phần Nhận xét chuyên sâu của AI trong phòng phỏng vấn sẽ bị khóa mờ, chỉ mở khóa khi nâng cấp Pro. Giới hạn tài khoản Free tối đa 3 lượt phỏng vấn thử.
+7.  **💼 Việc làm & Smart Scraping:** Giao diện chia đôi màn hình. Đặc biệt, hỗ trợ dán liên kết tuyển dụng bất kỳ từ web và sử dụng Cheerio + Gemini AI bóc tách thông tin JD tự động để tạo đề thi phỏng vấn ngay lập tức.
+8.  **🏢 Dành cho Doanh nghiệp (Recruiter):** Bảng giám sát các phòng live, xem webcam phân tích biểu cảm hành vi AI (Gaze Context), quản lý danh sách CV và tạo ngân hàng câu hỏi.
 
 ---
 
@@ -75,7 +88,8 @@ Truy cập ngay trình duyệt tại địa chỉ mặc định: **`http://local
 1. Truy cập Vercel Dashboard, nhấn **Add New -> Project** và liên kết với kho lưu trữ git chứa mã nguồn.
 2. Chọn thư mục gốc là `frontend`.
 3. Thiết lập biến môi trường:
-   - `VITE_API_BASE`: Địa chỉ URL của Backend Server sau khi deploy lên Render/Railway (ví dụ: `https://x-interview-api.onrender.com`).
+   - `VITE_API_BASE`: Địa chỉ URL của Backend Server sau khi deploy lên Render/Railway (ví dụ: `https://viet-interview-api.onrender.com`).
+   - `VITE_SUPABASE_URL` và `VITE_SUPABASE_ANON_KEY`: Địa chỉ kết nối Supabase của bạn.
 4. Nhấn **Deploy**.
 
 ### 2. Triển khai Backend lên Render hoặc Railway
@@ -112,5 +126,6 @@ App_Phong_Van/
         ├── InterviewRoom.jsx    # Phòng chat thi phỏng vấn trực tiếp với AI
         ├── JobsDashboard.jsx    # Giao diện tuyển dụng chia đôi màn hình
         ├── QuestionBankViewer.jsx # Tra cứu bộ câu hỏi tuyển dụng của các doanh nghiệp
+        ├── Pricing.jsx          # Cổng thanh toán giả lập Sandbox & Bảng giá VIP
         └── InterviewerDashboard.jsx # Bảng cấu hình quản trị đề thi của phỏng vấn viên
 ```
