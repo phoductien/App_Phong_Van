@@ -17,6 +17,7 @@ if (supabaseUrl && supabaseAnonKey && supabaseUrl !== 'your_supabase_project_url
 
 export default function Auth({ onLoginSuccess }) {
   const [isSignUp, setIsSignUp] = useState(false);
+  const [signupRole, setSignupRole] = useState('candidate');
   
   // Form fields
   const [fullName, setFullName] = useState('');
@@ -35,40 +36,24 @@ export default function Auth({ onLoginSuccess }) {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  // Google account list
-  const [googleAccounts, setGoogleAccounts] = useState([]);
+  // Custom mock Google accounts chooser modal
   const [showGoogleChooser, setShowGoogleChooser] = useState(false);
   const [showNewGoogleForm, setShowNewGoogleForm] = useState(false);
   const [newGoogleName, setNewGoogleName] = useState('');
   const [newGoogleEmail, setNewGoogleEmail] = useState('');
 
-  // Load saved Google accounts on mount
-  useEffect(() => {
+  const [googleAccounts, setGoogleAccounts] = useState(() => {
     const saved = localStorage.getItem('x_google_accounts');
-    if (saved) {
-      setGoogleAccounts(JSON.parse(saved));
-    } else {
-      const defaults = [
-        { id: 'g-1', name: 'Đức Tiến', email: 'ductien.dev@gmail.com', avatar: '🍀', role: 'candidate' },
-        { id: 'g-2', name: 'Hoàng Interviewer', email: 'hoang.interviewer@gmail.com', avatar: '🎓', role: 'interviewer' }
-      ];
-      localStorage.setItem('x_google_accounts', JSON.stringify(defaults));
-      setGoogleAccounts(defaults);
-    }
-  }, []);
+    if (saved) return JSON.parse(saved);
+    return [
+      { id: '1', name: 'Đức Tiến', email: 'ductien.dev@gmail.com', avatar: '🍀', role: 'candidate' },
+      { id: '2', name: 'Hoàng Interviewer', email: 'hoang.interviewer@gmail.com', avatar: '🎓', role: 'interviewer' }
+    ];
+  });
 
   const handleSelectGoogleAccount = (acc) => {
-    setLoading(true);
+    onLoginSuccess(acc);
     setShowGoogleChooser(false);
-    setTimeout(() => {
-      setLoading(false);
-      onLoginSuccess({
-        id: acc.id,
-        email: acc.email,
-        full_name: acc.name,
-        role: acc.role || 'candidate'
-      });
-    }, 600);
   };
 
   const handleRegisterNewGoogleAccount = (e) => {
@@ -133,10 +118,26 @@ export default function Auth({ onLoginSuccess }) {
         return;
       }
 
+      // Check for duplicate emails in local storage
+      const localUsers = JSON.parse(localStorage.getItem('x_local_users') || '[]');
+      if (localUsers.some(u => u.email.toLowerCase() === email.toLowerCase())) {
+        setErrorMsg('Email này đã được đăng ký trên hệ thống.');
+        return;
+      }
+
       setLoading(true);
       setTimeout(() => {
         setLoading(false);
         
+        // Save user details to local storage
+        localUsers.push({
+          email: email.toLowerCase(),
+          password: password,
+          fullName: fullName,
+          role: signupRole
+        });
+        localStorage.setItem('x_local_users', JSON.stringify(localUsers));
+
         // Save to unverified emails list to block direct login
         const unverified = JSON.parse(localStorage.getItem('x_unverified_emails') || '[]');
         if (!unverified.includes(email)) {
@@ -162,16 +163,38 @@ export default function Auth({ onLoginSuccess }) {
         return;
       }
 
-      setLoading(true);
-      setTimeout(() => {
-        setLoading(false);
-        onLoginSuccess({
-          id: 'user-' + Date.now(),
-          email: email,
-          full_name: email.split('@')[0],
-          role: email.includes('interviewer') ? 'interviewer' : 'candidate'
-        });
-      }, 1000);
+      // Verify login details from local storage
+      const localUsers = JSON.parse(localStorage.getItem('x_local_users') || '[]');
+      const userMatch = localUsers.find(u => u.email.toLowerCase() === email.toLowerCase());
+
+      if (userMatch) {
+        if (userMatch.password !== password) {
+          setErrorMsg('Mật khẩu nhập vào không chính xác.');
+          return;
+        }
+        setLoading(true);
+        setTimeout(() => {
+          setLoading(false);
+          onLoginSuccess({
+            id: 'user-' + Date.now(),
+            email: userMatch.email,
+            full_name: userMatch.fullName,
+            role: userMatch.role
+          });
+        }, 1000);
+      } else {
+        // Fallback auto-resolve logic for quick development login
+        setLoading(true);
+        setTimeout(() => {
+          setLoading(false);
+          onLoginSuccess({
+            id: 'user-' + Date.now(),
+            email: email,
+            full_name: email.split('@')[0],
+            role: email.includes('interviewer') ? 'interviewer' : 'candidate'
+          });
+        }, 1000);
+      }
     }
   };
 
@@ -282,24 +305,54 @@ export default function Auth({ onLoginSuccess }) {
 
             <form className="space-y-5" onSubmit={handleEmailAuth}>
               {isSignUp && (
-                <div>
-                  <label className="block text-sm font-medium text-slate-700">Họ và tên</label>
-                  <div className="mt-1.5 relative rounded-md shadow-sm">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
-                      <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                      </svg>
+                <>
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700">Họ và tên</label>
+                    <div className="mt-1.5 relative rounded-md shadow-sm">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                        <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                        </svg>
+                      </div>
+                      <input
+                        type="text"
+                        required
+                        value={fullName}
+                        onChange={(e) => setFullName(e.target.value)}
+                        className="block w-full pl-10 pr-3 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm placeholder-slate-400 bg-slate-50/50"
+                        placeholder="Nguyễn Văn A"
+                      />
                     </div>
-                    <input
-                      type="text"
-                      required
-                      value={fullName}
-                      onChange={(e) => setFullName(e.target.value)}
-                      className="block w-full pl-10 pr-3 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm placeholder-slate-400 bg-slate-50/50"
-                      placeholder="Nguyễn Văn A"
-                    />
                   </div>
-                </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700">Tôi muốn đăng ký là</label>
+                    <div className="mt-1.5 flex gap-3">
+                      <button
+                        type="button"
+                        onClick={() => setSignupRole('candidate')}
+                        className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl border text-sm font-semibold transition duration-150 ${
+                          signupRole === 'candidate'
+                            ? 'border-indigo-600 bg-indigo-50 text-indigo-700'
+                            : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50'
+                        }`}
+                      >
+                        <span>💼 Ứng viên</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setSignupRole('interviewer')}
+                        className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl border text-sm font-semibold transition duration-150 ${
+                          signupRole === 'interviewer'
+                            ? 'border-indigo-600 bg-indigo-50 text-indigo-700'
+                            : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50'
+                        }`}
+                      >
+                        <span>🏢 Nhà tuyển dụng</span>
+                      </button>
+                    </div>
+                  </div>
+                </>
               )}
 
               <div>
