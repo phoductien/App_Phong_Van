@@ -3,17 +3,54 @@ const express = require('express');
 const cors = require('cors');
 const { createClient } = require('@supabase/supabase-js');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
+const axios = require('axios');
+const cheerio = require('cheerio');
 
-const evaluateAnswerWithAI = async (currentQuestion, level, answer) => {
+const getInterviewerRole = (index) => {
+  if (index >= 0 && index <= 3) {
+    return { role: 'Tech Lead', name: 'Anh Hùng (Tech Lead)' };
+  } else if (index >= 4 && index <= 6) {
+    return { role: 'PM', name: 'Chị Mai (Project Manager)' };
+  } else {
+    return { role: 'HR', name: 'Chị Lan (HR Manager)' };
+  }
+};
+
+const evaluateAnswerWithAI = async (currentQuestion, level, answer, chatHistory, companyName, positionTitle, currentIndex) => {
+  const interviewer = getInterviewerRole(currentIndex);
+  
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
     // Return rich simulated score breakdown if no API key is set
+    const isOffTopic = answer.trim().length < 5 || 
+                       (!answer.toLowerCase().includes('react') && 
+                        !answer.toLowerCase().includes('node') && 
+                        !answer.toLowerCase().includes('java') && 
+                        !answer.toLowerCase().includes('devops') && 
+                        !answer.toLowerCase().includes('docker') && 
+                        !answer.toLowerCase().includes('git') && 
+                        !answer.toLowerCase().includes('hệ thống') && 
+                        !answer.toLowerCase().includes('luật') && 
+                        !answer.toLowerCase().includes('kinh nghiệm') &&
+                        answer.toLowerCase().split(' ').length < 3);
+
+    if (isOffTopic) {
+      return {
+        score: 0,
+        techScore: 0,
+        commScore: 0,
+        confScore: 0,
+        feedback: `[Hội đồng Phỏng vấn] Cảnh báo: Vui lòng trả lời tập trung vào chuyên môn phỏng vấn và câu hỏi đặt ra. Tránh trả lời lạc đề hoặc phiếm chuyện ngoài lề.`,
+        sampleAnswer: `Ví dụ câu trả lời tham khảo: Em sẽ giải thích khái niệm này một cách ngắn gọn, tập trung vào lợi ích kỹ thuật...`
+      };
+    }
+
     const score = Math.floor(Math.random() * 4) + 6; // 6 to 9
     const techScore = score;
     const commScore = Math.min(10, score + (Math.random() > 0.5 ? 1 : -1));
     const confScore = Math.min(10, score + (Math.random() > 0.5 ? 2 : 0));
-    const feedback = `[Giả lập AI] Trả lời khá tốt câu hỏi: "${currentQuestion}". Điểm đánh giá: ${score}/10. Tuy nhiên cần bổ sung thêm các trường hợp thực tế để nâng cao tính thuyết phục.`;
-    return { score, techScore, commScore, confScore, feedback };
+    const feedback = `[Giả lập - ${interviewer.name}] Phản hồi khá tốt câu hỏi: "${currentQuestion}". Bạn cần trả lời tự tin và lấy thêm nhiều ví dụ dự án thực tế hơn nữa.`;
+    return { score, techScore, commScore, confScore, feedback, sampleAnswer: "Em đã ứng dụng kiến thức này trong dự án X bằng cách..." };
   }
 
   try {
@@ -23,17 +60,42 @@ const evaluateAnswerWithAI = async (currentQuestion, level, answer) => {
       generationConfig: { responseMimeType: "application/json" }
     });
 
-    const prompt = `Evaluate the candidate's answer for the following technical interview question.
-Question: "${currentQuestion}"
-Difficulty Level: "${level}" (ez = Intern/Fresher, medium = Junior, hard = Senior)
-Candidate's Answer: "${answer}"
+    const formattedHistory = chatHistory.slice(-4).map(h => {
+      if (h.role === 'candidate') return `Candidate: ${h.content}`;
+      if (h.role === 'ai_evaluation') return `Interviewer Feedback: ${h.feedback}`;
+      return `Interviewer: ${h.content}`;
+    }).join('\n');
 
-Return a JSON object containing:
-- score: overall average score out of 10 (number, 0-10)
-- techScore: hard skills score out of 10 (number, 0-10)
-- commScore: soft skills score out of 10 (number, 0-10)
-- confScore: confidence score out of 10 (number, 0-10)
-- feedback: detailed, constructive feedback in Vietnamese (string)`;
+    const prompt = `Bạn đang đóng vai là thành viên của Hội đồng phỏng vấn tại công ty "${companyName}" cho vị trí "${positionTitle}".
+Người phỏng vấn hiện tại: "${interviewer.name}" (Vai trò: ${interviewer.role}).
+Độ khó câu hỏi: "${level}" (easy = Intern/Fresher, medium = Junior, hard = Senior).
+
+Câu hỏi vừa đặt: "${currentQuestion}"
+Câu trả lời của ứng viên: "${answer}"
+
+Lịch sử đối thoại gần đây:
+${formattedHistory}
+
+Nhiệm vụ của bạn là:
+1. Đánh giá xem câu trả lời của ứng viên có bị lạc đề hoàn toàn hoặc đùa giỡn, nói nhảm nhí hay không. Nếu lạc đề/nói nhảm nhí: set score, techScore, commScore, confScore đồng loạt bằng 0, viết nhận xét nhắc nhở ứng viên tập trung (Anti-derailment).
+2. Nếu ứng viên trả lời nghiêm túc, hãy chấm điểm chi tiết trên thang điểm 10 cho:
+   - techScore (Kiến thức chuyên môn kỹ thuật)
+   - commScore (Khả năng diễn đạt, giao tiếp truyền tải thông tin)
+   - confScore (Độ tự tin, sự quyết đoán trong câu trả lời)
+   - score (Điểm trung bình cộng của 3 điểm trên)
+3. Viết nhận xét (feedback) bằng Tiếng Việt thân thiện, mang tính xây dựng dưới góc nhìn của "${interviewer.name}".
+4. Đưa ra một câu trả lời mẫu tối ưu (sampleAnswer) bằng Tiếng Việt để ứng viên có thể học hỏi và tham khảo.
+
+Hãy trả về một đối tượng JSON duy nhất có cấu trúc sau:
+{
+  "score": 8,
+  "techScore": 8,
+  "commScore": 9,
+  "confScore": 7,
+  "feedback": "Nhận xét chi tiết...",
+  "sampleAnswer": "Câu trả lời mẫu tối ưu..."
+}
+Chú ý: Chỉ trả về JSON hợp lệ, không bọc trong thẻ markdown \`\`\`json.`;
 
     const result = await model.generateContent(prompt);
     const response = await result.response;
@@ -43,7 +105,8 @@ Return a JSON object containing:
       techScore: parsed.techScore || 7,
       commScore: parsed.commScore || 7,
       confScore: parsed.confScore || 7,
-      feedback: parsed.feedback || "Cảm ơn câu trả lời của bạn."
+      feedback: parsed.feedback || "Cảm ơn câu trả lời của bạn.",
+      sampleAnswer: parsed.sampleAnswer || "Em sẽ tìm hiểu thêm về chủ đề này."
     };
   } catch (err) {
     console.error("Gemini API error, falling back to mock evaluation:", err.message);
@@ -53,7 +116,8 @@ Return a JSON object containing:
       techScore: 7,
       commScore: 7,
       confScore: 8,
-      feedback: `Đã nhận câu trả lời. [Lỗi kết nối Gemini API: ${err.message}]`
+      feedback: `Đã nhận câu trả lời. [Lỗi kết nối Gemini API: ${err.message}]`,
+      sampleAnswer: "Ví dụ: Em sẽ tiếp cận vấn đề theo cấu trúc..."
     };
   }
 };
@@ -61,6 +125,8 @@ Return a JSON object containing:
 const app = express();
 app.use(cors());
 app.use(express.json());
+
+global.recruiterJoinedSessions = {};
 
 const SUPABASE_URL = process.env.SUPABASE_URL || '';
 const SUPABASE_KEY = process.env.SUPABASE_KEY || '';
@@ -394,14 +460,15 @@ app.post('/api/sessions/answer', async (req, res) => {
     const targetCompany = comp ? comp.name : "Doanh nghiệp đối tác";
     const targetPosition = session.question_bank.title || "Lập trình viên";
 
-    // Call AI evaluator with complete context & memory history
+    // Call AI evaluator with complete context, memory history, and index
     const evaluation = await evaluateAnswerWithAI(
       currentQuestion, 
-      session.level || 'medium', 
+      session.question_bank.level || 'medium', 
       answer,
       session.chat_history || [],
       targetCompany,
-      targetPosition
+      targetPosition,
+      currentIndex
     );
 
     session.chat_history.push({
@@ -418,6 +485,7 @@ app.post('/api/sessions/answer', async (req, res) => {
       commScore: evaluation.commScore,
       confScore: evaluation.confScore,
       feedback: evaluation.feedback,
+      sampleAnswer: evaluation.sampleAnswer,
       timestamp: new Date().toISOString()
     });
 
@@ -432,6 +500,7 @@ app.post('/api/sessions/answer', async (req, res) => {
       currentQuestionIndex: nextIndex,
       isCompleted,
       feedback: evaluation.feedback,
+      sampleAnswer: evaluation.sampleAnswer,
       scores: {
         techScore: evaluation.techScore,
         commScore: evaluation.commScore,
@@ -465,14 +534,15 @@ app.post('/api/sessions/answer', async (req, res) => {
   const targetCompany = session.question_banks && session.question_banks.companies ? session.question_banks.companies.name : "Doanh nghiệp đối tác";
   const targetPosition = session.question_banks ? session.question_banks.title : "Lập trình viên";
 
-  // Call AI evaluator with complete context & memory history
+  // Call AI evaluator with complete context, memory history, and index
   const evaluation = await evaluateAnswerWithAI(
     currentQuestion, 
     session.question_banks.level || 'medium', 
     answer,
     session.chat_history || [],
     targetCompany,
-    targetPosition
+    targetPosition,
+    currentIndex
   );
 
   const updatedHistory = [...session.chat_history];
@@ -484,15 +554,35 @@ app.post('/api/sessions/answer', async (req, res) => {
     commScore: evaluation.commScore,
     confScore: evaluation.confScore,
     feedback: evaluation.feedback, 
+    sampleAnswer: evaluation.sampleAnswer,
     timestamp: new Date().toISOString() 
   });
 
   const nextIndex = currentIndex + 1;
   const isCompleted = nextIndex >= questions.length;
 
+  let finalScores = null;
+  if (isCompleted) {
+    const evaluations = updatedHistory.filter(h => h.role === 'ai_evaluation');
+    const totalTech = evaluations.reduce((acc, curr) => acc + (curr.techScore || 0), 0);
+    const totalComm = evaluations.reduce((acc, curr) => acc + (curr.commScore || 0), 0);
+    const totalConf = evaluations.reduce((acc, curr) => acc + (curr.confScore || 0), 0);
+    const count = evaluations.length || 1;
+    finalScores = {
+      techScore: parseFloat((totalTech / count).toFixed(1)),
+      commScore: parseFloat((totalComm / count).toFixed(1)),
+      confScore: parseFloat((totalConf / count).toFixed(1))
+    };
+  }
+
   const { data: updatedSession, error: uError } = await supabase
     .from('interview_sessions')
-    .update({ current_question_index: nextIndex, chat_history: updatedHistory, status: isCompleted ? 'completed' : 'ongoing' })
+    .update({ 
+      current_question_index: nextIndex, 
+      chat_history: updatedHistory, 
+      status: isCompleted ? 'completed' : 'ongoing',
+      scores: finalScores
+    })
     .eq('id', sessionId)
     .select();
 
@@ -502,6 +592,7 @@ app.post('/api/sessions/answer', async (req, res) => {
     currentQuestionIndex: nextIndex,
     isCompleted,
     feedback: evaluation.feedback,
+    sampleAnswer: evaluation.sampleAnswer,
     scores: {
       techScore: evaluation.techScore,
       commScore: evaluation.commScore,
@@ -1005,6 +1096,82 @@ Return a JSON object containing:
   } catch (err) {
     console.error(err);
     return res.status(500).json({ error: err.message });
+  }
+});
+
+// API: Crawl and parse JD from URL
+app.post('/api/crawl-jd', async (req, res) => {
+  const { url } = req.body;
+  if (!url) return res.status(400).json({ error: "Missing url" });
+
+  try {
+    // 1. Fetch raw HTML
+    const response = await axios.get(url, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+      },
+      timeout: 10000
+    });
+    
+    const html = response.data;
+    
+    // 2. Load and parse with Cheerio
+    const $ = cheerio.load(html);
+    
+    // Remove unwanted script & style elements
+    $('script, style, nav, footer, header, iframe, noscript').remove();
+    
+    // Extract raw text
+    const rawText = $('body').text().replace(/\s+/g, ' ').trim().substring(0, 10000);
+
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) {
+      // Mock/fallback parser when Gemini key is missing
+      const titleMatch = rawText.match(/(frontend|backend|fullstack|devops|security|engineer|developer|luật|trợ lý)/i);
+      const companyMatch = url.match(/https?:\/\/(?:www\.)?([^\/\.]+)/i);
+      
+      const parsedMock = {
+        company_name: companyMatch ? companyMatch[1].toUpperCase() : "Doanh nghiệp đối tác",
+        job_title: titleMatch ? `${titleMatch[0]} Developer` : "Kỹ sư lập trình chuyên nghiệp",
+        level: rawText.toLowerCase().includes('senior') ? 'hard' : rawText.toLowerCase().includes('intern') ? 'easy' : 'medium',
+        requirements: ["Hiểu sâu về kiến trúc ứng dụng & tối ưu hiệu năng", "Khả năng tư duy logic và kỹ năng giải quyết vấn đề tốt", "Tiếng Anh chuyên ngành đọc hiểu tài liệu kỹ thuật"],
+        desc: rawText.substring(0, 500) + "..."
+      };
+      
+      return res.json({ success: true, data: parsedMock });
+    }
+
+    // 3. AI Extraction
+    const genAI = new GoogleGenerativeAI(apiKey);
+    const model = genAI.getGenerativeModel({
+      model: "gemini-1.5-flash",
+      generationConfig: { responseMimeType: "application/json" }
+    });
+
+    const prompt = `Hãy phân tích nội dung tuyển dụng dưới đây và trích xuất ra thông tin có cấu trúc dưới định dạng JSON.
+Chỉ trả về JSON hợp lệ, không chứa mã markdown hoặc văn bản giải thích ngoài lề.
+
+Cấu trúc JSON mong muốn:
+{
+  "company_name": "Tên công ty tuyển dụng",
+  "job_title": "Tiêu đề công việc (ví dụ: Frontend Developer, Node.js Engineer...)",
+  "level": "Cấp độ yêu cầu: easy (Intern/Fresher), medium (Junior/Mid), hard (Senior/Lead)",
+  "requirements": ["Yêu cầu 1", "Yêu cầu 2", "Yêu cầu 3", ...],
+  "desc": "Tóm tắt ngắn gọn mô tả công việc (khoảng 3-4 câu)"
+}
+
+Nội dung tuyển dụng:
+${rawText}`;
+
+    const result = await model.generateContent(prompt);
+    const textResponse = await result.response;
+    const parsed = JSON.parse(textResponse.text().trim());
+
+    return res.json({ success: true, data: parsed });
+
+  } catch (err) {
+    console.error("Smart scraping error:", err.message);
+    return res.status(500).json({ error: `Không thể tải hoặc phân tích nội dung từ liên kết: ${err.message}` });
   }
 });
 

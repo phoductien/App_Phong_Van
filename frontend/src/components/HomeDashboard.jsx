@@ -1,16 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import {
-  Container,
-  Header,
-  SpaceBetween,
-  Button,
-  Grid,
-  Box,
-  Badge,
-  Input,
-  Table,
-  Spinner
-} from '@cloudscape-design/components';
 
 export default function HomeDashboard({ user, onNavigateToTab, onStartQuickInterview }) {
   const [sessions, setSessions] = useState([]);
@@ -36,198 +24,224 @@ export default function HomeDashboard({ user, onNavigateToTab, onStartQuickInter
     fetchSessions();
   }, [candidateId]);
 
-  // Filter completed sessions for the activity log table
+  // Filter completed sessions
   const completedSessions = sessions.filter(s => s.status === 'completed');
   const totalCount = sessions.length;
   const completedCount = completedSessions.length;
 
-  // Calculate average score of completed sessions
+  // Average score
   const validScores = completedSessions.map(s => parseFloat(s.score)).filter(score => !isNaN(score));
   const avgScore = validScores.length > 0 
     ? (validScores.reduce((acc, curr) => acc + curr, 0) / validScores.length).toFixed(1) 
     : "0.0";
 
   const stats = [
-    { label: 'Tổng số phòng phỏng vấn 📹', value: totalCount.toString() },
-    { label: 'Phòng vấn đã hoàn thành ✅', value: completedCount.toString() },
-    { label: 'Đơn ứng tuyển đã gửi ✉️', value: Math.ceil(completedCount * 0.5).toString() },
-    { label: 'Điểm trung bình 📊', value: `${avgScore} / 10` }
+    { label: 'Tổng số phòng phỏng vấn', value: totalCount.toString(), icon: '📹' },
+    { label: 'Phòng vấn đã hoàn thành', value: completedCount.toString(), icon: '✅' },
+    { label: 'Đơn ứng tuyển đã gửi', value: Math.ceil(completedCount * 0.5).toString(), icon: '✉️' },
+    { label: 'Điểm trung bình', value: `${avgScore}%`, icon: '📊' }
   ];
 
   const suggestedJobs = [
-    { title: 'Trợ lý Luật sư', company: 'Công ty Luật TNHH Everest', tags: ['Thỏa thuận', 'Làm việc từ xa'] },
-    { title: 'Luật sư cộng sự', company: 'Công ty Luật TNHH Everest', tags: ['Thỏa thuận', 'Làm việc từ xa'] }
+    { title: 'Trợ lý Luật sư', company: 'Công ty Luật TNHH Everest', location: 'Hà Nội', type: 'Làm việc từ xa', logo: '🏢' },
+    { title: 'Luật sư cộng sự', company: 'Công ty Luật TNHH Everest', location: 'Hà Nội', type: 'Làm việc từ xa', logo: '⚖️' }
   ];
 
   return (
-    <SpaceBetween size="l" direction="vertical">
-      {/* Welcome Banner */}
-      <div>
-        <Box variant="h2" style={{ fontSize: '24px', fontWeight: 'bold', margin: '0 0 4px 0' }}>
-          Chào mừng trở lại, {user?.full_name || 'Ứng viên'}!
-        </Box>
-        <Box variant="p" color="text-muted">
-          Đây là tổng quan về hành trình chuẩn bị phỏng vấn của bạn.
-        </Box>
+    <div className="space-y-8 font-sans">
+      {/* Header and greeting */}
+      <div className="flex justify-between items-center">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-800 tracking-tight">
+            Chào mừng trở lại, {user?.full_name || 'Đức Tiến'}!
+          </h1>
+          <p className="text-sm text-slate-500 mt-1">
+            Đây là tổng quan về hành trình chuẩn bị phỏng vấn của bạn
+          </p>
+        </div>
+        {/* Simple dark mode/sun placeholder to match header header */}
+        <div className="text-slate-400 p-2 hover:bg-slate-100 rounded-xl cursor-pointer">
+          🌙
+        </div>
       </div>
 
-      {/* Main Grid: Left Stats & Activities, Right Quick Start Banner */}
-      <Grid gridDefinition={[{ colspan: 8 }, { colspan: 4 }]}>
-        <SpaceBetween size="l" direction="vertical">
-          {/* Stats Cards */}
-          <Grid gridDefinition={[{ colspan: 3 }, { colspan: 3 }, { colspan: 3 }, { colspan: 3 }]}>
-            {stats.map((stat, idx) => (
-              <div
-                key={idx}
-                style={{
-                  background: '#ffffff',
-                  border: '1px solid #e2e8f0',
-                  borderRadius: '12px',
-                  padding: '16px',
-                  boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
-                  position: 'relative',
-                  overflow: 'hidden'
-                }}
-              >
-                <div style={{ fontSize: '12px', color: '#64748b', marginBottom: '8px' }}>{stat.label}</div>
-                <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#0f172a' }}>{stat.value}</div>
-                {/* Visual subtle circle in card */}
-                <div style={{
-                  position: 'absolute',
-                  right: '-10px',
-                  bottom: '-10px',
-                  width: '50px',
-                  height: '50px',
-                  borderRadius: '50%',
-                  background: '#f1f5f9',
-                  zIndex: 0,
-                  opacity: 0.7
-                }} />
-              </div>
-            ))}
-          </Grid>
-
-          {/* Search bar inside container */}
-          <Container>
-            <div style={{ display: 'flex', gap: '10px' }}>
-              <div style={{ flexGrow: 1 }}>
-                <Input
-                  onChange={() => {}}
-                  value=""
-                  placeholder="🔍 Tìm kiếm câu hỏi, việc làm hoặc tài nguyên..."
-                />
-              </div>
-              <Button variant="normal">Tất cả danh mục</Button>
-              <Button variant="normal">Độ khó: Bất kỳ</Button>
+      {/* 4 Stats Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        {stats.map((stat, idx) => (
+          <div key={idx} className="bg-white border border-slate-150 rounded-2xl p-5 shadow-sm hover:shadow-md transition duration-200 relative overflow-hidden flex flex-col justify-between h-28">
+            <div className="flex justify-between items-center">
+              <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">{stat.label}</span>
+              <span className="text-sm">{stat.icon}</span>
             </div>
-          </Container>
+            <div className="text-3xl font-bold text-slate-800 mt-2 z-10">{stat.value}</div>
+            <div className="absolute right-0 bottom-0 w-16 h-16 rounded-full bg-slate-50 translate-x-4 translate-y-4 -z-10" />
+          </div>
+        ))}
+      </div>
+
+      {/* Main Grid split screen */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        {/* Left Column (8/12) */}
+        <div className="lg:col-span-8 space-y-6">
+          {/* Search bar & filter selection dropdowns */}
+          <div className="bg-white border border-slate-150 rounded-2xl p-4 shadow-sm flex flex-col sm:flex-row gap-4 items-center">
+            {/* Search Input */}
+            <div className="relative flex-1 w-full">
+              <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                🔍
+              </span>
+              <input
+                type="text"
+                placeholder="Tìm kiếm câu hỏi, việc làm hoặc tài nguyên..."
+                className="w-full pl-10 pr-4 py-2 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50"
+              />
+            </div>
+            
+            {/* Filters */}
+            <div className="flex gap-2 w-full sm:w-auto">
+              <select className="px-3 py-2 text-xs font-semibold border border-slate-200 rounded-xl bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                <option>Tất cả danh mục</option>
+              </select>
+              <select className="px-3 py-2 text-xs font-semibold border border-slate-200 rounded-xl bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                <option>Độ khó: Bất kỳ</option>
+              </select>
+            </div>
+          </div>
 
           {/* Recent Activity Table */}
-          <Container header={<Header variant="h3">Hoạt động gần đây</Header>}>
-            {loading ? (
-              <Box variant="p" style={{ textAlign: 'center', padding: '20px 0' }}>
-                <Spinner size="large" />
-              </Box>
-            ) : completedSessions.length === 0 ? (
-              <Box variant="p" color="text-muted" style={{ textAlign: 'center', padding: '30px 0' }}>
-                Chưa có hoạt động phỏng vấn nào hoàn thành.
-              </Box>
-            ) : (
-              <Table
-                items={completedSessions}
-                columnDefinitions={[
-                  { id: 'date', header: 'Ngày phỏng vấn', cell: item => new Date(item.created_at || Date.now()).toLocaleDateString() },
-                  { id: 'company', header: 'Công ty', cell: item => item.company_name },
-                  { id: 'position', header: 'Vị trí tuyển dụng', cell: item => item.title },
-                  { id: 'score', header: 'Điểm số', cell: item => <Badge color="green">{item.score}/10</Badge> },
-                  { id: 'status', header: 'Trạng thái', cell: item => 'Hoàn thành' }
-                ]}
-              />
-            )}
-          </Container>
-        </SpaceBetween>
-
-        {/* Right column: Purple Promo & Suggested Jobs */}
-        <SpaceBetween size="l" direction="vertical">
-          {/* Big Purple Call-to-action banner */}
-          <div
-            style={{
-              background: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)',
-              color: '#ffffff',
-              borderRadius: '16px',
-              padding: '24px',
-              boxShadow: '0 4px 6px -1px rgba(99, 102, 241, 0.2)',
-              textAlign: 'center',
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'space-between',
-              minHeight: '230px'
-            }}
-          >
-            <div>
-              <div style={{ fontSize: '32px', marginBottom: '8px' }}>📹</div>
-              <div style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '6px' }}>Giả lập phỏng vấn thực tế</div>
-              <div style={{ fontSize: '13px', opacity: 0.9, lineHeight: '1.5', padding: '0 10px' }}>
-                Trải nghiệm buổi phỏng vấn hoàn chỉnh với AI. Thực hành trả lời câu hỏi, nhận phản hồi chi tiết và tự tin hơn.
-              </div>
-            </div>
-            <div style={{ marginTop: '16px' }}>
+          <div className="bg-white border border-slate-150 rounded-2xl p-6 shadow-sm">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-base font-bold text-slate-800">Hoạt động gần đây</h2>
               <button
+                type="button"
+                onClick={() => onNavigateToTab('question_bank')}
+                className="text-xs font-semibold text-indigo-600 hover:text-indigo-500"
+              >
+                Xem tất cả
+              </button>
+            </div>
+
+            {loading ? (
+              <div className="flex justify-center py-10">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600" />
+              </div>
+            ) : completedSessions.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-12 text-slate-400">
+                <div className="w-12 h-12 bg-slate-50 rounded-full flex items-center justify-center text-2xl shadow-inner mb-3">
+                  ⏳
+                </div>
+                <p className="text-sm">Không có hoạt động gần đây</p>
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-slate-100">
+                  <thead>
+                    <tr>
+                      <th className="px-3 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Ngày phỏng vấn</th>
+                      <th className="px-3 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Doanh nghiệp</th>
+                      <th className="px-3 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Vị trí</th>
+                      <th className="px-3 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Điểm số</th>
+                      <th className="px-3 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Trạng thái</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100">
+                    {completedSessions.slice(0, 5).map((item) => (
+                      <tr key={item.id} className="hover:bg-slate-50/50 transition">
+                        <td className="px-3 py-4 whitespace-nowrap text-sm text-slate-600">
+                          {new Date(item.created_at || Date.now()).toLocaleDateString()}
+                        </td>
+                        <td className="px-3 py-4 whitespace-nowrap text-sm font-bold text-slate-800">
+                          {item.company_name}
+                        </td>
+                        <td className="px-3 py-4 whitespace-nowrap text-sm text-slate-600">
+                          {item.title}
+                        </td>
+                        <td className="px-3 py-4 whitespace-nowrap text-sm">
+                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-green-50 text-green-700 border border-green-200">
+                            {item.score}/10
+                          </span>
+                        </td>
+                        <td className="px-3 py-4 whitespace-nowrap text-sm text-indigo-600 font-semibold">
+                          Hoàn thành
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Right Column (4/12) */}
+        <div className="lg:col-span-4 space-y-6">
+          {/* Practice Promo Card (webcam simulation CTA) */}
+          <div className="bg-gradient-to-br from-indigo-600 to-indigo-700 rounded-2xl p-6 text-white shadow-md flex flex-col justify-between h-64 relative overflow-hidden group">
+            <div className="absolute right-0 bottom-0 opacity-10 group-hover:scale-105 transition duration-300 transform translate-x-4 translate-y-4">
+              {/* Massive webcam SVG */}
+              <svg className="w-48 h-48" fill="currentColor" viewBox="0 0 24 24"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4zM14 13h-3v3H9v-3H6v-2h3V8h2v3h3v2z"/></svg>
+            </div>
+            <div className="z-10">
+              <span className="text-3xl">📹</span>
+              <h2 className="text-lg font-bold mt-3">Giả lập phỏng vấn thực tế</h2>
+              <p className="text-xs text-indigo-150 mt-2 leading-relaxed opacity-90">
+                Trải nghiệm buổi phỏng vấn hoàn chỉnh với AI. Thực hành trả lời câu hỏi, nhận phản hồi chi tiết và tự tin hơn khi đi phỏng vấn thật.
+              </p>
+            </div>
+            <div className="z-10 mt-4">
+              <button
+                type="button"
                 onClick={onStartQuickInterview}
-                style={{
-                  background: '#ffffff',
-                  color: '#4f46e5',
-                  border: 'none',
-                  borderRadius: '30px',
-                  padding: '10px 24px',
-                  fontWeight: 'bold',
-                  cursor: 'pointer',
-                  fontSize: '14px',
-                  boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-                  transition: 'transform 0.1s ease'
-                }}
-                onMouseDown={e => e.currentTarget.style.transform = 'scale(0.98)'}
-                onMouseUp={e => e.currentTarget.style.transform = 'scale(1)'}
+                className="bg-white hover:bg-slate-50 text-indigo-700 font-bold text-xs px-5 py-2.5 rounded-full shadow-sm shadow-indigo-900/10 hover:shadow transition duration-150"
               >
                 Bắt đầu ngay →
               </button>
             </div>
           </div>
 
-          {/* Suggested Jobs card */}
-          <Container header={<Header variant="h3">Việc làm gợi ý</Header>}>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+          {/* Suggested Jobs Card */}
+          <div className="bg-white border border-slate-150 rounded-2xl p-6 shadow-sm">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-base font-bold text-slate-800">Việc làm gợi ý</h2>
+              <button
+                type="button"
+                onClick={() => onNavigateToTab('jobs')}
+                className="text-xs font-semibold text-indigo-600 hover:text-indigo-500"
+              >
+                Xem tất cả
+              </button>
+            </div>
+
+            <div className="space-y-4">
               {suggestedJobs.map((job, idx) => (
                 <div
                   key={idx}
                   onClick={() => onNavigateToTab('jobs')}
-                  style={{
-                    border: '1px solid #e2e8f0',
-                    borderRadius: '8px',
-                    padding: '12px 16px',
-                    cursor: 'pointer',
-                    background: '#ffffff',
-                    transition: 'all 0.2s ease',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '4px'
-                  }}
-                  onMouseEnter={e => e.currentTarget.style.borderColor = '#6366f1'}
-                  onMouseLeave={e => e.currentTarget.style.borderColor = '#e2e8f0'}
+                  className="flex items-center justify-between p-3.5 border border-slate-150 hover:border-indigo-500 rounded-xl cursor-pointer hover:bg-slate-50/50 transition duration-150 group"
                 >
-                  <div style={{ fontWeight: 'bold', color: '#0f172a', fontSize: '14px' }}>{job.title}</div>
-                  <div style={{ color: '#64748b', fontSize: '12px' }}>{job.company}</div>
-                  <div style={{ display: 'flex', gap: '6px', marginTop: '6px' }}>
-                    {job.tags.map((tag, tIdx) => (
-                      <Badge key={tIdx} color="blue">{tag}</Badge>
-                    ))}
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="w-10 h-10 rounded-xl bg-slate-100 border border-slate-200/50 flex items-center justify-center text-lg select-none flex-shrink-0">
+                      {job.logo}
+                    </div>
+                    <div className="min-w-0 leading-tight">
+                      <div className="text-xs font-bold text-slate-800 truncate group-hover:text-indigo-600 transition">{job.title}</div>
+                      <div className="text-[10px] text-slate-400 truncate mt-0.5">{job.company}</div>
+                      <div className="flex gap-1.5 mt-2">
+                        <span className="px-1.5 py-0.5 text-[9px] font-bold bg-green-50 text-green-700 rounded-full">Thỏa thuận</span>
+                        <span className="px-1.5 py-0.5 text-[9px] font-bold bg-slate-50 text-slate-600 rounded-full">{job.type}</span>
+                      </div>
+                    </div>
                   </div>
+                  {/* Chevron Right */}
+                  <svg className="w-4 h-4 text-slate-400 group-hover:text-indigo-600 transition transform group-hover:translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+                  </svg>
                 </div>
               ))}
             </div>
-          </Container>
-        </SpaceBetween>
-      </Grid>
-    </SpaceBetween>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }

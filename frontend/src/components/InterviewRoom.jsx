@@ -119,14 +119,17 @@ export default function InterviewRoom({ session, onLeaveSession }) {
         newLogs.push({
           role: 'ai_feedback',
           content: data.feedback,
-          scores: { techScore, commScore, confScore }
+          scores: { techScore, commScore, confScore },
+          sampleAnswer: data.sampleAnswer,
+          interviewerIndex: currentIndex
         });
 
         if (data.isCompleted) {
           setCompleted(true);
           newLogs.push({
             role: 'ai',
-            content: 'Chúc mừng bạn đã hoàn tất các câu hỏi của phiên phỏng vấn thử nghiệm VietInterview AI. Bạn có thể xem bảng phân tích đánh giá tổng quan ở bảng bên phải.'
+            content: 'Chúc mừng bạn đã hoàn tất các câu hỏi của phiên phỏng vấn thử nghiệm X-Interview AI. Bạn có thể xem bảng phân tích đánh giá tổng quan ở bảng bên phải.',
+            interviewerIndex: currentIndex
           });
           setChatLog(newLogs);
         } else {
@@ -134,7 +137,8 @@ export default function InterviewRoom({ session, onLeaveSession }) {
           setCurrentQuestion(data.nextQuestion);
           newLogs.push({
             role: 'ai',
-            content: data.nextQuestion
+            content: data.nextQuestion,
+            interviewerIndex: data.currentQuestionIndex
           });
           setChatLog(newLogs);
         }
@@ -257,32 +261,51 @@ export default function InterviewRoom({ session, onLeaveSession }) {
                 {chatLog.map((log, index) => {
                   const isAi = log.role === 'ai' || log.role === 'ai_feedback';
                   const isFeedback = log.role === 'ai_feedback';
+
+                  const getInterviewerName = (qIndex) => {
+                    const idx = qIndex !== undefined ? qIndex : currentIndex;
+                    if (idx >= 0 && idx <= 3) return 'Anh Hùng (Tech Lead) 💻';
+                    if (idx >= 4 && idx <= 6) return 'Chị Mai (Project Manager) 📊';
+                    return 'Chị Lan (HR Manager) 🤝';
+                  };
+
                   return (
                     <div 
                       key={index} 
                       style={{
                         alignSelf: isAi ? 'flex-start' : 'flex-end',
                         maxWidth: '85%',
-                        padding: '12px 18px',
+                        padding: '14px 18px',
                         borderRadius: isAi ? '16px 16px 16px 0px' : '16px 16px 0px 16px',
                         background: isAi 
-                          ? (isFeedback ? '#eff6ff' : '#ffffff')
-                          : '#0f172a',
+                          ? (isFeedback ? '#f5f3ff' : '#ffffff')
+                          : '#1e293b',
                         color: isAi ? '#1e293b' : '#ffffff',
                         border: isAi ? '1px solid #e2e8f0' : 'none',
                         boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)'
                       }}
                     >
-                      <Box variant="small" style={{ fontWeight: 'bold', marginBottom: '6px', color: isAi ? '#3b82f6' : '#94a3b8' }}>
-                        {log.role === 'ai' ? '🤖 X-Interview Bot' : log.role === 'ai_feedback' ? '📊 Đánh giá phản hồi' : '👤 Bạn'}
+                      <Box variant="small" style={{ fontWeight: 'bold', marginBottom: '6px', color: isAi ? '#6366f1' : '#94a3b8' }}>
+                        {log.role === 'ai' 
+                          ? `🤖 Người phỏng vấn: ${getInterviewerName(log.interviewerIndex)}` 
+                          : log.role === 'ai_feedback' 
+                            ? `📊 Đánh giá từ ${getInterviewerName(log.interviewerIndex)}` 
+                            : '👤 Bạn'}
                       </Box>
                       <div style={{ fontSize: '14px', lineHeight: '1.6' }}>{log.content}</div>
                       
                       {isFeedback && log.scores && (
-                        <div style={{ marginTop: '8px', borderTop: '1px dashed #bfdbfe', paddingTop: '6px', fontSize: '12px', display: 'flex', gap: '10px' }}>
+                        <div style={{ mt: '8px', borderTop: '1px dashed #c7d2fe', paddingTop: '6px', fontSize: '11px', display: 'flex', gap: '10px', color: '#4f46e5' }}>
                           <span>🔧 Kỹ thuật: <strong>{log.scores.techScore}/10</strong></span>
                           <span>💬 Giao tiếp: <strong>{log.scores.commScore}/10</strong></span>
                           <span>⚡ Tự tin: <strong>{log.scores.confScore}/10</strong></span>
+                        </div>
+                      )}
+
+                      {isFeedback && log.sampleAnswer && (
+                        <div style={{ marginTop: '10px', background: '#ffffff', borderLeft: '3px solid #818cf8', padding: '8px 12px', borderRadius: '6px', fontSize: '11px', color: '#3730a3' }}>
+                          <strong style={{ color: '#4f46e5' }}>💡 Câu trả lời mẫu tối ưu:</strong>
+                          <div style={{ marginTop: '4px', lineHeight: '1.5' }}>{log.sampleAnswer}</div>
                         </div>
                       )}
                     </div>
