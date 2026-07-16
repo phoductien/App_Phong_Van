@@ -33,6 +33,7 @@ export default function StartInterview({ onStartSession, user, userId = '0000000
   // Quick CV upload
   const [newCvUrl, setNewCvUrl] = useState('');
   const [uploading, setUploading] = useState(false);
+  const [selectedFile, setSelectedFile] = useState(null);
 
   // Simulated CV analysis results
   const [cvAnalysis, setCvAnalysis] = useState(null);
@@ -168,6 +169,52 @@ export default function StartInterview({ onStartSession, user, userId = '0000000
     }
   };
 
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setSelectedFile(file);
+    }
+  };
+
+  const handleUploadSelectedFile = () => {
+    if (!selectedFile) return;
+
+    const reader = new FileReader();
+    reader.onload = async (event) => {
+      const base64Data = event.target.result;
+      try {
+        setUploading(true);
+        setErrorMsg('');
+        const res = await fetch(`${API_BASE}/api/cv/upload`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            userId,
+            filename: selectedFile.name,
+            base64Data: base64Data
+          })
+        });
+
+        if (res.ok) {
+          const newCv = await res.json();
+          const option = { label: `📁 ${newCv.file_url.split('/').pop()}`, value: newCv.id };
+          setCvOptions(prev => [option, ...prev]);
+          setSelectedCv(option);
+          setSelectedFile(null);
+        } else {
+          const errData = await res.json();
+          setErrorMsg(errData.error || 'Lỗi khi tải file CV lên.');
+        }
+      } catch (err) {
+        console.error(err);
+        setErrorMsg('Lỗi kết nối máy chủ khi upload file.');
+      } finally {
+        setUploading(false);
+      }
+    };
+    reader.readAsDataURL(selectedFile);
+  };
+
   const handleStart = async (e) => {
     e.preventDefault();
     if (!selectedCompany || !selectedLevel) {
@@ -247,18 +294,61 @@ export default function StartInterview({ onStartSession, user, userId = '0000000
           <SpaceBetween direction="vertical" size="l">
             {/* Quick CV Section */}
             <div style={{ border: '1px dashed #d1d5db', padding: '16px', borderRadius: '8px', background: '#fafafa' }}>
-              <FormField label="1. Tải lên CV mới của bạn (Dán link file PDF)">
-                <SpaceBetween direction="horizontal" size="xs">
-                  <div style={{ flexGrow: 1 }}>
-                    <Input
-                      value={newCvUrl}
-                      onChange={({ detail }) => setNewCvUrl(detail.value)}
-                      placeholder="https://supabase-storage-url.com/cv.pdf"
+              <FormField label="1. Tải lên CV mới của bạn">
+                <SpaceBetween direction="vertical" size="s">
+                  {/* File Selector */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+                    <input
+                      type="file"
+                      id="cv-file-upload"
+                      accept=".pdf,.doc,.docx"
+                      onChange={handleFileChange}
+                      style={{ display: 'none' }}
                     />
+                    <Button
+                      onClick={() => document.getElementById('cv-file-upload').click()}
+                      disabled={uploading}
+                      iconName="upload"
+                    >
+                      Chọn file từ thiết bị (.pdf, .doc, .docx)
+                    </Button>
+                    {selectedFile && (
+                      <span style={{ fontSize: '12px', fontWeight: '600', color: '#475569', maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        📁 {selectedFile.name}
+                      </span>
+                    )}
+                    {selectedFile && (
+                      <Button
+                        onClick={handleUploadSelectedFile}
+                        disabled={uploading}
+                        variant="primary"
+                      >
+                        {uploading ? <Spinner size="normal" /> : 'Tải lên'}
+                      </Button>
+                    )}
                   </div>
-                  <Button onClick={handleAddCv} disabled={uploading || !newCvUrl}>
-                    {uploading ? <Spinner size="normal" /> : 'Nhập CV'}
-                  </Button>
+
+                  <div style={{ position: 'relative', margin: '8px 0', textAlign: 'center' }}>
+                    <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center' }}>
+                      <div style={{ width: 'full', borderTop: '1px solid #e2e8f0', flexGrow: 1 }}></div>
+                    </div>
+                    <span style={{ position: 'relative', padding: '0 8px', backgroundColor: '#fafafa', fontSize: '10px', fontWeight: 'bold', color: '#94a3b8', textTransform: 'uppercase' }}>
+                      Hoặc nhập link trực tiếp
+                    </span>
+                  </div>
+
+                  <SpaceBetween direction="horizontal" size="xs">
+                    <div style={{ flexGrow: 1 }}>
+                      <Input
+                        value={newCvUrl}
+                        onChange={({ detail }) => setNewCvUrl(detail.value)}
+                        placeholder="https://supabase-storage-url.com/cv.pdf"
+                      />
+                    </div>
+                    <Button onClick={handleAddCv} disabled={uploading || !newCvUrl}>
+                      {uploading ? <Spinner size="normal" /> : 'Nhập Link'}
+                    </Button>
+                  </SpaceBetween>
                 </SpaceBetween>
               </FormField>
             </div>

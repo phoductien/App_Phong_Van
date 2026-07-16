@@ -124,7 +124,16 @@ Chú ý: Chỉ trả về JSON hợp lệ, không bọc trong thẻ markdown \`\
 
 const app = express();
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
+
+const fs = require('fs');
+const path = require('path');
+const uploadsDir = path.join(__dirname, 'public', 'uploads');
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+}
+app.use('/uploads', express.static(path.join(__dirname, 'public', 'uploads')));
 
 global.recruiterJoinedSessions = {};
 
@@ -276,6 +285,59 @@ app.get('/api/cv', async (req, res) => {
 
   if (error) return res.status(400).json(error);
   return res.json(data);
+});
+
+// API: Actual Device File Upload for CV (Base64)
+app.post('/api/cv/upload', async (req, res) => {
+  const { userId, filename, base64Data } = req.body;
+  if (!userId || !filename || !base64Data) {
+    return res.status(400).json({ error: "Missing userId, filename, or base64Data" });
+  }
+
+  try {
+    // Strip data header from base64 string
+    const matches = base64Data.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/);
+    let fileBuffer;
+    if (matches && matches.length === 3) {
+      fileBuffer = Buffer.from(matches[2], 'base64');
+    } else {
+      fileBuffer = Buffer.from(base64Data, 'base64');
+    }
+
+    const uniqueFilename = `${Date.now()}-${filename.replace(/\s+/g, '_')}`;
+    const filePath = path.join(uploadsDir, uniqueFilename);
+
+    fs.writeFileSync(filePath, fileBuffer);
+
+    const fileUrl = `${req.protocol}://${req.get('host')}/uploads/${uniqueFilename}`;
+
+    if (isMock) {
+      const newCv = {
+        id: `cv-${Date.now()}`,
+        user_id: userId,
+        file_url: fileUrl,
+        uploaded_at: new Date().toISOString()
+      };
+      mockCvs.push(newCv);
+      return res.status(201).json(newCv);
+    }
+
+    const { data, error } = await supabase
+      .from('cv_vault')
+      .insert([{ user_id: userId, file_url: fileUrl }])
+      .select()
+      .single();
+
+    if (error) {
+      console.error("Supabase CV insert error:", error);
+      return res.status(400).json(error);
+    }
+    return res.status(201).json(data);
+
+  } catch (err) {
+    console.error("CV upload error:", err);
+    return res.status(500).json({ error: "Lỗi ghi file CV lên máy chủ" });
+  }
 });
 
 // API: Save/upload CV reference
