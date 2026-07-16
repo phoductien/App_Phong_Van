@@ -20,7 +20,7 @@ export default function CVProfile({ userId = '00000000-0000-0000-0000-0000000000
   const [cvInput, setCvInput] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
-
+  const [uploading, setUploading] = useState(false);
   const fetchCvs = async () => {
     try {
       setLoading(true);
@@ -66,6 +66,44 @@ export default function CVProfile({ userId = '00000000-0000-0000-0000-0000000000
     }
   };
 
+  const handleFileChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = async (event) => {
+      const base64Data = event.target.result;
+      try {
+        setUploading(true);
+        setErrorMsg('');
+        setSuccessMsg('');
+        const res = await fetch(`${API_BASE}/api/cv/upload`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            userId,
+            filename: file.name,
+            base64Data: base64Data
+          })
+        });
+
+        if (res.ok) {
+          setSuccessMsg(`Đã tải lên tệp CV "${file.name}" thành công.`);
+          fetchCvs();
+        } else {
+          const errData = await res.json();
+          setErrorMsg(errData.error || 'Lỗi khi tải file CV lên.');
+        }
+      } catch (err) {
+        console.error(err);
+        setErrorMsg('Lỗi kết nối máy chủ khi upload file.');
+      } finally {
+        setUploading(false);
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
   return (
     <SpaceBetween size="l" direction="vertical">
       <Container header={<Header variant="h2" description="Quản lý hồ sơ CV và thư mời xin việc của bạn">Hồ Sơ CV</Header>}>
@@ -73,14 +111,26 @@ export default function CVProfile({ userId = '00000000-0000-0000-0000-0000000000
         {successMsg && <Alert type="success" dismissible onDismiss={() => setSuccessMsg('')}>{successMsg}</Alert>}
 
         {/* Upload simulated dropzone area matching image 4 */}
+        <input
+          type="file"
+          id="profile-cv-upload"
+          accept=".pdf,.doc,.docx"
+          onChange={handleFileChange}
+          style={{ display: 'none' }}
+        />
         <div
+          onClick={() => {
+            if (!uploading) {
+              document.getElementById('profile-cv-upload').click();
+            }
+          }}
           style={{
             border: '2px dashed #6366f1',
             borderRadius: '12px',
             padding: '40px 20px',
             background: '#f8fafc',
             textAlign: 'center',
-            cursor: 'pointer',
+            cursor: uploading ? 'not-allowed' : 'pointer',
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
@@ -88,13 +138,24 @@ export default function CVProfile({ userId = '00000000-0000-0000-0000-0000000000
             gap: '12px'
           }}
         >
-          <div style={{ fontSize: '40px' }}>☁️</div>
-          <div style={{ fontWeight: 'bold', fontSize: '15px', color: '#1e293b' }}>
-            Kéo và thả tệp vào đây hoặc nhấp để duyệt
-          </div>
-          <div style={{ fontSize: '12px', color: '#64748b' }}>
-            Định dạng hỗ trợ: PDF, DOC, DOCX (Kích thước tối đa: 10MB)
-          </div>
+          {uploading ? (
+            <>
+              <Spinner size="large" />
+              <div style={{ fontWeight: 'bold', fontSize: '15px', color: '#6366f1' }}>
+                Đang tải tệp lên hệ thống...
+              </div>
+            </>
+          ) : (
+            <>
+              <div style={{ fontSize: '40px' }}>☁️</div>
+              <div style={{ fontWeight: 'bold', fontSize: '15px', color: '#1e293b' }}>
+                Kéo và thả tệp vào đây hoặc nhấp để duyệt
+              </div>
+              <div style={{ fontSize: '12px', color: '#64748b' }}>
+                Định dạng hỗ trợ: PDF, DOC, DOCX (Kích thước tối đa: 10MB)
+              </div>
+            </>
+          )}
         </div>
 
         {/* Quick URL form */}

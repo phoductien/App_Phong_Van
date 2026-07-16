@@ -14,6 +14,8 @@ import {
   Alert
 } from '@cloudscape-design/components';
 
+const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:5000';
+
 export default function JobsDashboard({ onStartInterviewWithJob }) {
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -28,7 +30,7 @@ export default function JobsDashboard({ onStartInterviewWithJob }) {
     try {
       setLoading(true);
       setError('');
-      const res = await fetch('http://localhost:5000/api/jobs');
+      const res = await fetch(`${API_BASE}/api/jobs`);
       if (res.ok) {
         const data = await res.json();
         setJobs(data);
@@ -54,7 +56,7 @@ export default function JobsDashboard({ onStartInterviewWithJob }) {
     try {
       setCrawling(true);
       setCrawlSuccess('');
-      const res = await fetch('http://localhost:5000/api/jobs/crawl', {
+      const res = await fetch(`${API_BASE}/api/jobs/crawl`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' }
       });

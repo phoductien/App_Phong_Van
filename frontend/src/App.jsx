@@ -22,6 +22,8 @@ import Blog from './components/Blog';
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
 
+const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:5000';
+
 let supabase = null;
 if (supabaseUrl && supabaseAnonKey && supabaseUrl !== 'your_supabase_project_url') {
   try {
@@ -105,7 +107,7 @@ function App() {
 
   const handleStartQuickInterview = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/sessions/start', {
+      const res = await fetch(`${API_BASE}/api/sessions/start`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -139,7 +141,7 @@ function App() {
       setActiveTab('candidate');
     } else if (actionType === 'interview') {
       try {
-        const res = await fetch('http://localhost:5000/api/questions/generate-from-jd', {
+        const res = await fetch(`${API_BASE}/api/questions/generate-from-jd`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({

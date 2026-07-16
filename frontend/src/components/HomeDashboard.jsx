@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
+const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:5000';
+
 export default function HomeDashboard({ user, onNavigateToTab, onStartQuickInterview }) {
   const [sessions, setSessions] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -10,7 +12,7 @@ export default function HomeDashboard({ user, onNavigateToTab, onStartQuickInter
     const fetchSessions = async () => {
       try {
         setLoading(true);
-        const res = await fetch(`http://localhost:5000/api/sessions?candidateId=${candidateId}`);
+        const res = await fetch(`${API_BASE}/api/sessions?candidateId=${candidateId}`);
         if (res.ok) {
           const data = await res.json();
           setSessions(data);
