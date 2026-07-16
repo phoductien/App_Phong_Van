@@ -202,7 +202,7 @@ function App() {
         );
       case 'candidate':
         return (
-          <StartInterview onStartSession={handleStartSession} userId={user?.id} />
+          <StartInterview onStartSession={handleStartSession} user={user} userId={user?.id} />
         );
       case 'question_bank':
         return (
@@ -226,7 +226,7 @@ function App() {
         );
       case 'interview_session':
         return activeSession ? (
-          <InterviewRoom session={activeSession} onLeaveSession={handleLeaveSession} />
+          <InterviewRoom user={user} session={activeSession} onLeaveSession={handleLeaveSession} />
         ) : null;
       default:
         return <div className="text-slate-500">Đang tải trang...</div>;

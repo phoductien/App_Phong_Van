@@ -19,7 +19,7 @@ import {
 
 const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:5000';
 
-export default function StartInterview({ onStartSession, userId = '00000000-0000-0000-0000-000000000000' }) {
+export default function StartInterview({ onStartSession, user, userId = '00000000-0000-0000-0000-000000000000' }) {
   const [cvOptions, setCvOptions] = useState([]);
   const [selectedCv, setSelectedCv] = useState(null);
   const [selectedCompany, setSelectedCompany] = useState(null);
@@ -28,6 +28,7 @@ export default function StartInterview({ onStartSession, userId = '00000000-0000
   
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState('');
+  const [completedSessionsCount, setCompletedSessionsCount] = useState(0);
   
   // Quick CV upload
   const [newCvUrl, setNewCvUrl] = useState('');
@@ -36,6 +37,24 @@ export default function StartInterview({ onStartSession, userId = '00000000-0000
   // Simulated CV analysis results
   const [cvAnalysis, setCvAnalysis] = useState(null);
   const [analyzing, setAnalyzing] = useState(false);
+
+  useEffect(() => {
+    const fetchSessions = async () => {
+      try {
+        const res = await fetch(`${API_BASE}/api/sessions?candidateId=${userId}`);
+        if (res.ok) {
+          const data = await res.json();
+          const completed = data.filter(s => s.status === 'completed').length;
+          setCompletedSessionsCount(completed);
+        }
+      } catch (err) {
+        console.error("Failed to fetch sessions count:", err);
+      }
+    };
+    if (userId) {
+      fetchSessions();
+    }
+  }, [userId]);
 
   useEffect(() => {
     async function loadData() {
@@ -153,6 +172,13 @@ export default function StartInterview({ onStartSession, userId = '00000000-0000
     e.preventDefault();
     if (!selectedCompany || !selectedLevel) {
       setErrorMsg('Vui lòng chọn Công ty và Vị trí/Cấp độ.');
+      return;
+    }
+
+    // Check Free tier limit
+    const userTier = user?.tier || 'free';
+    if (userTier === 'free' && completedSessionsCount >= 3) {
+      setErrorMsg('Bạn đã hết lượt phỏng vấn miễn phí. Vui lòng nâng cấp tài khoản để luyện tập không giới hạn!');
       return;
     }
 

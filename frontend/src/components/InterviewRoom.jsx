@@ -16,7 +16,7 @@ import {
 
 const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:5000';
 
-export default function InterviewRoom({ session, onLeaveSession }) {
+export default function InterviewRoom({ user, session, onLeaveSession }) {
   const { sessionId, companyName, level, questions } = session;
   const totalQuestions = questions ? questions.length : 10;
 
@@ -340,50 +340,80 @@ export default function InterviewRoom({ session, onLeaveSession }) {
           {/* X-Interview Style Dashboard Sidebar Assessment */}
           <div style={{ paddingLeft: '20px', borderLeft: '1px solid #e2e8f0' }}>
             <SpaceBetween size="l" direction="vertical">
-              <Header variant="h3">X-Interview Radar & Scorecard</Header>
+              <Header variant="h3">Viet-Interview Radar & Scorecard</Header>
               
-              <Container>
-                <SpaceBetween size="m" direction="vertical">
-                  <div style={{ textAlign: 'center', padding: '10px 0' }}>
-                    <Box variant="awsui-key-label">Điểm Số Tổng Hợp</Box>
-                    <Box variant="h1" style={{ fontSize: '36px', color: '#3b82f6', fontWeight: 'bold' }}>
-                      {overallAvg} <span style={{ fontSize: '16px', color: '#64748b' }}>/ 10</span>
-                    </Box>
-                  </div>
+              <div style={{ position: 'relative' }}>
+                {/* Blurrable wrapper container */}
+                <div style={user?.tier !== 'pro' && user?.tier !== 'enterprise' ? { filter: 'blur(5px)', pointerEvents: 'none', userSelect: 'none' } : {}} className="space-y-4">
+                  <Container>
+                    <SpaceBetween size="m" direction="vertical">
+                      <div style={{ textAlign: 'center', padding: '10px 0' }}>
+                        <Box variant="awsui-key-label">Điểm Số Tổng Hợp</Box>
+                        <Box variant="h1" style={{ fontSize: '36px', color: '#3b82f6', fontWeight: 'bold' }}>
+                          {overallAvg} <span style={{ fontSize: '16px', color: '#64748b' }}>/ 10</span>
+                        </Box>
+                      </div>
 
-                  <div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-                      <Box variant="small">🔧 Kiến thức Chuyên môn (Hard Skills)</Box>
-                      <strong>{avgTech}/10</strong>
+                      <div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                          <Box variant="small">🔧 Kiến thức Chuyên môn (Hard Skills)</Box>
+                          <strong>{avgTech}/10</strong>
+                        </div>
+                        <ProgressBar value={parseFloat(avgTech) * 10} variant="success" />
+                      </div>
+
+                      <div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                          <Box variant="small">💬 Kỹ năng Diễn đạt (Soft Skills)</Box>
+                          <strong>{avgComm}/10</strong>
+                        </div>
+                        <ProgressBar value={parseFloat(avgComm) * 10} variant="success" />
+                      </div>
+
+                      <div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                          <Box variant="small">⚡ Mức độ Tự tin (Confidence)</Box>
+                          <strong>{avgConf}/10</strong>
+                        </div>
+                        <ProgressBar value={parseFloat(avgConf) * 10} variant="success" />
+                      </div>
+                    </SpaceBetween>
+                  </Container>
+
+                  {latestFeedback && (
+                    <Container header={<Header variant="h3">Nhận xét chi tiết</Header>}>
+                      <div style={{ fontSize: '13px', lineHeight: '1.6', color: '#475569' }}>
+                        {latestFeedback.text}
+                      </div>
+                    </Container>
+                  )}
+                </div>
+
+                {/* Paywall Overlay */}
+                {user?.tier !== 'pro' && user?.tier !== 'enterprise' && (
+                  <div style={{
+                    position: 'absolute',
+                    inset: 0,
+                    backgroundColor: 'rgba(255, 255, 255, 0.7)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    textAlign: 'center',
+                    padding: '24px',
+                    borderRadius: '16px',
+                    zIndex: 10
+                  }}>
+                    <span style={{ fontSize: '32px', marginBottom: '12px' }}>🔒</span>
+                    <div style={{ fontWeight: 'bold', fontSize: '16px', color: '#1e293b', marginBottom: '6px' }}>
+                      Mở Khóa Phân Tích Chuyên Sâu
                     </div>
-                    <ProgressBar value={parseFloat(avgTech) * 10} variant="success" />
-                  </div>
-
-                  <div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-                      <Box variant="small">💬 Kỹ năng Diễn đạt (Soft Skills)</Box>
-                      <strong>{avgComm}/10</strong>
+                    <div style={{ fontSize: '12px', color: '#64748b', maxWidth: '260px', lineHeight: '1.5', marginBottom: '16px' }}>
+                      Vui lòng nâng cấp lên tài khoản **PRO** để mở khóa thanh đo 3 khía cạnh chi tiết, nhận xét sâu sắc của hội đồng AI và xem đáp án mẫu tối ưu!
                     </div>
-                    <ProgressBar value={parseFloat(avgComm) * 10} variant="success" />
                   </div>
-
-                  <div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-                      <Box variant="small">⚡ Mức độ Tự tin (Confidence)</Box>
-                      <strong>{avgConf}/10</strong>
-                    </div>
-                    <ProgressBar value={parseFloat(avgConf) * 10} variant="success" />
-                  </div>
-                </SpaceBetween>
-              </Container>
-
-              {latestFeedback && (
-                <Container header={<Header variant="h3">Nhận xét chi tiết</Header>}>
-                  <div style={{ fontSize: '13px', lineHeight: '1.6', color: '#475569' }}>
-                    {latestFeedback.text}
-                  </div>
-                </Container>
-              )}
+                )}
+              </div>
 
               {completed && (
                 <Alert type="success" header="Hoàn thành buổi phỏng vấn">
