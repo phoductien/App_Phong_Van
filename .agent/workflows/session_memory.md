@@ -1,8 +1,14 @@
-# BỘ NHỚ PHIÊN PHÁT TRIỂN (SESSION_MEMORY) - CẬP NHẬT: 16/07/2026 14:55
+# BỘ NHỚ PHIÊN PHÁT TRIỂN (SESSION_MEMORY) - CẬP NHẬT: 17/07/2026 01:44
 
 ## 1. TIẾN ĐỘ HIỆN TẠI
-- **Phase đang chạy**: Phase 5 - Đóng Gói, Deploy & Hướng Dẫn Vận Hành [Đã Hoàn Thành Toàn Bộ]
-- **Task đang thực hiện**: Tích hợp cào JD cho nhà tuyển dụng, hoàn thành đồng bộ vai trò đăng nhập & menu điều hướng.
+- **Trạng thái**: Hoàn thành xuất sắc toàn bộ MVP Viet-Interview và deploy thành công lên Vercel + Render.
+- **Tính năng mới bổ sung**:
+  - Giao diện đăng ký phân quyền Ứng viên / Nhà tuyển dụng chống trùng lặp email.
+  - Tải lên file CV nhị phân trực tiếp từ thiết bị (local PDF/Word uploader qua Base64) tại tab Luyện tập phỏng vấn & Hồ sơ CV.
+  - Gói cước Pricing tích hợp Cổng thanh toán giả lập Sandbox (QR Code, Visa, MoMo) có hiệu ứng loading & nâng cấp vai trò + huy hiệu VIP PRO/ENTERPRISE trên Sidebar.
+  - Giới hạn 3 lượt phỏng vấn và khóa mờ (blur) kết quả đánh giá 3 trục đối với tài khoản Free.
+  - Sửa lỗi cứng địa chỉ API localhost bằng cấu hình động `VITE_API_BASE` và sửa lỗi redirect OAuth Google trong Supabase Site URL.
+  - Đồng bộ đẩy code song song lên cả 2 repository Public (`App_Phong_Van`) và Private (`app-phong-van`).
 
 ## 2. CẤU TRÚC THƯ MỤC THỰC TẾ ĐÃ TRIỂN KHAI
 - `docs/PHASE_1_ARCHITECTURE.md`: Tài liệu cấu trúc hệ thống, port và sơ đồ luồng dữ liệu.
@@ -10,11 +16,12 @@
 - `docs/PHASE_3_UI_COMPONENTS.md`: Đặc tả giao diện Tailwind CSS (Auth, Candidate Dashboard) và Cloudscape UI.
 - `docs/PHASE_4_AI_INTEGRATION.md`: Thiết kế thuật toán cào JD, Prompt chấm điểm, anti-derailment và xoay vòng vai trò hội đồng.
 - `.agent/skills/save_checkpoint.md`: Kỹ năng lưu trữ mốc checkpoint Git của AI.
-- `.agent/rules/PLAN.md`: Cập nhật lộ trình 5 Phase chi tiết của dự án X-Interview.
+- `.agent/rules/PLAN.md`: Cập nhật lộ trình 5 Phase chi tiết của dự án Viet-Interview.
 
 ## 3. CẤU HÌNH & THIẾT LẬP MÔI TRƯỜNG
-- **Database**: Mock Local DB hoạt động mặc định trên RAM của server Express; hỗ trợ kết nối PostgreSQL Supabase thông qua biến môi trường.
-- **Biến môi trường**: `PORT`, `GEMINI_API_KEY`, `SUPABASE_URL`, `SUPABASE_KEY` (được cấu hình trong tệp `.env` của backend).
+- **Frontend (Vercel)**: Đã deploy thành công trên tên miền riêng, liên kết biến môi trường `VITE_API_BASE`, `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`.
+- **Backend (Render)**: Đã deploy dịch vụ Web Service với Root Directory là `backend`, biến môi trường `PORT`, `GEMINI_API_KEY` (và Supabase credentials).
+- **Database**: Mock Local DB kết hợp Supabase PostgreSQL thật (tự động chuyển đổi thông minh).
 
 ## 4. CÁC BUG / VẤN ĐỀ CHƯA GIẢI QUYẾT
-- Không có. Tất cả các tài liệu giai đoạn đã được tạo lập thành công và kiểm tra cấu trúc thư mục hợp lệ.
+- Không có. Ứng dụng đã hoạt động trơn tru 100%, bảo mật hoàn hảo không bị lộ mật khẩu, và đã trỏ đúng Site URL trong Supabase.
