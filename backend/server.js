@@ -688,6 +688,23 @@ app.get('/api/sessions', async (req, res) => {
     }));
   }
 
+  const { data, error } = await supabase
+    .from('interview_sessions')
+    .select(`
+      id,
+      created_at,
+      status,
+      chat_history,
+      question_banks (
+        title,
+        companies (
+          name
+        )
+      )
+    `)
+    .eq('candidate_id', candidateId)
+    .order('created_at', { ascending: false });
+
   if (error) return res.status(400).json(error);
 
   return res.json(data.map(s => {
