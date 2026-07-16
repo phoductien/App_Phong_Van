@@ -8,9 +8,9 @@ Tài liệu này vạch ra các giai đoạn phát triển và tích hợp của
 *   [x] Khởi tạo các tài liệu kỹ thuật cốt lõi: `docs/PHASE_1_ARCHITECTURE.md`, `docs/PHASE_2_DATABASE_SCHEMA.md`, `docs/PHASE_3_UI_COMPONENTS.md`, `docs/PHASE_4_AI_INTEGRATION.md`.
 *   [ ] Thiết lập cấu hình `.agent/skills/save_checkpoint.md` quản lý mã nguồn.
 
-### Phase 2: Thiết Kế Cơ Sở Dữ Liệu & Cấu Hình Bảo Mật (Supabase & RLS)
-*   [ ] Cập nhật bảng cơ sở dữ liệu Supabase, thêm Postgres Triggers tự động đồng bộ profiles từ `auth.users`.
-*   [ ] Cấu hình chi tiết các chính sách Row Level Security (RLS) bảo vệ thông tin ứng viên và đề thi doanh nghiệp.
+### Phase 2: Thiết Kế Cơ Sở Dữ Liệu & Cấu Hình Bảo Mật (Supabase & RLS) [Đã hoàn thành]
+*   [x] Cập nhật bảng cơ sở dữ liệu Supabase, thêm Postgres Triggers tự động đồng bộ profiles từ `auth.users`.
+*   [x] Cấu hình chi tiết các chính sách Row Level Security (RLS) bảo vệ thông tin ứng viên và đề thi doanh nghiệp.
 
 ### Phase 3: Phát Triển Dashboard Vai Trò & Trang Đăng Nhập Custom (Tailwind CSS)
 *   [ ] Dựng trang Đăng ký / Đăng nhập hoàn toàn bằng Tailwind CSS thuần (hỗ trợ ẩn/hiện mật khẩu, chọn vai trò).

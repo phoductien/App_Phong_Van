@@ -13,6 +13,25 @@ CREATE TABLE profiles (
 -- Enable RLS (Row Level Security) on Profiles
 ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
 
+-- Trigger to sync auth.users with public.profiles
+CREATE OR REPLACE FUNCTION public.handle_new_user()
+RETURNS trigger AS $$
+BEGIN
+  INSERT INTO public.profiles (id, email, role, full_name)
+  VALUES (
+    new.id,
+    new.email,
+    COALESCE((new.raw_user_meta_data->>'role')::user_role, 'candidate'::user_role),
+    COALESCE(new.raw_user_meta_data->>'full_name', split_part(new.email, '@', 1))
+  );
+  RETURN new;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+CREATE OR REPLACE TRIGGER on_auth_user_created
+  AFTER INSERT ON auth.users
+  FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
+
 -- 3. CV Vault Table
 CREATE TABLE cv_vault (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -55,6 +74,8 @@ CREATE TABLE interview_sessions (
     current_question_index INT NOT NULL DEFAULT 0,
     chat_history JSONB NOT NULL DEFAULT '[]'::jsonb, -- JSON array storing the chat stream
     status VARCHAR(50) CHECK (status IN ('ongoing', 'completed')) DEFAULT 'ongoing',
+    recruiter_joined BOOLEAN DEFAULT FALSE,
+    scores JSONB DEFAULT NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -73,6 +94,15 @@ CREATE POLICY "Allow users to update their own profile"
 CREATE POLICY "Allow candidates to manage their own CVs"
     ON cv_vault FOR ALL
     USING (auth.uid() = user_id);
+
+CREATE POLICY "Allow recruiters to view CVs"
+    ON cv_vault FOR SELECT
+    USING (
+        EXISTS (
+            SELECT 1 FROM profiles 
+            WHERE profiles.id = auth.uid() AND profiles.role = 'interviewer'
+        )
+    );
 
 -- Basic RLS Policies for Companies (Public read)
 CREATE POLICY "Allow public read access to companies"
@@ -93,13 +123,13 @@ CREATE POLICY "Allow interviewers to manage question banks"
         )
     );
 
--- Basic RLS Policies for Interview Sessions (Candidate reads/writes their own, interviewer reads all)
+-- Basic RLS Policies for Interview Sessions (Candidate reads/writes their own, interviewer manages all)
 CREATE POLICY "Allow candidates to view and update their own sessions"
     ON interview_sessions FOR ALL
     USING (auth.uid() = candidate_id);
 
-CREATE POLICY "Allow interviewers to view all sessions"
-    ON interview_sessions FOR SELECT
+CREATE POLICY "Allow interviewers to manage all sessions"
+    ON interview_sessions FOR ALL
     USING (
         EXISTS (
             SELECT 1 FROM profiles 

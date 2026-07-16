@@ -1,8 +1,8 @@
 # BỘ NHỚ PHIÊN PHÁT TRIỂN (SESSION_MEMORY) - CẬP NHẬT: 16/07/2026 14:55
 
 ## 1. TIẾN ĐỘ HIỆN TẠI
-- **Phase đang chạy**: Phase 1 - Thiết Kế Kiến Trúc & Tạo Tài Liệu Kỹ Thuật [Đã Hoàn Thành Docs]
-- **Task đang thực hiện**: Chuẩn bị chuyển sang Phase 2 - Cập nhật database và trigger Supabase.
+- **Phase đang chạy**: Phase 2 - Thiết Kế Cơ Sở Dữ Liệu & Cấu Hình Bảo Mật [Đã Hoàn Thành]
+- **Task đang thực hiện**: Chuẩn bị sang Phase 3 - Phát triển giao diện đăng nhập custom Tailwind CSS và Dashboards.
 
 ## 2. CẤU TRÚC THƯ MỤC THỰC TẾ ĐÃ TRIỂN KHAI
 - `docs/PHASE_1_ARCHITECTURE.md`: Tài liệu cấu trúc hệ thống, port và sơ đồ luồng dữ liệu.
