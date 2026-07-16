@@ -104,6 +104,14 @@ export default function Auth({ onLoginSuccess }) {
       setLoading(true);
       setTimeout(() => {
         setLoading(false);
+        
+        // Save to unverified emails list to block direct login
+        const unverified = JSON.parse(localStorage.getItem('x_unverified_emails') || '[]');
+        if (!unverified.includes(email)) {
+          unverified.push(email);
+          localStorage.setItem('x_unverified_emails', JSON.stringify(unverified));
+        }
+
         setSuccessMsg('Đăng ký thành công! Vui lòng kiểm tra email để xác thực tài khoản (Link kích hoạt đã được gửi).');
         setIsSignUp(false);
       }, 1000);
@@ -112,6 +120,13 @@ export default function Auth({ onLoginSuccess }) {
       // Sign In validation
       if (!email.trim() || !password) {
         setErrorMsg('Vui lòng nhập email và mật khẩu.');
+        return;
+      }
+
+      // Check if email requires verification
+      const unverified = JSON.parse(localStorage.getItem('x_unverified_emails') || '[]');
+      if (unverified.includes(email)) {
+        setErrorMsg(`Tài khoản ${email} chưa được xác thực. Vui lòng click vào link kích hoạt trong email của bạn.`);
         return;
       }
 
@@ -144,6 +159,21 @@ export default function Auth({ onLoginSuccess }) {
           {errorMsg && (
             <div className="mb-4 bg-red-50 border-l-4 border-red-500 p-4 rounded-md">
               <p className="text-sm text-red-700">{errorMsg}</p>
+              {errorMsg.includes('chưa được xác thực') && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    const unverified = JSON.parse(localStorage.getItem('x_unverified_emails') || '[]');
+                    const filtered = unverified.filter(e => e !== email);
+                    localStorage.setItem('x_unverified_emails', JSON.stringify(filtered));
+                    setSuccessMsg('Giả lập xác thực email thành công! Bạn hiện đã có thể đăng nhập.');
+                    setErrorMsg('');
+                  }}
+                  className="mt-2 text-xs font-semibold text-indigo-600 hover:text-indigo-800 underline block"
+                >
+                  ⚡ Bấm vào đây để giả lập click Link kích hoạt Email của Supabase
+                </button>
+              )}
             </div>
           )}
 
