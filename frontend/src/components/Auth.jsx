@@ -144,95 +144,245 @@ export default function Auth({ onLoginSuccess }) {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8 font-sans">
-      <div className="sm:mx-auto sm:w-full sm:max-w-md text-center">
-        <h2 className="text-3xl font-extrabold text-slate-900 tracking-tight">
-          {isSignUp ? 'Tạo tài khoản' : 'Đăng nhập'}
-        </h2>
-        <p className="mt-2 text-sm text-slate-600">
-          {isSignUp ? 'Đăng ký để bắt đầu sử dụng X-interview' : 'Nhập thông tin đăng nhập để truy cập tài khoản của bạn'}
-        </p>
+    <div className="min-h-screen bg-white flex font-sans">
+      {/* LEFT PANEL: Branding & Visuals (Hidden on small screens) */}
+      <div className="hidden lg:flex lg:w-[50%] bg-gradient-to-tr from-[#312e81] via-[#1e1b4b] to-[#4c1d95] text-white p-16 flex-col justify-between relative overflow-hidden select-none">
+        {/* Background Decorative rotated squares */}
+        <div className="absolute top-10 left-10 w-24 h-24 border border-white/5 bg-white/5 rotate-45 rounded-2xl pointer-events-none"></div>
+        <div className="absolute top-1/3 right-10 w-16 h-16 border border-white/5 bg-white/5 rotate-45 rounded-xl pointer-events-none"></div>
+        <div className="absolute bottom-40 left-12 w-20 h-20 border border-white/5 bg-white/5 rotate-45 rounded-2xl pointer-events-none"></div>
+        <div className="absolute bottom-10 right-1/4 w-32 h-32 border border-white/5 bg-white/5 rotate-45 rounded-3xl pointer-events-none"></div>
+
+        {/* Header Logo */}
+        <div className="flex items-center z-10">
+          <svg width="45" height="45" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className="mr-3">
+            <path d="M20 30L45 50L20 70" stroke="url(#logo_grad1)" strokeWidth="12" strokeLinecap="round" strokeLinejoin="round"/>
+            <path d="M80 30L55 50L80 70" stroke="url(#logo_grad2)" strokeWidth="12" strokeLinecap="round" strokeLinejoin="round"/>
+            <path d="M45 50L55 50" stroke="#818cf8" strokeWidth="12" strokeLinecap="round"/>
+            <defs>
+              <linearGradient id="logo_grad1" x1="20" y1="30" x2="45" y2="70" gradientUnits="userSpaceOnUse">
+                <stop stopColor="#6366f1" />
+                <stop offset="1" stopColor="#4f46e5" />
+              </linearGradient>
+              <linearGradient id="logo_grad2" x1="80" y1="30" x2="55" y2="70" gradientUnits="userSpaceOnUse">
+                <stop stopColor="#a855f7" />
+                <stop offset="1" stopColor="#7c3aed" />
+              </linearGradient>
+            </defs>
+          </svg>
+          <span className="text-2xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-slate-100 to-indigo-200">
+            Viet-Interview
+          </span>
+        </div>
+
+        {/* Center Promotion */}
+        <div className="my-auto z-10 max-w-lg space-y-6">
+          <h1 className="text-4xl font-extrabold leading-tight">
+            Chinh phục buổi phỏng vấn tiếp theo cùng AI
+          </h1>
+          <p className="text-slate-300 text-base leading-relaxed">
+            Nhận phản hồi cá nhân hóa, xây dựng sự tự tin và tiến gần hơn đến công việc mơ ước qua các buổi phỏng vấn thử thông minh.
+          </p>
+
+          <div className="flex flex-wrap gap-3 pt-4">
+            <div className="flex items-center space-x-2 bg-white/10 backdrop-blur-md px-4 py-2.5 rounded-full text-sm font-medium border border-white/10">
+              <svg className="w-5 h-5 text-indigo-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+              </svg>
+              <span><strong>10K+</strong> người dùng</span>
+            </div>
+            <div className="flex items-center space-x-2 bg-white/10 backdrop-blur-md px-4 py-2.5 rounded-full text-sm font-medium border border-white/10">
+              <svg className="w-5 h-5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+              </svg>
+              <span><strong>95%</strong> thành công</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="text-sm text-slate-400 z-10">
+          © 2026 TMI Soft
+        </div>
       </div>
 
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-white py-8 px-4 shadow-sm border border-slate-100 rounded-2xl sm:px-10">
-          {errorMsg && (
-            <div className="mb-4 bg-red-50 border-l-4 border-red-500 p-4 rounded-md">
-              <p className="text-sm text-red-700">{errorMsg}</p>
-              {errorMsg.includes('chưa được xác thực') && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    const unverified = JSON.parse(localStorage.getItem('x_unverified_emails') || '[]');
-                    const filtered = unverified.filter(e => e !== email);
-                    localStorage.setItem('x_unverified_emails', JSON.stringify(filtered));
-                    setSuccessMsg('Giả lập xác thực email thành công! Bạn hiện đã có thể đăng nhập.');
-                    setErrorMsg('');
-                  }}
-                  className="mt-2 text-xs font-semibold text-indigo-600 hover:text-indigo-800 underline block"
-                >
-                  ⚡ Bấm vào đây để giả lập click Link kích hoạt Email của Supabase
-                </button>
-              )}
-            </div>
-          )}
+      {/* RIGHT PANEL: Form Container */}
+      <div className="w-full lg:w-[50%] flex flex-col justify-center relative px-6 sm:px-12 lg:px-20 py-12">
+        {/* Language selector and Dark Mode mock */}
+        <div className="absolute top-6 right-8 flex items-center space-x-3">
+          <div className="flex items-center space-x-1.5 px-3 py-1.5 border border-slate-200 rounded-lg text-sm font-medium text-slate-700 bg-white shadow-sm cursor-pointer hover:bg-slate-50 transition duration-150">
+            <span className="text-base">🇻🇳</span>
+            <span>Tiếng Việt</span>
+            <svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </div>
+          <button type="button" className="p-2 border border-slate-200 rounded-lg bg-white shadow-sm hover:bg-slate-50 text-slate-600 transition duration-150">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+            </svg>
+          </button>
+        </div>
 
-          {successMsg && (
-            <div className="mb-4 bg-green-50 border-l-4 border-green-500 p-4 rounded-md">
-              <p className="text-sm text-green-700">{successMsg}</p>
-            </div>
-          )}
+        {/* Form content */}
+        <div className="w-full max-w-md mx-auto space-y-6">
+          <div>
+            <h2 className="text-3xl font-bold text-slate-900 tracking-tight">
+              {isSignUp ? 'Tạo tài khoản' : 'Đăng nhập'}
+            </h2>
+            <p className="mt-2 text-sm text-slate-600">
+              {isSignUp ? 'Đăng ký để bắt đầu sử dụng Viet-Interview' : 'Nhập thông tin đăng nhập để truy cập tài khoản của bạn'}
+            </p>
+          </div>
 
-          <form className="space-y-5" onSubmit={handleEmailAuth}>
-            {isSignUp && (
-              <div>
-                <label className="block text-sm font-medium text-slate-700">Họ và tên</label>
-                <div className="mt-1 relative rounded-md shadow-sm">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
-                    {/* User Icon */}
-                    <svg className="h-5 width-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                    </svg>
-                  </div>
-                  <input
-                    type="text"
-                    required
-                    value={fullName}
-                    onChange={(e) => setFullName(e.target.value)}
-                    className="block w-full pl-10 pr-3 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm placeholder-slate-400 bg-slate-50/50"
-                    placeholder="Nguyễn Văn A"
-                  />
-                </div>
+          <div className="bg-white">
+            {errorMsg && (
+              <div className="mb-4 bg-red-50 border-l-4 border-red-500 p-4 rounded-md">
+                <p className="text-sm text-red-700">{errorMsg}</p>
+                {errorMsg.includes('chưa được xác thực') && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const unverified = JSON.parse(localStorage.getItem('x_unverified_emails') || '[]');
+                      const filtered = unverified.filter(e => e !== email);
+                      localStorage.setItem('x_unverified_emails', JSON.stringify(filtered));
+                      setSuccessMsg('Giả lập xác thực email thành công! Bạn hiện đã có thể đăng nhập.');
+                      setErrorMsg('');
+                    }}
+                    className="mt-2 text-xs font-semibold text-indigo-600 hover:text-indigo-800 underline block"
+                  >
+                    ⚡ Bấm vào đây để giả lập click Link kích hoạt Email của Supabase
+                  </button>
+                )}
               </div>
             )}
 
-            <div>
-              <label className="block text-sm font-medium text-slate-700">Email</label>
-              <div className="mt-1 relative rounded-md shadow-sm">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
-                  {/* Envelope Icon */}
-                  <svg className="h-5 width-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                  </svg>
-                </div>
-                <input
-                  type="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="block w-full pl-10 pr-3 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm placeholder-slate-400 bg-slate-50/50"
-                  placeholder="name@example.com"
-                />
+            {successMsg && (
+              <div className="mb-4 bg-green-50 border-l-4 border-green-500 p-4 rounded-md">
+                <p className="text-sm text-green-700">{successMsg}</p>
               </div>
-            </div>
+            )}
 
-            {isSignUp ? (
-              <div className="grid grid-cols-2 gap-4">
+            <form className="space-y-5" onSubmit={handleEmailAuth}>
+              {isSignUp && (
                 <div>
-                  <label className="block text-sm font-medium text-slate-700">Mật khẩu</label>
-                  <div className="mt-1 relative rounded-md shadow-sm">
+                  <label className="block text-sm font-medium text-slate-700">Họ và tên</label>
+                  <div className="mt-1.5 relative rounded-md shadow-sm">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
-                      <svg className="h-5 width-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                      </svg>
+                    </div>
+                    <input
+                      type="text"
+                      required
+                      value={fullName}
+                      onChange={(e) => setFullName(e.target.value)}
+                      className="block w-full pl-10 pr-3 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm placeholder-slate-400 bg-slate-50/50"
+                      placeholder="Nguyễn Văn A"
+                    />
+                  </div>
+                </div>
+              )}
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700">Email</label>
+                <div className="mt-1.5 relative rounded-md shadow-sm">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    </svg>
+                  </div>
+                  <input
+                    type="email"
+                    required
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="block w-full pl-10 pr-3 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm placeholder-slate-400 bg-slate-50/50"
+                    placeholder="name@example.com"
+                  />
+                </div>
+              </div>
+
+              {isSignUp ? (
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700">Mật khẩu</label>
+                    <div className="mt-1.5 relative rounded-md shadow-sm">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                        <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                        </svg>
+                      </div>
+                      <input
+                        type={showPassword ? 'text' : 'password'}
+                        required
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        className="block w-full pl-10 pr-10 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm placeholder-slate-400 bg-slate-50/50"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600"
+                      >
+                        {showPassword ? (
+                          <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+                          </svg>
+                        ) : (
+                          <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                          </svg>
+                        )}
+                      </button>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700">Xác nhận mật khẩu</label>
+                    <div className="mt-1.5 relative rounded-md shadow-sm">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                        <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                        </svg>
+                      </div>
+                      <input
+                        type={showConfirmPassword ? 'text' : 'password'}
+                        required
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        className="block w-full pl-10 pr-10 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm placeholder-slate-400 bg-slate-50/50"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                        className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600"
+                      >
+                        {showConfirmPassword ? (
+                          <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+                          </svg>
+                        ) : (
+                          <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                          </svg>
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div>
+                  <div className="flex justify-between items-center">
+                    <label className="block text-sm font-medium text-slate-700">Mật khẩu</label>
+                    <a href="#" className="text-sm font-semibold text-indigo-600 hover:text-indigo-500">Quên mật khẩu?</a>
+                  </div>
+                  <div className="mt-1.5 relative rounded-md shadow-sm">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                      <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                       </svg>
                     </div>
@@ -249,11 +399,11 @@ export default function Auth({ onLoginSuccess }) {
                       className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600"
                     >
                       {showPassword ? (
-                        <svg className="h-5 width-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
                         </svg>
                       ) : (
-                        <svg className="h-5 width-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                         </svg>
@@ -261,143 +411,77 @@ export default function Auth({ onLoginSuccess }) {
                     </button>
                   </div>
                 </div>
+              )}
 
-                <div>
-                  <label className="block text-sm font-medium text-slate-700">Xác nhận mật khẩu</label>
-                  <div className="mt-1 relative rounded-md shadow-sm">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
-                      <svg className="h-5 width-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                      </svg>
-                    </div>
-                    <input
-                      type={showConfirmPassword ? 'text' : 'password'}
-                      required
-                      value={confirmPassword}
-                      onChange={(e) => setConfirmPassword(e.target.value)}
-                      className="block w-full pl-10 pr-10 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm placeholder-slate-400 bg-slate-50/50"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                      className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600"
-                    >
-                      {showConfirmPassword ? (
-                        <svg className="h-5 width-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
-                        </svg>
-                      ) : (
-                        <svg className="h-5 width-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                        </svg>
-                      )}
-                    </button>
-                  </div>
-                </div>
+              <div className="flex items-center">
+                <input
+                  id="remember_or_agree"
+                  type="checkbox"
+                  checked={isSignUp ? agreeTerms : rememberMe}
+                  onChange={(e) => isSignUp ? setAgreeTerms(e.target.checked) : setRememberMe(e.target.checked)}
+                  className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-slate-300 rounded"
+                />
+                <label htmlFor="remember_or_agree" className="ml-2 block text-sm text-slate-700 select-none">
+                  {isSignUp ? (
+                    <span>Tôi đồng ý với <span className="text-indigo-600 font-semibold hover:underline cursor-pointer">điều khoản sử dụng</span>.</span>
+                  ) : (
+                    'Ghi nhớ đăng nhập'
+                  )}
+                </label>
               </div>
-            ) : (
+
               <div>
-                <div className="flex justify-between items-center">
-                  <label className="block text-sm font-medium text-slate-700">Mật khẩu</label>
-                  <a href="#" className="text-sm font-semibold text-indigo-600 hover:text-indigo-500">Quên mật khẩu?</a>
-                </div>
-                <div className="mt-1 relative rounded-md shadow-sm">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
-                    <svg className="h-5 width-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full flex items-center justify-center py-2.5 px-4 border border-transparent rounded-xl shadow-sm text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <span>{loading ? 'Đang xử lý...' : (isSignUp ? 'Đăng ký' : 'Đăng nhập')}</span>
+                  {!loading && (
+                    <svg className="w-4 h-4 ml-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h3a3 3 0 013 3v1" />
                     </svg>
-                  </div>
-                  <input
-                    type={showPassword ? 'text' : 'password'}
-                    required
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="block w-full pl-10 pr-10 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm placeholder-slate-400 bg-slate-50/50"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600"
-                  >
-                    {showPassword ? (
-                      <svg className="h-5 width-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
-                      </svg>
-                    ) : (
-                      <svg className="h-5 width-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                      </svg>
-                    )}
-                  </button>
-                </div>
+                  )}
+                </button>
               </div>
-            )}
-
-            <div className="flex items-center">
-              <input
-                id="remember_or_agree"
-                type="checkbox"
-                checked={isSignUp ? agreeTerms : rememberMe}
-                onChange={(e) => isSignUp ? setAgreeTerms(e.target.checked) : setRememberMe(e.target.checked)}
-                className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-slate-300 rounded"
-              />
-              <label htmlFor="remember_or_agree" className="ml-2 block text-sm text-slate-700 select-none">
-                {isSignUp ? (
-                  <span>Tôi đồng ý với <span className="text-indigo-600 font-medium hover:underline cursor-pointer">điều khoản sử dụng</span>.</span>
-                ) : (
-                  'Ghi nhớ đăng nhập'
-                )}
-              </label>
-            </div>
-
-            <div>
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-xl shadow-sm text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {loading ? 'Đang xử lý...' : (isSignUp ? 'Đăng ký' : 'Đăng nhập')}
-              </button>
-            </div>
-          </form>
-
-          <div className="mt-6">
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-slate-200" />
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white text-slate-500">Hoặc {isSignUp ? 'đăng ký' : 'đăng nhập'} với</span>
-              </div>
-            </div>
+            </form>
 
             <div className="mt-6">
-              <button
-                type="button"
-                onClick={() => setShowGoogleChooser(true)}
-                className="w-full inline-flex justify-center py-2.5 px-4 rounded-xl border border-slate-200 bg-white text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50/80 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150 ease-in-out"
-              >
-                <svg className="h-5 w-5 mr-2" viewBox="0 0 24 24">
-                  <path fill="#EA4335" d="M12.24 10.285V14.4h6.887c-.648 2.41-2.519 4.114-5.136 4.114A5.79 5.79 0 0 1 8.2 12.728a5.79 5.79 0 0 1 5.79-5.79c2.479 0 4.547 1.488 5.404 3.613l3.87-2.996C21.134 3.738 17.062 1 12 1 5.925 1 1 5.925 1 12s4.925 11 11 11c5.688 0 10.4-4.114 10.843-9.5H12.24z" />
-                </svg>
-                {isSignUp ? 'Đăng ký bằng Google' : 'Đăng nhập với Google'}
-              </button>
-            </div>
-          </div>
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-slate-200" />
+                </div>
+                <div className="relative flex justify-center text-sm">
+                  <span className="px-2 bg-white text-slate-500">Hoặc đăng nhập với</span>
+                </div>
+              </div>
 
-          <div className="mt-6 text-center">
-            <p className="text-sm text-slate-600">
-              {isSignUp ? 'Bạn đã có tài khoản?' : 'Bạn chưa có tài khoản?'}{' '}
-              <button
-                type="button"
-                onClick={() => setIsSignUp(!isSignUp)}
-                className="font-semibold text-indigo-600 hover:text-indigo-500 focus:outline-none"
-              >
-                {isSignUp ? 'Đăng nhập' : 'Đăng ký ngay'}
-              </button>
-            </p>
+              <div className="mt-6">
+                <button
+                  type="button"
+                  onClick={() => setShowGoogleChooser(true)}
+                  className="w-full inline-flex items-center justify-center py-2.5 px-4 rounded-xl border border-slate-200 bg-white text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50 transition duration-150 ease-in-out"
+                >
+                  <svg className="h-5 w-5 mr-2" viewBox="0 0 24 24">
+                    <path fill="#EA4335" d="M12.24 10.285V14.4h6.887c-.648 2.41-2.519 4.114-5.136 4.114A5.79 5.79 0 0 1 8.2 12.728a5.79 5.79 0 0 1 5.79-5.79c2.479 0 4.547 1.488 5.404 3.613l3.87-2.996C21.134 3.738 17.062 1 12 1 5.925 1 1 5.925 1 12s4.925 11 11 11c5.688 0 10.4-4.114 10.843-9.5H12.24z" />
+                  </svg>
+                  {isSignUp ? 'Đăng ký bằng Google' : 'Đăng nhập với Google'}
+                </button>
+              </div>
+            </div>
+
+            <div className="mt-6 text-center">
+              <p className="text-sm text-slate-600">
+                {isSignUp ? 'Bạn đã có tài khoản?' : 'Bạn chưa có tài khoản?'}{' '}
+                <button
+                  type="button"
+                  onClick={() => setIsSignUp(!isSignUp)}
+                  className="font-semibold text-indigo-600 hover:text-indigo-500 focus:outline-none"
+                >
+                  {isSignUp ? 'Đăng nhập' : 'Đăng ký ngay'}
+                </button>
+              </p>
+            </div>
           </div>
         </div>
       </div>
@@ -413,7 +497,7 @@ export default function Auth({ onLoginSuccess }) {
               <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
             </svg>
             <h3 className="text-lg font-bold text-slate-800 text-center">Chọn tài khoản</h3>
-            <p className="text-xs text-slate-500 mt-1 mb-5">để tiếp tục đến X-Interview</p>
+            <p className="text-xs text-slate-500 mt-1 mb-5">để tiếp tục đến Viet-Interview</p>
 
             {showNewGoogleForm ? (
               <form onSubmit={handleRegisterNewGoogleAccount} className="w-full space-y-4">
@@ -506,7 +590,7 @@ export default function Auth({ onLoginSuccess }) {
                 onClick={() => {
                   onLoginSuccess({
                     id: '00000000-0000-0000-0000-000000000000',
-                    email: 'guest@xinterview.com',
+                    email: 'guest@vietinterview.com',
                     full_name: 'Đức Tiến',
                     role: 'candidate'
                   });

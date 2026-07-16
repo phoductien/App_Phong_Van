@@ -185,12 +185,12 @@ function App() {
         <aside className="w-72 border-r border-slate-200 bg-[#f8fafc] flex flex-col justify-between p-5 flex-shrink-0 select-none">
           <div className="space-y-7">
             {/* Logo */}
-            <div className="flex items-center gap-3 px-2 py-1">
-              <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white font-extrabold text-lg shadow-sm shadow-indigo-600/30">
-                X
+            <div className="flex items-center gap-2.5 px-2 py-1">
+              <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white font-extrabold text-sm shadow-sm shadow-indigo-600/30">
+                VI
               </div>
               <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-indigo-800 tracking-tight">
-                X-Interview
+                Viet-Interview
               </span>
             </div>
 
@@ -299,7 +299,7 @@ function App() {
       navigation={
         <SideNavigation
           activeHref={activeTab === 'interviewer' ? recruiterTab : activeTab}
-          header={{ href: '#', text: `X-Interview — Nhà tuyển dụng` }}
+          header={{ href: '#', text: `Viet-Interview — Nhà tuyển dụng` }}
           onFollow={({ detail }) => {
             if (detail.id === 'logout') {
               if (confirm('Bạn có chắc chắn muốn đăng xuất tài khoản?')) {
