@@ -1,28 +1,30 @@
-# Lộ Trình Phát Triển (PLAN.md)
+# Lộ Trình Phát Triển X-Interview (PLAN.md)
 
-Tài liệu này vạch ra các giai đoạn phát triển và tích hợp của Nền tảng Phỏng vấn thông minh.
+Tài liệu này vạch ra các giai đoạn phát triển và tích hợp của Nền tảng Phỏng vấn thông minh X-Interview.
 
 ## Các Giai Đoạn Phát Triển
 
-### Giai Đoạn 1: Thiết Lập Môi Trường & Cơ Sở Dữ Liệu
-*   [ ] Thiết lập cơ sở dữ liệu Supabase với các bảng: `profiles`, `cv_vault`, `companies`, `question_banks`, `interview_sessions`.
-*   [ ] Thiết lập cấu hình `.agent/` để dẫn dắt AI hoạt động đúng nghiệp vụ.
+### Phase 1: Thiết Kế Kiến Trúc & Tạo Tài Liệu Kỹ Thuật [Đã hoàn thành Docs]
+*   [x] Khởi tạo các tài liệu kỹ thuật cốt lõi: `docs/PHASE_1_ARCHITECTURE.md`, `docs/PHASE_2_DATABASE_SCHEMA.md`, `docs/PHASE_3_UI_COMPONENTS.md`, `docs/PHASE_4_AI_INTEGRATION.md`.
+*   [ ] Thiết lập cấu hình `.agent/skills/save_checkpoint.md` quản lý mã nguồn.
 
-### Giai Đoạn 2: Xây Dựng API Backend (Node.js/Express)
-*   [ ] Kết nối Supabase bằng `@supabase/supabase-client`.
-*   [ ] Viết API quản lý CV ứng viên: Tải lên, truy xuất danh sách CV đã lưu.
-*   [ ] Viết API quản lý bộ đề câu hỏi: Lưu trữ, truy vấn câu hỏi theo Công ty/Cấp độ.
-*   [ ] Viết API quản lý phiên phỏng vấn: Khởi tạo phiên, lưu lịch sử, cập nhật chỉ số câu hỏi hiện tại.
+### Phase 2: Thiết Kế Cơ Sở Dữ Liệu & Cấu Hình Bảo Mật (Supabase & RLS)
+*   [ ] Cập nhật bảng cơ sở dữ liệu Supabase, thêm Postgres Triggers tự động đồng bộ profiles từ `auth.users`.
+*   [ ] Cấu hình chi tiết các chính sách Row Level Security (RLS) bảo vệ thông tin ứng viên và đề thi doanh nghiệp.
 
-### Giai Đoạn 3: Phát Triển Giao Diện (React + Cloudscape Design)
-*   [ ] Tích hợp Cloudscape Design cho Layout, Form và container chính.
-*   [ ] Tạo màn hình **Bắt đầu phỏng vấn**: Chọn CV từ hồ sơ, Chọn Công ty & Vị trí mục tiêu.
-*   [ ] Tạo màn hình **Phòng phỏng vấn (Interview Room)**: Giao diện Chatbot tương tác thời gian thực, hiển thị tiến trình (câu hỏi X/10).
+### Phase 3: Phát Triển Dashboard Vai Trò & Trang Đăng Nhập Custom (Tailwind CSS)
+*   [ ] Dựng trang Đăng ký / Đăng nhập hoàn toàn bằng Tailwind CSS thuần (hỗ trợ ẩn/hiện mật khẩu, chọn vai trò).
+*   [ ] Phát triển Dashboard Ứng viên (Candidate) hiển thị 4 stats cards, Banner lớn, bộ lọc tìm kiếm và bảng việc làm gợi ý.
+*   [ ] Hoàn thiện Dashboard Nhà tuyển dụng (Recruiter) dạng Tab chứa bảng theo dõi phòng live, quản lý CV vault, xem webcam phân tích biểu cảm.
+*   [ ] Bổ sung các trang bổ trợ: Pricing (Gói dịch vụ), Blog (Tin tức).
 
-### Giai Đoạn 4: Trí Tuệ Nhân Tạo & Điều Phối
-*   [ ] Tích hợp prompt mẫu cho AI để chấm điểm, nhận xét câu trả lời của ứng viên từng câu.
-*   [ ] Xử lý CV tự động (CV Parsing) để gợi ý công ty/lĩnh vực phù hợp.
+### Phase 4: AI Engine, Tính năng Smart Scraping & Phòng Phỏng Vấn (Role Rotation)
+*   [ ] Xây dựng API `/api/crawl-jd` tải và bóc tách tự động link tuyển dụng thực tế bằng Cheerio & Gemini.
+*   [ ] Xây dựng phòng phỏng vấn Tailwind CSS chat bubble, hỗ trợ đếm giờ và polling kích hoạt mở khóa phòng thi từ HR.
+*   [ ] Tích hợp API `/api/interview/chat` chấm điểm tự động, chống trả lời lạc đề (anti-derailment) và xoay vòng vai trò hội đồng phỏng vấn (Tech Lead, HR, PM).
 
-### Giai Đoạn 5: Triển Khai & Kiểm Thử
-*   [ ] Đưa ứng dụng lên Vercel (Monorepo setup hoặc Serverless functions).
-*   [ ] Kiểm thử toàn trình (E2E Test) từ bước đăng nhập, tạo đề, phỏng vấn đến xem báo cáo chấm điểm.
+### Phase 5: Đóng Gói, Deploy & Hướng Dẫn Vận Hành
+*   [ ] Kiểm tra biên dịch sản phẩm (`npm run build`).
+*   [ ] Cập nhật tệp hướng dẫn vận hành hệ thống `README.md`.
+*   [ ] Triển khai ứng dụng lên nền tảng cloud Vercel & Render.
+
