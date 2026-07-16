@@ -23,8 +23,8 @@ Tài liệu này vạch ra các giai đoạn phát triển và tích hợp của
 *   [x] Xây dựng phòng phỏng vấn Tailwind CSS chat bubble, hỗ trợ đếm giờ và polling kích hoạt mở khóa phòng thi từ HR.
 *   [x] Tích hợp API `/api/sessions/answer` chấm điểm tự động, chống trả lời lạc đề (anti-derailment) và xoay vòng vai trò hội đồng phỏng vấn (Tech Lead, HR, PM).
 
-### Phase 5: Đóng Gói, Deploy & Hướng Dẫn Vận Hành
-*   [ ] Kiểm tra biên dịch sản phẩm (`npm run build`).
-*   [ ] Cập nhật tệp hướng dẫn vận hành hệ thống `README.md`.
-*   [ ] Triển khai ứng dụng lên nền tảng cloud Vercel & Render.
+### Phase 5: Đóng Gói, Deploy & Hướng Dẫn Vận Hành [Đã hoàn thành]
+*   [x] Kiểm tra biên dịch sản phẩm (`npm run build`).
+*   [x] Cập nhật tệp hướng dẫn vận hành hệ thống `README.md`.
+*   [x] Triển khai ứng dụng lên nền tảng cloud Vercel & Render.
 
