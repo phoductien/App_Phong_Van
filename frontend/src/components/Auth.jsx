@@ -1,6 +1,19 @@
 import React, { useState, useEffect } from 'react';
+import { createClient } from '@supabase/supabase-js';
 
 const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:5000';
+
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
+
+let supabase = null;
+if (supabaseUrl && supabaseAnonKey && supabaseUrl !== 'your_supabase_project_url') {
+  try {
+    supabase = createClient(supabaseUrl, supabaseAnonKey);
+  } catch (err) {
+    console.error("Supabase init error:", err.message);
+  }
+}
 
 export default function Auth({ onLoginSuccess }) {
   const [isSignUp, setIsSignUp] = useState(false);
@@ -79,6 +92,25 @@ export default function Auth({ onLoginSuccess }) {
 
     setShowNewGoogleForm(false);
     handleSelectGoogleAccount(newAcc);
+  };
+
+  const handleGoogleLogin = async () => {
+    if (supabase) {
+      setLoading(true);
+      setErrorMsg('');
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: window.location.origin
+        }
+      });
+      if (error) {
+        setErrorMsg('Lỗi đăng nhập Google: ' + error.message);
+        setLoading(false);
+      }
+    } else {
+      setShowGoogleChooser(true);
+    }
   };
 
   const handleEmailAuth = (e) => {
@@ -444,7 +476,7 @@ export default function Auth({ onLoginSuccess }) {
               <div className="mt-6">
                 <button
                   type="button"
-                  onClick={() => setShowGoogleChooser(true)}
+                  onClick={handleGoogleLogin}
                   className="w-full inline-flex items-center justify-center py-2.5 px-4 rounded-xl border border-slate-200 bg-white text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50 transition duration-150 ease-in-out"
                 >
                   <svg className="h-5 w-5 mr-2" viewBox="0 0 24 24">

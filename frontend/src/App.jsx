@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { createClient } from '@supabase/supabase-js';
 import '@cloudscape-design/global-styles/index.css';
 import {
   AppLayout,
@@ -18,12 +19,72 @@ import CVProfile from './components/CVProfile';
 import Pricing from './components/Pricing';
 import Blog from './components/Blog';
 
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
+
+let supabase = null;
+if (supabaseUrl && supabaseAnonKey && supabaseUrl !== 'your_supabase_project_url') {
+  try {
+    supabase = createClient(supabaseUrl, supabaseAnonKey);
+  } catch (err) {
+    console.error("Supabase init error in App.jsx:", err.message);
+  }
+}
+
 function App() {
   const [user, setUser] = useState(null);
   const [role, setRole] = useState('candidate'); // 'candidate' or 'interviewer'
   const [activeTab, setActiveTab] = useState('home');
   const [activeSession, setActiveSession] = useState(null);
   const [recruiterTab, setRecruiterTab] = useState('live_rooms');
+
+  useEffect(() => {
+    if (!supabase) return;
+
+    // Check active session on startup
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user) {
+        const metadata = session.user.user_metadata || {};
+        const fullName = metadata.full_name || metadata.name || session.user.email.split('@')[0];
+        
+        let resolvedRole = 'candidate';
+        if (metadata.role === 'interviewer' || session.user.email.includes('interviewer') || session.user.email.includes('recruiter')) {
+          resolvedRole = 'interviewer';
+        }
+
+        setUser({
+          id: session.user.id,
+          email: session.user.email,
+          full_name: fullName,
+          role: resolvedRole
+        });
+      }
+    });
+
+    // Listen to Auth State Changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (session?.user) {
+        const metadata = session.user.user_metadata || {};
+        const fullName = metadata.full_name || metadata.name || session.user.email.split('@')[0];
+        
+        let resolvedRole = 'candidate';
+        if (metadata.role === 'interviewer' || session.user.email.includes('interviewer') || session.user.email.includes('recruiter')) {
+          resolvedRole = 'interviewer';
+        }
+
+        setUser({
+          id: session.user.id,
+          email: session.user.email,
+          full_name: fullName,
+          role: resolvedRole
+        });
+      } else {
+        setUser(null);
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
 
   useEffect(() => {
     if (user && user.role) {
@@ -265,6 +326,9 @@ function App() {
               <button
                 onClick={() => {
                   if (confirm('Bạn có chắc chắn muốn đăng xuất?')) {
+                    if (supabase) {
+                      supabase.auth.signOut();
+                    }
                     setUser(null);
                     setActiveSession(null);
                     setActiveTab('home');
@@ -303,6 +367,9 @@ function App() {
           onFollow={({ detail }) => {
             if (detail.id === 'logout') {
               if (confirm('Bạn có chắc chắn muốn đăng xuất tài khoản?')) {
+                if (supabase) {
+                  supabase.auth.signOut();
+                }
                 setUser(null);
                 setActiveSession(null);
                 setActiveTab('home');
