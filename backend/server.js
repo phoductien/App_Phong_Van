@@ -424,6 +424,62 @@ app.post('/api/cv', async (req, res) => {
   }
 });
 
+// API: Delete a CV
+app.delete('/api/cv/:id', async (req, res) => {
+  const { id } = req.params;
+
+  let fileUrl = '';
+
+  // 1. Delete from mock list if it exists there
+  const mockCvIndex = mockCvs.findIndex(c => c.id === id);
+  if (mockCvIndex !== -1) {
+    fileUrl = mockCvs[mockCvIndex].file_url;
+    mockCvs.splice(mockCvIndex, 1);
+  }
+
+  // 2. Delete from Supabase if active and is a valid UUID
+  if (!isMock && isValidUUID(id)) {
+    try {
+      const { data: cvData } = await supabase
+        .from('cv_vault')
+        .select('file_url')
+        .eq('id', id)
+        .single();
+      
+      if (cvData) {
+        fileUrl = cvData.file_url;
+      }
+
+      const { error } = await supabase
+        .from('cv_vault')
+        .delete()
+        .eq('id', id);
+
+      if (error) {
+        console.warn("Supabase delete failed, proceeding to disk check:", error.message);
+      }
+    } catch (err) {
+      console.warn("Supabase delete exception:", err.message);
+    }
+  }
+
+  // 3. Delete file from local disk if it was stored locally
+  if (fileUrl && fileUrl.includes('/uploads/')) {
+    try {
+      const filename = fileUrl.split('/').pop();
+      const filePath = path.join(uploadsDir, filename);
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+        console.log("Successfully deleted local CV file from disk:", filename);
+      }
+    } catch (diskErr) {
+      console.error("Failed to delete CV file from local disk:", diskErr.message);
+    }
+  }
+
+  return res.json({ success: true, message: "Đã xóa CV thành công." });
+});
+
 // API: Get list of companies
 app.get('/api/companies', async (req, res) => {
   if (isMock) {

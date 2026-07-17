@@ -104,6 +104,33 @@ export default function CVProfile({ userId = '00000000-0000-0000-0000-0000000000
     reader.readAsDataURL(file);
   };
 
+  const handleDeleteCv = async (cvId, filename) => {
+    if (!window.confirm(`Bạn có chắc chắn muốn xóa tệp CV "${filename}" khỏi hồ sơ không?`)) {
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setErrorMsg('');
+      setSuccessMsg('');
+      const res = await fetch(`${API_BASE}/api/cv/${cvId}`, {
+        method: 'DELETE'
+      });
+
+      if (res.ok) {
+        setSuccessMsg(`Đã xóa tệp CV "${filename}" thành công.`);
+        fetchCvs();
+      } else {
+        setErrorMsg('Không thể xóa CV.');
+      }
+    } catch (err) {
+      console.error(err);
+      setErrorMsg('Lỗi kết nối khi xóa CV.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <SpaceBetween size="l" direction="vertical">
       <Container header={<Header variant="h2" description="Quản lý hồ sơ CV và thư mời xin việc của bạn">Hồ Sơ CV</Header>}>
@@ -296,7 +323,7 @@ export default function CVProfile({ userId = '00000000-0000-0000-0000-0000000000
                   <div
                     style={{
                       display: 'flex',
-                      gap: '8px',
+                      gap: '6px',
                       borderTop: '1px solid #e2e8f0',
                       paddingTop: '10px',
                       justifyContent: 'space-between'
@@ -307,10 +334,10 @@ export default function CVProfile({ userId = '00000000-0000-0000-0000-0000000000
                       target="_blank"
                       rel="noopener noreferrer"
                       style={{
-                        flex: 1,
+                        flex: 1.2,
                         textAlign: 'center',
                         padding: '6px 0',
-                        fontSize: '12px',
+                        fontSize: '11px',
                         color: '#00b14f',
                         border: '1px solid #00b14f',
                         borderRadius: '6px',
@@ -320,7 +347,7 @@ export default function CVProfile({ userId = '00000000-0000-0000-0000-0000000000
                         display: 'inline-flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        gap: '4px',
+                        gap: '2px',
                         cursor: 'pointer'
                       }}
                     >
@@ -332,10 +359,10 @@ export default function CVProfile({ userId = '00000000-0000-0000-0000-0000000000
                       target="_blank"
                       rel="noopener noreferrer"
                       style={{
-                        flex: 1,
+                        flex: 1.2,
                         textAlign: 'center',
                         padding: '6px 0',
-                        fontSize: '12px',
+                        fontSize: '11px',
                         color: '#ffffff',
                         border: '1px solid #00b14f',
                         borderRadius: '6px',
@@ -345,12 +372,34 @@ export default function CVProfile({ userId = '00000000-0000-0000-0000-0000000000
                         display: 'inline-flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        gap: '4px',
+                        gap: '2px',
                         cursor: 'pointer'
                       }}
                     >
                       📥 Tải về
                     </a>
+                    <button
+                      onClick={() => handleDeleteCv(cv.id, filename)}
+                      style={{
+                        flex: 1,
+                        textAlign: 'center',
+                        padding: '6px 0',
+                        fontSize: '11px',
+                        color: '#ef4444',
+                        border: '1px solid #fee2e2',
+                        borderRadius: '6px',
+                        background: '#fee2e2',
+                        fontWeight: '600',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '2px',
+                        cursor: 'pointer',
+                        transition: 'background 0.2s'
+                      }}
+                    >
+                      🗑️ Xóa
+                    </button>
                   </div>
                 </div>
               );
