@@ -215,7 +215,11 @@ export default function CVProfile({ userId = '00000000-0000-0000-0000-0000000000
         ) : (
           <Grid gridDefinition={cvs.map(() => ({ colspan: 4 }))}>
             {cvs.map(cv => {
-              const filename = cv.file_url.split('/').pop();
+              let displayUrl = cv.file_url;
+              if (window.location.protocol === 'https:' && displayUrl.startsWith('http://') && !displayUrl.includes('localhost')) {
+                displayUrl = displayUrl.replace('http://', 'https://');
+              }
+              const filename = displayUrl.split('/').pop();
               const formattedDate = new Date(cv.uploaded_at).toLocaleDateString('vi-VN', {
                 day: '2-digit',
                 month: '2-digit',
@@ -250,10 +254,10 @@ export default function CVProfile({ userId = '00000000-0000-0000-0000-0000000000
                       borderTop: '5px solid #00b14f'
                     }}
                   >
-                    {cv.file_url.toLowerCase().endsWith('.pdf') ? (
+                    {displayUrl.toLowerCase().endsWith('.pdf') ? (
                       <div style={{ width: '100%', height: '100%', position: 'relative' }}>
                         <iframe
-                          src={`${cv.file_url}#toolbar=0&navpanes=0&scrollbar=0`}
+                          src={`${displayUrl}#toolbar=0&navpanes=0&scrollbar=0`}
                           style={{
                             width: '100%',
                             height: '100%',
@@ -330,7 +334,7 @@ export default function CVProfile({ userId = '00000000-0000-0000-0000-0000000000
                     }}
                   >
                     <a
-                      href={cv.file_url}
+                      href={displayUrl}
                       target="_blank"
                       rel="noopener noreferrer"
                       style={{
@@ -354,7 +358,7 @@ export default function CVProfile({ userId = '00000000-0000-0000-0000-0000000000
                       👁️ Xem
                     </a>
                     <a
-                      href={cv.file_url}
+                      href={displayUrl}
                       download={filename}
                       target="_blank"
                       rel="noopener noreferrer"

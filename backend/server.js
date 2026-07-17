@@ -136,7 +136,15 @@ const uploadsDir = path.join(__dirname, 'public', 'uploads');
 if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir, { recursive: true });
 }
-app.use('/uploads', express.static(path.join(__dirname, 'public', 'uploads')));
+app.use('/uploads', (req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+  if (req.path.toLowerCase().endsWith('.pdf')) {
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', 'inline');
+  }
+  next();
+}, express.static(path.join(__dirname, 'public', 'uploads')));
 
 global.recruiterJoinedSessions = {};
 
@@ -328,7 +336,11 @@ app.post('/api/cv/upload', async (req, res) => {
 
     fs.writeFileSync(filePath, fileBuffer);
 
-    const fileUrl = `${req.protocol}://${req.get('host')}/uploads/${uniqueFilename}`;
+    let protocol = req.protocol;
+    if (!req.get('host').includes('localhost')) {
+      protocol = 'https';
+    }
+    const fileUrl = `${protocol}://${req.get('host')}/uploads/${uniqueFilename}`;
 
     if (isMock || !isValidUUID(userId)) {
       const newCv = {
