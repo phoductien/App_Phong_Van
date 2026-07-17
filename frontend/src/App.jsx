@@ -1,23 +1,24 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { createClient } from '@supabase/supabase-js';
 import '@cloudscape-design/global-styles/index.css';
 import {
   AppLayout,
   SideNavigation,
   Header,
-  ContentLayout
+  ContentLayout,
+  Spinner
 } from '@cloudscape-design/components';
 
-import Auth from './components/Auth';
-import HomeDashboard from './components/HomeDashboard';
-import StartInterview from './components/StartInterview';
-import InterviewRoom from './components/InterviewRoom';
-import InterviewerDashboard from './components/InterviewerDashboard';
-import QuestionBankViewer from './components/QuestionBankViewer';
-import JobsDashboard from './components/JobsDashboard';
-import CVProfile from './components/CVProfile';
-import Pricing from './components/Pricing';
-import Blog from './components/Blog';
+const Auth = lazy(() => import('./components/Auth'));
+const HomeDashboard = lazy(() => import('./components/HomeDashboard'));
+const StartInterview = lazy(() => import('./components/StartInterview'));
+const InterviewRoom = lazy(() => import('./components/InterviewRoom'));
+const InterviewerDashboard = lazy(() => import('./components/InterviewerDashboard'));
+const QuestionBankViewer = lazy(() => import('./components/QuestionBankViewer'));
+const JobsDashboard = lazy(() => import('./components/JobsDashboard'));
+const CVProfile = lazy(() => import('./components/CVProfile'));
+const Pricing = lazy(() => import('./components/Pricing'));
+const Blog = lazy(() => import('./components/Blog'));
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
@@ -235,9 +236,12 @@ function App() {
     }
   };
 
-  // If user is not authenticated, render the premium Auth/Login panel
   if (!user) {
-    return <Auth onLoginSuccess={(u) => setUser(u)} />;
+    return (
+      <Suspense fallback={<div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}><Spinner size="large" /></div>}>
+        <Auth onLoginSuccess={(u) => setUser(u)} />
+      </Suspense>
+    );
   }
 
   // 1. Candidate Custom Tailwind Layout
@@ -359,7 +363,9 @@ function App() {
         {/* Main Content Area */}
         <main className="flex-1 overflow-y-auto p-8 bg-slate-50/10">
           <div className="max-w-6xl mx-auto">
-            {renderCandidateContent()}
+            <Suspense fallback={<div style={{ display: 'flex', justifyContent: 'center', padding: '60px' }}><Spinner size="large" /></div>}>
+              {renderCandidateContent()}
+            </Suspense>
           </div>
         </main>
       </div>
@@ -410,7 +416,11 @@ function App() {
           ]}
         />
       }
-      content={renderRecruiterContent()}
+      content={
+        <Suspense fallback={<div style={{ display: 'flex', justifyContent: 'center', padding: '60px' }}><Spinner size="large" /></div>}>
+          {renderRecruiterContent()}
+        </Suspense>
+      }
       toolsHide={true}
     />
   );
