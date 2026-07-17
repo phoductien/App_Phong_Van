@@ -137,43 +137,68 @@ export default function CVProfile({ userId = '00000000-0000-0000-0000-0000000000
         {errorMsg && <Alert type="error" dismissible onDismiss={() => setErrorMsg('')}>{errorMsg}</Alert>}
         {successMsg && <Alert type="success" dismissible onDismiss={() => setSuccessMsg('')}>{successMsg}</Alert>}
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-          {/* File Upload Button + Spinner */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <input
-              type="file"
-              id="profile-cv-upload"
-              accept=".pdf,.doc,.docx"
-              onChange={handleFileChange}
-              style={{ display: 'none' }}
-            />
-            <Button
-              iconName="upload"
-              onClick={() => document.getElementById('profile-cv-upload').click()}
-              loading={uploading}
-            >
-              Chọn file CV từ thiết bị
-            </Button>
-            <span style={{ fontSize: '12px', color: '#64748b' }}>
-              Định dạng hỗ trợ: PDF, DOC, DOCX (Tối đa 50MB)
-            </span>
-          </div>
-
-          {/* Quick URL form */}
-          <div style={{ borderTop: '1px solid #f1f5f9', paddingTop: '16px' }}>
-            <SpaceBetween direction="horizontal" size="xs">
-              <div style={{ flexGrow: 1 }}>
-                <Input
-                  value={cvInput}
-                  onChange={({ detail }) => setCvInput(detail.value)}
-                  placeholder="Hoặc nhập đường dẫn URL file CV PDF của bạn (Ví dụ: https://example.com/my_cv.pdf)..."
-                />
+        {/* Upload simulated dropzone area matching image 4 */}
+        <input
+          type="file"
+          id="profile-cv-upload"
+          accept=".pdf,.doc,.docx"
+          onChange={handleFileChange}
+          style={{ display: 'none' }}
+        />
+        <div
+          onClick={() => {
+            if (!uploading) {
+              document.getElementById('profile-cv-upload').click();
+            }
+          }}
+          style={{
+            border: '2px dashed #6366f1',
+            borderRadius: '12px',
+            padding: '40px 20px',
+            background: '#f8fafc',
+            textAlign: 'center',
+            cursor: uploading ? 'not-allowed' : 'pointer',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '12px'
+          }}
+        >
+          {uploading ? (
+            <>
+              <Spinner size="large" />
+              <div style={{ fontWeight: 'bold', fontSize: '15px', color: '#6366f1' }}>
+                Đang tải tệp lên hệ thống...
               </div>
-              <Button variant="primary" onClick={handleUploadCv} disabled={!cvInput.trim()}>
-                Lưu từ URL
-              </Button>
-            </SpaceBetween>
-          </div>
+            </>
+          ) : (
+            <>
+              <div style={{ fontSize: '40px' }}>☁️</div>
+              <div style={{ fontWeight: 'bold', fontSize: '15px', color: '#1e293b' }}>
+                Kéo và thả tệp vào đây hoặc nhấp để duyệt
+              </div>
+              <div style={{ fontSize: '12px', color: '#64748b' }}>
+                Định dạng hỗ trợ: PDF, DOC, DOCX (Kích thước tối đa: 10MB)
+              </div>
+            </>
+          )}
+        </div>
+
+        {/* Quick URL form */}
+        <div style={{ marginTop: '20px', borderTop: '1px solid #f1f5f9', paddingTop: '16px' }}>
+          <SpaceBetween direction="horizontal" size="xs">
+            <div style={{ flexGrow: 1 }}>
+              <Input
+                value={cvInput}
+                onChange={({ detail }) => setCvInput(detail.value)}
+                placeholder="Nhập đường dẫn URL file CV PDF của bạn (Ví dụ: https://example.com/my_cv.pdf)..."
+              />
+            </div>
+            <Button variant="primary" onClick={handleUploadCv} disabled={!cvInput.trim()}>
+              Thêm hồ sơ
+            </Button>
+          </SpaceBetween>
         </div>
       </Container>
 
