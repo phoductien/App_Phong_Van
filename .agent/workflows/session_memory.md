@@ -20,6 +20,7 @@
   - Tích hợp lắng nghe sự kiện thay đổi hash của URL (hashchange với #/auth và #/) để hỗ trợ nút Back/Forward (mũi tên quay lại) của trình duyệt hoạt động hoàn hảo, đồng thời loại bỏ nút Trang chủ thừa ở màn hình đăng nhập.
   - Cập nhật tài liệu `README.md` ở thư mục gốc để phản ánh đầy đủ các tính năng hiện đại vừa bổ sung trong phiên làm việc.
   - Bổ sung mục cảnh báo quan trọng trong `README.md` hướng dẫn các thành viên khác không đẩy code trực tiếp lên nhánh `main` (phải đi qua Pull Request) và cách đẩy code song song lên cả 2 remote repository (`origin` và `public_repo`).
+  - Viết kịch bản khởi tạo tự động `setup.js` đa nền tảng ở thư mục gốc giúp tạo các file `.env` mẫu và tự động chạy `npm install` cho cả 2 nhánh Frontend & Backend chỉ bằng 1 lệnh duy nhất.
 
 ## 2. CẤU TRÚC THƯ MỤC THỰC TẾ ĐÃ TRIỂN KHAI
 - `docs/PHASE_1_ARCHITECTURE.md`: Tài liệu cấu trúc hệ thống, port và sơ đồ luồng dữ liệu.
