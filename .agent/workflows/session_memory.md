@@ -10,6 +10,7 @@
   - Sửa lỗi cứng địa chỉ API localhost bằng cấu hình động `VITE_API_BASE` và sửa lỗi redirect OAuth Google trong Supabase Site URL.
   - Đồng bộ đẩy code song song lên cả 2 repository Public (`App_Phong_Van`) và Private (`app-phong-van`).
   - Giao diện danh sách CV mẫu TopCV thu nhỏ dạng A4, lấy dữ liệu động từ tài khoản ứng viên (Tên, Email, Vai trò, Avatar) và các nút thao tác nhanh (Xem, Tải về) không kèm nút Tạo CV.
+  - Tích hợp tính năng xóa CV (nút Xóa màu đỏ bên cạnh Xem và Tải về) liên kết API DELETE `/api/cv/:id` giải phóng cả cơ sở dữ liệu (Supabase/Mock) và tệp tin thực tế lưu trên đĩa máy chủ.
 
 ## 2. CẤU TRÚC THƯ MỤC THỰC TẾ ĐÃ TRIỂN KHAI
 - `docs/PHASE_1_ARCHITECTURE.md`: Tài liệu cấu trúc hệ thống, port và sơ đồ luồng dữ liệu.
