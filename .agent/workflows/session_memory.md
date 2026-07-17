@@ -21,6 +21,7 @@
   - Cập nhật tài liệu `README.md` ở thư mục gốc để phản ánh đầy đủ các tính năng hiện đại vừa bổ sung trong phiên làm việc.
   - Bổ sung mục cảnh báo quan trọng trong `README.md` hướng dẫn các thành viên khác không đẩy code trực tiếp lên nhánh `main` (phải đi qua Pull Request) và cách đẩy code song song lên cả 2 remote repository (`origin` và `public_repo`).
   - Viết kịch bản khởi tạo tự động `setup.js` đa nền tảng ở thư mục gốc giúp tạo các file `.env` mẫu và tự động chạy `npm install` cho cả 2 nhánh Frontend & Backend chỉ bằng 1 lệnh duy nhất.
+  - Cập nhật sơ đồ cấu trúc mã nguồn trong tài liệu `README.md` để bổ sung trực quan các tệp tin mới tạo (`setup.js`, `backend/.env.example`, `frontend/.env.example`).
 
 ## 2. CẤU TRÚC THƯ MỤC THỰC TẾ ĐÃ TRIỂN KHAI
 - `docs/PHASE_1_ARCHITECTURE.md`: Tài liệu cấu trúc hệ thống, port và sơ đồ luồng dữ liệu.
