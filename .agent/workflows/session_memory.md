@@ -16,6 +16,7 @@
   - Tích hợp bộ hiệu ứng động (CSS keyframes, float animation, scale on hover, rotate, slide-down FAQ) giúp trang Landing sinh động, mượt mà và trực quan.
   - Tích hợp linh kiện `AnimatedCounter` giúp tự động tăng số các số liệu thống kê (20,000+ Câu hỏi, 10,000+ Lượt luyện tập, 35,000+ Việc làm, 157+ Công ty) chạy từ 0 đến giới hạn khi tải trang Landing.
   - Loại bỏ phần dải logo thương hiệu đối tác (VNG, Grab, Shopee, MoMo, FPT) theo yêu cầu tinh giản của người dùng.
+  - Hiện thực hóa tính năng chuyển đổi giao diện sáng/tối (Light/Dark Theme) thực tế và chuyển đổi ngôn ngữ song ngữ Việt/Anh (Vietnamese/English) trên trang Đăng ký / Đăng nhập.
 
 ## 2. CẤU TRÚC THƯ MỤC THỰC TẾ ĐÃ TRIỂN KHAI
 - `docs/PHASE_1_ARCHITECTURE.md`: Tài liệu cấu trúc hệ thống, port và sơ đồ luồng dữ liệu.
