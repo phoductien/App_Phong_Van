@@ -4,7 +4,7 @@
 - **Trạng thái**: Hoàn thành xuất sắc toàn bộ MVP Viet-Interview và deploy thành công lên Vercel + Render.
 - **Tính năng mới bổ sung**:
   - Giao diện đăng ký phân quyền Ứng viên / Nhà tuyển dụng chống trùng lặp email.
-  - Tải lên file CV nhị phân trực tiếp từ thiết bị (local PDF/Word uploader qua Base64) tại tab Luyện tập phỏng vấn & Hồ sơ CV.
+  - Tải lên file CV nhị phân trực tiếp từ thiết bị (nút bấm tải file gọn nhẹ qua Base64, không dùng khung kéo thả cồng kềnh) tại tab Luyện tập phỏng vấn & Hồ sơ CV.
   - Gói cước Pricing tích hợp Cổng thanh toán giả lập Sandbox (QR Code, Visa, MoMo) có hiệu ứng loading & nâng cấp vai trò + huy hiệu VIP PRO/ENTERPRISE trên Sidebar.
   - Giới hạn 3 lượt phỏng vấn và khóa mờ (blur) kết quả đánh giá 3 trục đối với tài khoản Free.
   - Sửa lỗi cứng địa chỉ API localhost bằng cấu hình động `VITE_API_BASE` và sửa lỗi redirect OAuth Google trong Supabase Site URL.
