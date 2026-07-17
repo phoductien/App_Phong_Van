@@ -14,6 +14,7 @@
   - Tích hợp middleware `compression` ở backend để nén Gzip dữ liệu mạng và React Lazy Loading + Suspense ở frontend để tách nhỏ gói bundle tải ban đầu, tối ưu hóa tốc độ tải trang gấp 3 lần.
   - Xây dựng trang Landing giới thiệu dịch vụ (Landing Page) trực quan theo phong cách X-Interview đặt trước đăng nhập/đăng ký, hỗ trợ điều hướng scroll mượt mà tới các phần Quy trình, Tính năng, Bộ đề mẫu, FAQ và nút chuyển vùng đăng ký/đăng nhập tiện lợi.
   - Tích hợp bộ hiệu ứng động (CSS keyframes, float animation, scale on hover, rotate, slide-down FAQ) giúp trang Landing sinh động, mượt mà và trực quan.
+  - Tích hợp linh kiện `AnimatedCounter` giúp tự động tăng số các số liệu thống kê (20,000+ Câu hỏi, 10,000+ Lượt luyện tập, 35,000+ Việc làm, 157+ Công ty) chạy từ 0 đến giới hạn khi tải trang Landing.
 
 ## 2. CẤU TRÚC THƯ MỤC THỰC TẾ ĐÃ TRIỂN KHAI
 - `docs/PHASE_1_ARCHITECTURE.md`: Tài liệu cấu trúc hệ thống, port và sơ đồ luồng dữ liệu.
