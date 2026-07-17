@@ -45,6 +45,27 @@ function App() {
   const [authInitialSignUp, setAuthInitialSignUp] = useState(false);
 
   useEffect(() => {
+    const handleHashChange = () => {
+      const hash = window.location.hash;
+      if (hash.startsWith('#/auth')) {
+        setShowAuth(true);
+        if (hash.includes('signup=true')) {
+          setAuthInitialSignUp(true);
+        } else {
+          setAuthInitialSignUp(false);
+        }
+      } else {
+        setShowAuth(false);
+      }
+    };
+
+    window.addEventListener('hashchange', handleHashChange);
+    handleHashChange(); // Run on mount
+
+    return () => window.removeEventListener('hashchange', handleHashChange);
+  }, []);
+
+  useEffect(() => {
     if (!supabase) return;
 
     // Check active session on startup
@@ -247,13 +268,12 @@ function App() {
           <Auth 
             onLoginSuccess={(u) => setUser(u)} 
             initialSignUp={authInitialSignUp}
-            onBackToLanding={() => setShowAuth(false)}
+            onBackToLanding={() => { window.location.hash = '#/'; }}
           />
         ) : (
           <LandingPage 
             onNavigateToAuth={(isSignUp) => {
-              setAuthInitialSignUp(isSignUp);
-              setShowAuth(true);
+              window.location.hash = isSignUp ? '#/auth?signup=true' : '#/auth';
             }}
           />
         )}

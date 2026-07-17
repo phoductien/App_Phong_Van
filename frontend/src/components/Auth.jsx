@@ -333,19 +333,7 @@ export default function Auth({ onLoginSuccess, initialSignUp = false, onBackToLa
       <div className={`w-full lg:w-[50%] flex flex-col justify-center relative px-6 sm:px-12 lg:px-20 py-12 transition-colors duration-300 ${darkMode ? 'bg-slate-900 text-slate-100' : 'bg-white text-slate-800'}`}>
         {/* Language selector and Dark Mode mock */}
         <div className="absolute top-6 right-8 flex items-center space-x-3">
-          {onBackToLanding && (
-            <button
-              type="button"
-              onClick={onBackToLanding}
-              className={`flex items-center space-x-1.5 px-3 py-1.5 border rounded-lg text-xs font-bold transition duration-150 cursor-pointer ${
-                darkMode
-                  ? 'border-slate-700 bg-slate-800 text-slate-200 hover:bg-slate-700'
-                  : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50'
-              }`}
-            >
-              <span>🏠 {lang === 'vi' ? 'Trang chủ' : 'Home'}</span>
-            </button>
-          )}
+
           <div 
             onClick={() => setLang(lang === 'vi' ? 'en' : 'vi')}
             className={`flex items-center space-x-1.5 px-3 py-1.5 border rounded-lg text-sm font-semibold shadow-sm cursor-pointer transition duration-150 ${
