@@ -209,101 +209,67 @@ export default function CVProfile({ userId = '00000000-0000-0000-0000-0000000000
                     transition: 'all 0.3s'
                   }}
                 >
-                  {/* Stylized Miniature CV Template */}
+                  {/* Stylized Miniature CV Template or Real PDF Embed */}
                   <div
                     style={{
                       border: '1px solid #cbd5e1',
                       borderRadius: '8px',
                       background: '#ffffff',
-                      padding: '12px',
                       boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)',
                       width: '100%',
                       aspectRatio: '1 / 1.4',
                       overflow: 'hidden',
                       position: 'relative',
-                      fontSize: '8px',
-                      lineHeight: '1.4',
-                      color: '#334155',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      gap: '8px',
                       borderTop: '5px solid #00b14f'
                     }}
                   >
-                    {/* CV Header */}
-                    <div style={{ display: 'flex', gap: '8px', borderBottom: '1px solid #f1f5f9', paddingBottom: '6px' }}>
+                    {cv.file_url.toLowerCase().endsWith('.pdf') ? (
+                      <div style={{ width: '100%', height: '100%', position: 'relative' }}>
+                        <iframe
+                          src={`${cv.file_url}#toolbar=0&navpanes=0&scrollbar=0`}
+                          style={{
+                            width: '100%',
+                            height: '100%',
+                            border: 'none',
+                            pointerEvents: 'none'
+                          }}
+                          title={filename}
+                        />
+                        <div 
+                          style={{ 
+                            position: 'absolute', 
+                            top: 0, 
+                            left: 0, 
+                            width: '100%', 
+                            height: '100%', 
+                            background: 'transparent',
+                            cursor: 'pointer'
+                          }} 
+                        />
+                      </div>
+                    ) : (
                       <div 
                         style={{ 
-                          width: '32px', 
-                          height: '32px', 
-                          borderRadius: '50%', 
-                          background: '#f1f5f9', 
+                          padding: '16px', 
+                          height: '100%', 
                           display: 'flex', 
-                          alignItems: 'center', 
-                          justifyContent: 'center',
-                          fontSize: '16px',
-                          overflow: 'hidden',
-                          border: '1px solid #cbd5e1',
-                          flexShrink: 0
+                          flexDirection: 'column', 
+                          justifyContent: 'center', 
+                          alignItems: 'center',
+                          textAlign: 'center',
+                          gap: '12px',
+                          color: '#475569'
                         }}
                       >
-                        {user?.avatar_url ? (
-                          <img src={user.avatar_url} alt="avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                        ) : (
-                          user?.avatar || '👤'
-                        )}
-                      </div>
-                      <div style={{ flexGrow: 1, minWidth: 0 }}>
-                        <div style={{ fontWeight: '700', fontSize: '9px', color: '#0f172a', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                          {user?.full_name || 'Phó Đức Tiến'}
+                        <div style={{ fontSize: '40px' }}>📝</div>
+                        <div style={{ fontWeight: 'bold', fontSize: '11px', color: '#1e293b' }}>
+                          Tài liệu Văn bản / Link ngoài
                         </div>
-                        <div style={{ color: '#00b14f', fontWeight: '600', fontSize: '7px' }}>
-                          {user?.role === 'interviewer' ? 'Senior Technical Interviewer' : 'Developer Intern'}
-                        </div>
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2px', color: '#64748b', fontSize: '6px', marginTop: '2px' }}>
-                          <div style={{ whiteSpace: 'nowrap' }}>📅 26/02/2004</div>
-                          <div style={{ whiteSpace: 'nowrap' }}>📞 0819748812</div>
-                          <div style={{ gridColumn: 'span 2', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>✉️ {user?.email || 'ductien.dev@gmail.com'}</div>
+                        <div style={{ fontSize: '9px', color: '#64748b' }}>
+                          Không hỗ trợ xem trước trực tiếp. Bấm "Xem" hoặc "Tải về" để mở tài liệu.
                         </div>
                       </div>
-                    </div>
-
-                    {/* CV Content Sections */}
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', overflow: 'hidden', flexGrow: 1 }}>
-                      {/* Profiles */}
-                      <div>
-                        <div style={{ fontWeight: '700', color: '#00b14f', borderBottom: '1px solid #f1f5f9', paddingBottom: '1px', fontSize: '7px', letterSpacing: '0.5px' }}>PROFILES</div>
-                        <div style={{ color: '#475569', fontSize: '6.5px', marginTop: '2px' }}>
-                          Sinh viên ngành Công nghệ thông tin định hướng phát triển phần mềm và tối ưu hóa hệ thống.
-                        </div>
-                      </div>
-
-                      {/* Educations */}
-                      <div>
-                        <div style={{ fontWeight: '700', color: '#00b14f', borderBottom: '1px solid #f1f5f9', paddingBottom: '1px', fontSize: '7px', letterSpacing: '0.5px' }}>EDUCATIONS</div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '6.5px', marginTop: '2px', fontWeight: '600', color: '#334155' }}>
-                          <span>Đại học Thủ Dầu Một</span>
-                          <span style={{ color: '#64748b', fontWeight: 'normal' }}>2022 - 2027</span>
-                        </div>
-                        <div style={{ color: '#64748b', fontSize: '6px' }}>Ngành Công nghệ thông tin</div>
-                      </div>
-
-                      {/* Skills */}
-                      <div>
-                        <div style={{ fontWeight: '700', color: '#00b14f', borderBottom: '1px solid #f1f5f9', paddingBottom: '1px', fontSize: '7px', letterSpacing: '0.5px' }}>SKILLS</div>
-                        <ul style={{ paddingLeft: '8px', margin: '2px 0 0 0', listStyleType: 'disc', fontSize: '6.5px', color: '#475569' }}>
-                          <li>Web Development (React, Node.js)</li>
-                          <li>Android App Development & Git</li>
-                        </ul>
-                      </div>
-
-                      {/* Projects */}
-                      <div>
-                        <div style={{ fontWeight: '700', color: '#00b14f', borderBottom: '1px solid #f1f5f9', paddingBottom: '1px', fontSize: '7px', letterSpacing: '0.5px' }}>PROJECTS</div>
-                        <div style={{ fontSize: '6.5px', marginTop: '2px', fontWeight: '600', color: '#334155' }}>X-Interview Platform (Team Leader)</div>
-                        <div style={{ color: '#64748b', fontSize: '6px' }}>Hệ thống luyện phỏng vấn tích hợp AI thông minh.</div>
-                      </div>
-                    </div>
+                    )}
                   </div>
 
                   {/* CV Metadata */}
