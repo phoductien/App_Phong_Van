@@ -263,24 +263,6 @@ export default function LandingPage({ onNavigateToAuth }) {
         </div>
       </section>
 
-      {/* 3. Trust Brands Strip */}
-      <section className="bg-white border-y border-slate-150 py-10">
-        <div className="max-w-7xl mx-auto px-6 text-center space-y-6">
-          <p className="text-xs font-bold tracking-wider text-slate-400 uppercase">
-            ĐƯỢC TIN DÙNG BỞI ỨNG VIÊN ỨNG TUYỂN VÀO
-          </p>
-          <div className="flex flex-wrap justify-center items-center gap-10 sm:gap-16 opacity-60">
-            {['VNG', 'Grab', 'Shopee', 'MoMo', 'FPT'].map((brand, idx) => (
-              <span 
-                key={idx} 
-                className="text-xl font-bold tracking-tight text-slate-700 select-none hover:scale-110 hover:text-indigo-600 transition-all duration-200 cursor-pointer"
-              >
-                {brand}
-              </span>
-            ))}
-          </div>
-        </div>
-      </section>
 
       {/* 4. Stat Grid Counters */}
       <section className="py-12 bg-white">
