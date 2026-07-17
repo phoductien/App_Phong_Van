@@ -89,6 +89,24 @@ Truy cập ngay trình duyệt tại địa chỉ mặc định: **`http://local
 
 ---
 
+## ⚠️ Quy Tắc Đẩy Code Quan Trọng Cho Đội Ngũ (Git & Deployment Rules)
+
+> [!WARNING]
+> Để tránh xung đột mã nguồn và bảo đảm hệ thống deploy tự động chạy ổn định, các lập trình viên cần tuân thủ nghiêm ngặt các quy tắc sau:
+>
+> 1. **Không push trực tiếp lên nhánh `main`**: 
+>    * Mọi thành viên tuyệt đối không đẩy code trực tiếp lên nhánh `main`. 
+>    * Hãy tạo nhánh tính năng riêng (ví dụ: `feature/ten-tinh-nang`) và tạo **Pull Request (PR)** để được phê duyệt trước khi gộp vào `main`.
+> 2. **Phải đồng bộ cả 2 Remote Repository khi đẩy code**:
+>    * Dự án sử dụng 2 remote song song: **Private Repo (`origin`)** trỏ tới Vercel/Render để deploy tự động và **Public Repo (`public_repo`)** để chia sẻ công khai.
+>    * Khi push thay đổi lên `main` (sau khi PR được gộp), bạn **bắt buộc** phải chạy lệnh đẩy lên cả 2 remote để tránh làm lệch nhánh và cập nhật thay đổi trực tiếp lên web:
+>      ```bash
+>      git push origin main
+>      git push public_repo main --force
+>      ```
+
+---
+
 ## 📦 Hướng dẫn Triển khai (Deployment Guide)
 
 ### 1. Triển khai Frontend lên Vercel
