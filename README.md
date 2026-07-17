@@ -124,17 +124,20 @@ App_Phong_Van/
 │   └── schema.sql               # Thiết lập cơ sở dữ liệu quan hệ PostgreSQL
 ├── backend/                     # API Server bằng Express (Cổng 5000)
 │   ├── server.js                # Toàn bộ mã nguồn định tuyến API, kết nối DB & Gemini AI
+│   ├── .env.example             # File cấu hình biến môi trường mẫu của backend
 │   └── package.json             # Khai báo thư viện dependencies (Express, Supabase, GenAI)
-└── frontend/                    # Giao diện React/Vite (Cổng 5173)
-    ├── src/App.jsx              # Quản lý điều phối giao diện, thanh SideNavigation & chuyển Tab
-    ├── src/index.css            # Nền tảng thiết kế màu sắc, phông chữ Inter và bo góc VietInterview AI
-    └── src/components/          # Các phân hệ chức năng giao diện
-        ├── Auth.jsx             # Giao diện Đăng nhập Google & Bộ chọn tài khoản
-        ├── HomeDashboard.jsx    # Màn hình Trang chủ tổng quan chỉ số
-        ├── StartInterview.jsx   # Thiết lập phòng thi & nộp CV
-        ├── InterviewRoom.jsx    # Phòng chat thi phỏng vấn trực tiếp với AI
-        ├── JobsDashboard.jsx    # Giao diện tuyển dụng chia đôi màn hình
-        ├── QuestionBankViewer.jsx # Tra cứu bộ câu hỏi tuyển dụng của các doanh nghiệp
-        ├── Pricing.jsx          # Cổng thanh toán giả lập Sandbox & Bảng giá VIP
-        └── InterviewerDashboard.jsx # Bảng cấu hình quản trị đề thi của phỏng vấn viên
+├── frontend/                    # Giao diện React/Vite (Cổng 5173)
+│   ├── .env.example             # File cấu hình biến môi trường mẫu của frontend
+│   ├── src/App.jsx              # Quản lý điều phối giao diện, thanh SideNavigation & chuyển Tab
+│   ├── src/index.css            # Nền tảng thiết kế màu sắc, phông chữ Inter và bo góc VietInterview AI
+│   └── src/components/          # Các phân hệ chức năng giao diện
+│       ├── Auth.jsx             # Giao diện Đăng nhập Google & Bộ chọn tài khoản
+│       ├── HomeDashboard.jsx    # Màn hình Trang chủ tổng quan chỉ số
+│       ├── StartInterview.jsx   # Thiết lập phòng thi & nộp CV
+│       ├── InterviewRoom.jsx    # Phòng chat thi phỏng vấn trực tiếp với AI
+│       ├── JobsDashboard.jsx    # Giao diện tuyển dụng chia đôi màn hình
+│       ├── QuestionBankViewer.jsx # Tra cứu bộ câu hỏi tuyển dụng của các doanh nghiệp
+│       ├── Pricing.jsx          # Cổng thanh toán giả lập Sandbox & Bảng giá VIP
+│       └── InterviewerDashboard.jsx # Bảng cấu hình quản trị đề thi của phỏng vấn viên
+└── setup.js                     # Kịch bản khởi tạo dự án tự động (tạo .env & npm install)
 ```
