@@ -15,45 +15,29 @@ Dự án được phát triển theo mô hình **Fullstack Local-development** v
 
 ---
 
-## ⚡ Quick Start — Khởi Chạy Nhanh
+## ⚡ Quick Start — Khởi Chạy Nhanh Trong 1 Bước
 
-### Bước 1: Thiết lập biến môi trường cho Backend
-Tạo tệp `.env` trong thư mục [backend/](file:///d:/ThucTapDN/App_Phong_Van/backend/) (hoặc sao chép từ `.env.example`):
-```env
-PORT=5000
+Bạn chỉ cần mở terminal tại thư mục gốc của dự án và chạy duy nhất lệnh sau để tự động cấu hình các tệp tin `.env` và cài đặt thư viện (`npm install`) cho cả frontend và backend:
 
-# Google Gemini API Key (Bắt buộc để sử dụng AI thật)
-GEMINI_API_KEY=your_gemini_api_key_here
-
-# Supabase Credentials (Nếu muốn kết nối DB thật, nếu bỏ trống hệ thống tự chạy Mock Local DB)
-SUPABASE_URL=your_supabase_project_url
-SUPABASE_KEY=your_supabase_anon_key
-```
-
-### Bước 2: Thiết lập biến môi trường cho Frontend (Tùy chọn cho Google Login thật)
-Tạo tệp `.env` trong thư mục [frontend/](file:///d:/ThucTapDN/App_Phong_Van/frontend/) (sao chép từ `.env.example`):
-```env
-VITE_API_BASE=http://localhost:5000
-VITE_SUPABASE_URL=your_supabase_project_url
-VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
-```
-*(Nếu không điền thông tin Supabase ở Frontend, hệ thống sẽ tự động chuyển đổi sang giao diện Mock Google Chooser để bạn test thử nghiệm nhanh chóng)*.
-
-### Bước 3: Khởi động Backend API Server
-Mở terminal tại thư mục [backend/](file:///d:/ThucTapDN/App_Phong_Van/backend/) và chạy:
 ```bash
-npm install
-npm start
+node setup.js
 ```
-Server backend sẽ chạy tại: **`http://localhost:5000`** 🚀
 
-### Bước 4: Khởi động Frontend Client (React)
-Mở một cửa sổ terminal mới độc lập tại thư mục [frontend/](file:///d:/ThucTapDN/App_Phong_Van/frontend/):
-```bash
-npm install
-npm run dev
-```
-Truy cập ngay trình duyệt tại địa chỉ mặc định: **`http://localhost:5173`** 🚀
+Sau khi quá trình cài đặt tự động hoàn tất, bạn thực hiện tiếp:
+
+1. Mở file `backend/.env` và điền `GEMINI_API_KEY` của bạn để sử dụng AI thật.
+2. Khởi chạy Backend và Frontend ở 2 terminal riêng biệt:
+   * **Terminal 1 (Backend API):**
+     ```bash
+     cd backend
+     npm start
+     ```
+   * **Terminal 2 (Frontend Client):**
+     ```bash
+     cd frontend
+     npm run dev
+     ```
+3. Truy cập địa chỉ mặc định **`http://localhost:5173`** 🚀 trên trình duyệt để trải nghiệm ứng dụng!
 
 ---
 
