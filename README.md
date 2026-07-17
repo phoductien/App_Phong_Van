@@ -59,17 +59,24 @@ Truy cập ngay trình duyệt tại địa chỉ mặc định: **`http://local
 
 ## 🌟 Chức Năng Nổi Bật Giao Diện (Viet-Interview MVP Features)
 
-1.  **🔐 Giao Diện Đăng ký / Đăng nhập Custom:** Thiết kế chia đôi màn hình (split-screen) cao cấp bằng Tailwind CSS. Cột trái giới thiệu thương hiệu **Viet-Interview** sang trọng, bản quyền **© 2026 HKT Software**. Cột phải là Form điền thông tin, hỗ trợ toggle ẩn/hiện mật khẩu, **chọn vai trò đăng ký (Ứng viên / Nhà tuyển dụng)** chống trùng lặp email và nút Đăng nhập Google với logo 4 màu chuẩn xác.
-2.  **📁 Tải lên CV từ thiết bị (Local Device File Upload):** Hỗ trợ chọn file trực tiếp từ máy tính/thiết bị của bạn (.pdf, .doc, .docx). Frontend mã hóa Base64 và backend tự động giải mã, ghi file vật lý vào ổ đĩa và liên kết vào hệ thống phỏng vấn lập tức.
-3.  **🏠 Trang chủ Ứng viên (Candidate Dashboard):** Xem chỉ số tổng hợp (Số lượt phỏng vấn, phòng vấn đã hoàn thành, đơn ứng tuyển đã gửi, điểm trung bình) và danh sách việc làm đề xuất.
-4.  **📖 Ngân hàng câu hỏi:** Tra cứu danh mục câu hỏi tuyển dụng chính thức của các tập đoàn (Viettel VCS, VNG, NVIDIA, FPT Smart Cloud...).
-5.  **📹 Luyện tập phỏng vấn & Khóa Phòng Chờ:** Cấu hình phòng phỏng vấn thử, tải lên CV. Đồng hồ đếm ngược 30 phút sẽ chỉ kích hoạt chạy khi phát hiện Nhà tuyển dụng nhấn nút tham gia phòng từ Dashboard của họ.
-6.  **🏆 Gói dịch vụ & Cổng thanh toán giả lập (Simulated SaaS Paywall):**
+1.  **🚀 Trang Landing Giới Thiệu Dịch Vụ (Landing Page):** Đặt trước khu vực Đăng nhập / Đăng ký. Thiết kế theo phong cách hiện đại với thanh điều hướng cuộn mượt mà (smooth scrolling) tới Quy trình, Tính năng, Bộ đề mẫu, FAQ. 
+2.  **✨ Hiệu Ứng Động Cao Cấp (Premium Animations & Micro-interactions):** Tích hợp hiệu ứng trượt trôi nổi lơ lửng (`animate-float`), trượt hiện mượt mà (`fadeInUp`), chuyển động rê chuột thu phóng góc nghiêng cho thẻ, và accordion mở câu hỏi FAQ êm ái.
+3.  **🔢 Nhảy Số Tự Động (Animated Counters):** Linh kiện `AnimatedCounter` giúp các con số thống kê (20.000+ Câu hỏi, 10.000+ Lượt luyện tập, 35.000+ Việc làm, 157+ Công ty) tự động tăng dần từ 0 đến giới hạn khi người dùng mở trang Landing.
+4.  **🔐 Giao Diện Đăng ký / Đăng nhập Song Ngữ & Chế độ Tối/Sáng:**
+    *   Hỗ trợ chuyển đổi ngôn ngữ Việt/Anh (Vietnamese/English) toàn bộ các ô nhập, nhãn, nút bấm và thông báo.
+    *   Hỗ trợ chuyển đổi giao diện sáng/tối (Light/Dark Mode) thực tế, đổi màu sắc phông nền và các phần tử form một cách trực quan.
+    *   Đồng bộ hóa hash URL (`#/auth` và `#/`) giúp nút mũi tên Back/Forward (quay lại) của trình duyệt hoạt động chuẩn xác.
+5.  **📁 Tải lên & Xóa CV thực tế (Local Device File Upload & DELETE API):** Hỗ trợ chọn file trực tiếp từ thiết bị (.pdf, .doc, .docx). Frontend mã hóa Base64 và backend tự động lưu trữ file vật lý trên đĩa. Đi kèm nút Xóa CV liên kết API DELETE giải phóng tệp tin vật lý để tối ưu bộ nhớ máy chủ.
+6.  **⚡ Tối Ưu Tải Trang Gấp 3 Lần (Speed & Performance Optimization):** Tích hợp Gzip Compression ở backend và React Lazy Loading + Code Splitting ở frontend giúp chia tách bundle ban đầu, tăng tốc độ phản hồi đáng kể.
+7.  **🏠 Trang chủ Ứng viên (Candidate Dashboard):** Xem chỉ số tổng hợp (Số lượt phỏng vấn, phòng vấn đã hoàn thành, đơn ứng tuyển đã gửi, điểm trung bình) và danh sách việc làm đề xuất.
+8.  **📖 Ngân hàng câu hỏi:** Tra cứu danh mục câu hỏi tuyển dụng chính thức của các tập đoàn (Viettel VCS, VNG, NVIDIA, FPT Smart Cloud...).
+9.  **📹 Luyện tập phỏng vấn & Khóa Phòng Chờ:** Cấu hình phòng phỏng vấn thử, tải lên CV. Đồng hồ đếm ngược 30 phút sẽ chỉ kích hoạt chạy khi phát hiện Nhà tuyển dụng nhấn nút tham gia phòng từ Dashboard của họ.
+10. **🏆 Gói dịch vụ & Cổng thanh toán giả lập (Simulated SaaS Paywall):**
     *   Trang trí các gói dịch vụ (Free, Pro, Enterprise). Tích hợp cổng thanh toán Sandbox mô phỏng chuyển khoản QR, Thẻ Visa/Mastercard hoặc Ví MoMo.
     *   Thanh toán thành công sẽ cấp huy hiệu **`PRO`** hoặc **`ENTERPRISE`** sang trọng cạnh tên người dùng ở Sidebar.
     *   **Khóa mờ (Blur lock)**: Nếu tài khoản là Free, biểu đồ 3 trục điểm số chi tiết và phần Nhận xét chuyên sâu của AI trong phòng phỏng vấn sẽ bị khóa mờ, chỉ mở khóa khi nâng cấp Pro. Giới hạn tài khoản Free tối đa 3 lượt phỏng vấn thử.
-7.  **💼 Việc làm & Smart Scraping:** Giao diện chia đôi màn hình. Đặc biệt, hỗ trợ dán liên kết tuyển dụng bất kỳ từ web và sử dụng Cheerio + Gemini AI bóc tách thông tin JD tự động để tạo đề thi phỏng vấn ngay lập tức.
-8.  **🏢 Dành cho Doanh nghiệp (Recruiter):** Bảng giám sát các phòng live, xem webcam phân tích biểu cảm hành vi AI (Gaze Context), quản lý danh sách CV và tạo ngân hàng câu hỏi.
+11. **💼 Việc làm & Smart Scraping:** Giao diện chia đôi màn hình. Đặc biệt, hỗ trợ dán liên kết tuyển dụng bất kỳ từ web và sử dụng Cheerio + Gemini AI bóc tách thông tin JD tự động để tạo đề thi phỏng vấn ngay lập tức.
+12. **🏢 Dành cho Doanh nghiệp (Recruiter):** Bảng giám sát các phòng live, xem webcam phân tích biểu cảm hành vi AI (Gaze Context), quản lý danh sách CV và tạo ngân hàng câu hỏi.
 
 ---
 
