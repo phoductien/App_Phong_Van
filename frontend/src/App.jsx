@@ -19,6 +19,7 @@ const JobsDashboard = lazy(() => import('./components/JobsDashboard'));
 const CVProfile = lazy(() => import('./components/CVProfile'));
 const Pricing = lazy(() => import('./components/Pricing'));
 const Blog = lazy(() => import('./components/Blog'));
+const LandingPage = lazy(() => import('./components/LandingPage'));
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
@@ -40,6 +41,8 @@ function App() {
   const [activeTab, setActiveTab] = useState('home');
   const [activeSession, setActiveSession] = useState(null);
   const [recruiterTab, setRecruiterTab] = useState('live_rooms');
+  const [showAuth, setShowAuth] = useState(false);
+  const [authInitialSignUp, setAuthInitialSignUp] = useState(false);
 
   useEffect(() => {
     if (!supabase) return;
@@ -83,6 +86,7 @@ function App() {
         });
       } else {
         setUser(null);
+        setShowAuth(false);
       }
     });
 
@@ -239,7 +243,20 @@ function App() {
   if (!user) {
     return (
       <Suspense fallback={<div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}><Spinner size="large" /></div>}>
-        <Auth onLoginSuccess={(u) => setUser(u)} />
+        {showAuth ? (
+          <Auth 
+            onLoginSuccess={(u) => setUser(u)} 
+            initialSignUp={authInitialSignUp}
+            onBackToLanding={() => setShowAuth(false)}
+          />
+        ) : (
+          <LandingPage 
+            onNavigateToAuth={(isSignUp) => {
+              setAuthInitialSignUp(isSignUp);
+              setShowAuth(true);
+            }}
+          />
+        )}
       </Suspense>
     );
   }
@@ -346,6 +363,7 @@ function App() {
                     setUser(null);
                     setActiveSession(null);
                     setActiveTab('home');
+                    setShowAuth(false);
                     setRole('candidate');
                   }
                 }}
@@ -390,6 +408,7 @@ function App() {
                 setActiveSession(null);
                 setActiveTab('home');
                 setRole('candidate');
+                setShowAuth(false);
               }
             } else if (detail.id === 'switch_to_candidate') {
               setRole('candidate');

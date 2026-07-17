@@ -15,8 +15,8 @@ if (supabaseUrl && supabaseAnonKey && supabaseUrl !== 'your_supabase_project_url
   }
 }
 
-export default function Auth({ onLoginSuccess }) {
-  const [isSignUp, setIsSignUp] = useState(false);
+export default function Auth({ onLoginSuccess, initialSignUp = false, onBackToLanding = null }) {
+  const [isSignUp, setIsSignUp] = useState(initialSignUp);
   const [signupRole, setSignupRole] = useState('candidate');
   
   // Form fields
@@ -252,6 +252,15 @@ export default function Auth({ onLoginSuccess }) {
       <div className="w-full lg:w-[50%] flex flex-col justify-center relative px-6 sm:px-12 lg:px-20 py-12">
         {/* Language selector and Dark Mode mock */}
         <div className="absolute top-6 right-8 flex items-center space-x-3">
+          {onBackToLanding && (
+            <button
+              type="button"
+              onClick={onBackToLanding}
+              className="flex items-center space-x-1.5 px-3 py-1.5 border border-slate-200 rounded-lg text-xs font-bold text-slate-700 bg-white shadow-sm hover:bg-slate-50 transition duration-150 cursor-pointer"
+            >
+              <span>🏠 Trang chủ</span>
+            </button>
+          )}
           <div className="flex items-center space-x-1.5 px-3 py-1.5 border border-slate-200 rounded-lg text-sm font-medium text-slate-700 bg-white shadow-sm cursor-pointer hover:bg-slate-50 transition duration-150">
             <span className="text-base">🇻🇳</span>
             <span>Tiếng Việt</span>
