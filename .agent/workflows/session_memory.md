@@ -12,6 +12,7 @@
   - Giao diện danh sách CV mẫu TopCV thu nhỏ dạng A4, lấy dữ liệu động từ tài khoản ứng viên (Tên, Email, Vai trò, Avatar) và các nút thao tác nhanh (Xem, Tải về) không kèm nút Tạo CV.
   - Tích hợp tính năng xóa CV (nút Xóa màu đỏ bên cạnh Xem và Tải về) liên kết API DELETE `/api/cv/:id` giải phóng cả cơ sở dữ liệu (Supabase/Mock) và tệp tin thực tế lưu trên đĩa máy chủ.
   - Tích hợp middleware `compression` ở backend để nén Gzip dữ liệu mạng và React Lazy Loading + Suspense ở frontend để tách nhỏ gói bundle tải ban đầu, tối ưu hóa tốc độ tải trang gấp 3 lần.
+  - Xây dựng trang Landing giới thiệu dịch vụ (Landing Page) trực quan theo phong cách X-Interview đặt trước đăng nhập/đăng ký, hỗ trợ điều hướng scroll mượt mà tới các phần Quy trình, Tính năng, Bộ đề mẫu, FAQ và nút chuyển vùng đăng ký/đăng nhập tiện lợi.
 
 ## 2. CẤU TRÚC THƯ MỤC THỰC TẾ ĐÃ TRIỂN KHAI
 - `docs/PHASE_1_ARCHITECTURE.md`: Tài liệu cấu trúc hệ thống, port và sơ đồ luồng dữ liệu.
