@@ -18,7 +18,82 @@ if (supabaseUrl && supabaseAnonKey && supabaseUrl !== 'your_supabase_project_url
 export default function Auth({ onLoginSuccess, initialSignUp = false, onBackToLanding = null }) {
   const [isSignUp, setIsSignUp] = useState(initialSignUp);
   const [signupRole, setSignupRole] = useState('candidate');
-  
+  const [lang, setLang] = useState('vi');
+  const [darkMode, setDarkMode] = useState(false);
+
+  const t = {
+    vi: {
+      promoTitle: 'Chinh phục buổi phỏng vấn tiếp theo cùng AI',
+      promoDesc: 'Nhận phản hồi cá nhân hóa, xây dựng sự tự tin và tiến gần hơn đến công việc mơ ước qua các buổi phỏng vấn thử thông minh.',
+      loginTitle: 'Đăng nhập',
+      registerTitle: 'Tạo tài khoản',
+      loginDesc: 'Nhập thông tin đăng nhập để truy cập tài khoản của bạn',
+      registerDesc: 'Đăng ký để bắt đầu sử dụng Viet-Interview',
+      fullName: 'Họ và tên',
+      email: 'Địa chỉ Email',
+      password: 'Mật khẩu',
+      confirmPassword: 'Xác nhận mật khẩu',
+      rememberMe: 'Ghi nhớ đăng nhập',
+      forgotPassword: 'Quên mật khẩu?',
+      agreeTerms: 'Tôi đồng ý với điều khoản sử dụng.',
+      candidate: 'Ứng viên (Candidate)',
+      interviewer: 'Nhà tuyển dụng (Recruiter)',
+      selectRole: 'Chọn vai trò đăng ký',
+      signInGoogle: 'Tiếp tục với Google',
+      dontHaveAccount: 'Bạn chưa có tài khoản?',
+      alreadyHaveAccount: 'Bạn đã có tài khoản?',
+      signUpNow: 'Đăng ký ngay',
+      signInNow: 'Đăng nhập ngay',
+      simulateVerification: '⚡ Bấm vào đây để giả lập click Link kích hoạt Email của Supabase',
+      googleChooserTitle: 'Chọn tài khoản Google giả lập',
+      addNewGoogleAcc: '➕ Tạo tài khoản Google mới để test',
+      orSeparator: 'Hoặc đăng nhập bằng email',
+      orSeparatorRegister: 'Hoặc đăng ký bằng email',
+      loginSuccess: 'Đăng nhập thành công!',
+      registerSuccess: 'Đăng ký tài khoản thành công!',
+      unverifiedEmail: 'Email của bạn chưa được xác thực! Vui lòng kiểm tra hộp thư.',
+      termsWarning: 'Bạn cần đồng ý với điều khoản sử dụng để tiếp tục.',
+      passwordMismatch: 'Mật khẩu xác nhận không khớp.',
+      loadingText: 'Đang xử lý...',
+      enterNameEmail: 'Vui lòng điền đầy đủ thông tin.',
+    },
+    en: {
+      promoTitle: 'Conquer your next interview with AI',
+      promoDesc: 'Receive personalized feedback, build confidence, and get closer to your dream job through smart mock interviews.',
+      loginTitle: 'Sign In',
+      registerTitle: 'Create Account',
+      loginDesc: 'Enter your credentials to access your account',
+      registerDesc: 'Register to start using Viet-Interview',
+      fullName: 'Full Name',
+      email: 'Email Address',
+      password: 'Password',
+      confirmPassword: 'Confirm Password',
+      rememberMe: 'Remember me',
+      forgotPassword: 'Forgot password?',
+      agreeTerms: 'I agree to the terms of use.',
+      candidate: 'Candidate',
+      interviewer: 'Recruiter',
+      selectRole: 'Choose your registration role',
+      signInGoogle: 'Continue with Google',
+      dontHaveAccount: "Don't have an account?",
+      alreadyHaveAccount: 'Already have an account?',
+      signUpNow: 'Sign Up now',
+      signInNow: 'Sign In now',
+      simulateVerification: '⚡ Click here to simulate clicking the Supabase Email activation link',
+      googleChooserTitle: 'Select Mock Google Account',
+      addNewGoogleAcc: '➕ Create new mock Google account',
+      orSeparator: 'Or sign in with email',
+      orSeparatorRegister: 'Or register with email',
+      loginSuccess: 'Login successful!',
+      registerSuccess: 'Account registered successfully!',
+      unverifiedEmail: 'Your email is unverified! Please check your inbox.',
+      termsWarning: 'You must agree to the terms of use to continue.',
+      passwordMismatch: 'Confirm password does not match.',
+      loadingText: 'Processing...',
+      enterNameEmail: 'Please fill in all information.',
+    }
+  };
+
   // Form fields
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
@@ -59,7 +134,7 @@ export default function Auth({ onLoginSuccess, initialSignUp = false, onBackToLa
   const handleRegisterNewGoogleAccount = (e) => {
     e.preventDefault();
     if (!newGoogleName || !newGoogleEmail) {
-      alert('Vui lòng nhập đầy đủ Tên và Email.');
+      alert(lang === 'vi' ? 'Vui lòng nhập đầy đủ Tên và Email.' : 'Please enter Name and Email.');
       return;
     }
 
@@ -106,22 +181,22 @@ export default function Auth({ onLoginSuccess, initialSignUp = false, onBackToLa
     if (isSignUp) {
       // Sign Up validation
       if (!fullName.trim() || !email.trim() || !password || !confirmPassword) {
-        setErrorMsg('Vui lòng nhập đầy đủ tất cả các trường.');
+        setErrorMsg(lang === 'vi' ? 'Vui lòng nhập đầy đủ tất cả các trường.' : 'Please fill in all fields.');
         return;
       }
       if (password !== confirmPassword) {
-        setErrorMsg('Mật khẩu xác nhận không trùng khớp.');
+        setErrorMsg(lang === 'vi' ? 'Mật khẩu xác nhận không trùng khớp.' : 'Passwords do not match.');
         return;
       }
       if (!agreeTerms) {
-        setErrorMsg('Bạn phải đồng ý với điều khoản sử dụng.');
+        setErrorMsg(lang === 'vi' ? 'Bạn phải đồng ý với điều khoản sử dụng.' : 'You must agree to the terms.');
         return;
       }
 
       // Check for duplicate emails in local storage
       const localUsers = JSON.parse(localStorage.getItem('x_local_users') || '[]');
       if (localUsers.some(u => u.email.toLowerCase() === email.toLowerCase())) {
-        setErrorMsg('Email này đã được đăng ký trên hệ thống.');
+        setErrorMsg(lang === 'vi' ? 'Email này đã được đăng ký trên hệ thống.' : 'This email is already registered.');
         return;
       }
 
@@ -145,21 +220,27 @@ export default function Auth({ onLoginSuccess, initialSignUp = false, onBackToLa
           localStorage.setItem('x_unverified_emails', JSON.stringify(unverified));
         }
 
-        setSuccessMsg('Đăng ký thành công! Vui lòng kiểm tra email để xác thực tài khoản (Link kích hoạt đã được gửi).');
+        setSuccessMsg(lang === 'vi' 
+          ? 'Đăng ký thành công! Vui lòng kiểm tra email để xác thực tài khoản (Link kích hoạt đã được gửi).' 
+          : 'Registration successful! Please check your email to verify your account.'
+        );
         setIsSignUp(false);
       }, 1000);
 
     } else {
       // Sign In validation
       if (!email.trim() || !password) {
-        setErrorMsg('Vui lòng nhập email và mật khẩu.');
+        setErrorMsg(lang === 'vi' ? 'Vui lòng nhập email và mật khẩu.' : 'Please enter email and password.');
         return;
       }
 
       // Check if email requires verification
       const unverified = JSON.parse(localStorage.getItem('x_unverified_emails') || '[]');
       if (unverified.includes(email)) {
-        setErrorMsg(`Tài khoản ${email} chưa được xác thực. Vui lòng click vào link kích hoạt trong email của bạn.`);
+        setErrorMsg(lang === 'vi' 
+          ? `Tài khoản ${email} chưa được xác thực. Vui lòng click vào link kích hoạt trong email của bạn.` 
+          : `Account ${email} is unverified. Please check your inbox for activation link.`
+        );
         return;
       }
 
@@ -169,7 +250,7 @@ export default function Auth({ onLoginSuccess, initialSignUp = false, onBackToLa
 
       if (userMatch) {
         if (userMatch.password !== password) {
-          setErrorMsg('Mật khẩu nhập vào không chính xác.');
+          setErrorMsg(lang === 'vi' ? 'Mật khẩu nhập vào không chính xác.' : 'Incorrect password.');
           return;
         }
         setLoading(true);
@@ -201,7 +282,7 @@ export default function Auth({ onLoginSuccess, initialSignUp = false, onBackToLa
   };
 
   return (
-    <div className="min-h-screen bg-white flex font-sans">
+    <div className={`min-h-screen flex font-sans transition-colors duration-300 ${darkMode ? 'bg-slate-950 text-white' : 'bg-white text-slate-800'}`}>
       {/* LEFT PANEL: Branding & Visuals (Hidden on small screens) */}
       <div className="hidden lg:flex lg:w-[50%] bg-gradient-to-tr from-[#312e81] via-[#1e1b4b] to-[#4c1d95] text-white p-16 flex-col justify-between relative overflow-hidden select-none">
         {/* Background Decorative rotated squares */}
@@ -235,10 +316,10 @@ export default function Auth({ onLoginSuccess, initialSignUp = false, onBackToLa
         {/* Center Promotion */}
         <div className="my-auto z-10 max-w-lg space-y-6">
           <h1 className="text-4xl font-extrabold leading-tight">
-            Chinh phục buổi phỏng vấn tiếp theo cùng AI
+            {t[lang].promoTitle}
           </h1>
           <p className="text-slate-300 text-base leading-relaxed">
-            Nhận phản hồi cá nhân hóa, xây dựng sự tự tin và tiến gần hơn đến công việc mơ ước qua các buổi phỏng vấn thử thông minh.
+            {t[lang].promoDesc}
           </p>
         </div>
 
@@ -249,47 +330,72 @@ export default function Auth({ onLoginSuccess, initialSignUp = false, onBackToLa
       </div>
 
       {/* RIGHT PANEL: Form Container */}
-      <div className="w-full lg:w-[50%] flex flex-col justify-center relative px-6 sm:px-12 lg:px-20 py-12">
+      <div className={`w-full lg:w-[50%] flex flex-col justify-center relative px-6 sm:px-12 lg:px-20 py-12 transition-colors duration-300 ${darkMode ? 'bg-slate-900 text-slate-100' : 'bg-white text-slate-800'}`}>
         {/* Language selector and Dark Mode mock */}
         <div className="absolute top-6 right-8 flex items-center space-x-3">
           {onBackToLanding && (
             <button
               type="button"
               onClick={onBackToLanding}
-              className="flex items-center space-x-1.5 px-3 py-1.5 border border-slate-200 rounded-lg text-xs font-bold text-slate-700 bg-white shadow-sm hover:bg-slate-50 transition duration-150 cursor-pointer"
+              className={`flex items-center space-x-1.5 px-3 py-1.5 border rounded-lg text-xs font-bold transition duration-150 cursor-pointer ${
+                darkMode
+                  ? 'border-slate-700 bg-slate-800 text-slate-200 hover:bg-slate-700'
+                  : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50'
+              }`}
             >
-              <span>🏠 Trang chủ</span>
+              <span>🏠 {lang === 'vi' ? 'Trang chủ' : 'Home'}</span>
             </button>
           )}
-          <div className="flex items-center space-x-1.5 px-3 py-1.5 border border-slate-200 rounded-lg text-sm font-medium text-slate-700 bg-white shadow-sm cursor-pointer hover:bg-slate-50 transition duration-150">
-            <span className="text-base">🇻🇳</span>
-            <span>Tiếng Việt</span>
+          <div 
+            onClick={() => setLang(lang === 'vi' ? 'en' : 'vi')}
+            className={`flex items-center space-x-1.5 px-3 py-1.5 border rounded-lg text-sm font-semibold shadow-sm cursor-pointer transition duration-150 ${
+              darkMode 
+                ? 'border-slate-700 bg-slate-800 text-slate-200 hover:bg-slate-700' 
+                : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50'
+            }`}
+          >
+            <span className="text-base">{lang === 'vi' ? '🇻🇳' : '🇬🇧'}</span>
+            <span>{lang === 'vi' ? 'Tiếng Việt' : 'English'}</span>
             <svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
             </svg>
           </div>
-          <button type="button" className="p-2 border border-slate-200 rounded-lg bg-white shadow-sm hover:bg-slate-50 text-slate-600 transition duration-150">
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
-            </svg>
+          <button 
+            type="button" 
+            onClick={() => setDarkMode(!darkMode)}
+            className={`p-2 border rounded-lg shadow-sm transition duration-150 cursor-pointer ${
+              darkMode 
+                ? 'border-slate-700 bg-slate-800 text-yellow-400 hover:bg-slate-700' 
+                : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50'
+            }`}
+          >
+            {darkMode ? (
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m0-12.728l.707.707m12.728 12.728l.707.707M12 8a4 4 0 100 8 4 4 0 000-8z" />
+              </svg>
+            ) : (
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+              </svg>
+            )}
           </button>
         </div>
 
         {/* Form content */}
         <div className="w-full max-w-md mx-auto space-y-6">
           <div>
-            <h2 className="text-3xl font-bold text-slate-900 tracking-tight">
-              {isSignUp ? 'Tạo tài khoản' : 'Đăng nhập'}
+            <h2 className={`text-3xl font-bold tracking-tight ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+              {isSignUp ? t[lang].registerTitle : t[lang].loginTitle}
             </h2>
-            <p className="mt-2 text-sm text-slate-600">
-              {isSignUp ? 'Đăng ký để bắt đầu sử dụng Viet-Interview' : 'Nhập thông tin đăng nhập để truy cập tài khoản của bạn'}
+            <p className={`mt-2 text-sm ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+              {isSignUp ? t[lang].registerDesc : t[lang].loginDesc}
             </p>
           </div>
 
-          <div className="bg-white">
+          <div className={`transition-colors duration-300 ${darkMode ? 'bg-slate-900' : 'bg-white'}`}>
             {errorMsg && (
-              <div className="mb-4 bg-red-50 border-l-4 border-red-500 p-4 rounded-md">
-                <p className="text-sm text-red-700">{errorMsg}</p>
+              <div className={`mb-4 border-l-4 p-4 rounded-md ${darkMode ? 'bg-red-950/20 border-red-500 text-red-200' : 'bg-red-50 border-red-500 text-red-700'}`}>
+                <p className="text-sm">{errorMsg}</p>
                 {errorMsg.includes('chưa được xác thực') && (
                   <button
                     type="button"
@@ -300,17 +406,17 @@ export default function Auth({ onLoginSuccess, initialSignUp = false, onBackToLa
                       setSuccessMsg('Giả lập xác thực email thành công! Bạn hiện đã có thể đăng nhập.');
                       setErrorMsg('');
                     }}
-                    className="mt-2 text-xs font-semibold text-indigo-600 hover:text-indigo-800 underline block"
+                    className="mt-2 text-xs font-semibold text-indigo-400 hover:text-indigo-300 underline block"
                   >
-                    ⚡ Bấm vào đây để giả lập click Link kích hoạt Email của Supabase
+                    ⚡ {lang === 'vi' ? 'Bấm vào đây để giả lập click Link kích hoạt Email của Supabase' : 'Click here to simulate Supabase Email link verification'}
                   </button>
                 )}
               </div>
             )}
 
             {successMsg && (
-              <div className="mb-4 bg-green-50 border-l-4 border-green-500 p-4 rounded-md">
-                <p className="text-sm text-green-700">{successMsg}</p>
+              <div className={`mb-4 border-l-4 p-4 rounded-md ${darkMode ? 'bg-green-950/20 border-green-500 text-green-200' : 'bg-green-50 border-green-500 text-green-700'}`}>
+                <p className="text-sm">{successMsg}</p>
               </div>
             )}
 
@@ -318,7 +424,7 @@ export default function Auth({ onLoginSuccess, initialSignUp = false, onBackToLa
               {isSignUp && (
                 <>
                   <div>
-                    <label className="block text-sm font-medium text-slate-700">Họ và tên</label>
+                    <label className={`block text-sm font-medium ${darkMode ? 'text-slate-300' : 'text-slate-700'}`}>{t[lang].fullName}</label>
                     <div className="mt-1.5 relative rounded-md shadow-sm">
                       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
                         <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -330,36 +436,40 @@ export default function Auth({ onLoginSuccess, initialSignUp = false, onBackToLa
                         required
                         value={fullName}
                         onChange={(e) => setFullName(e.target.value)}
-                        className="block w-full pl-10 pr-3 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm placeholder-slate-400 bg-slate-50/50"
+                        className={`block w-full pl-10 pr-3 py-2.5 border rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm transition-colors duration-200 ${
+                          darkMode 
+                            ? 'bg-slate-800 border-slate-700 text-white placeholder-slate-505' 
+                            : 'bg-slate-50/50 border-slate-200 text-slate-900 placeholder-slate-400'
+                        }`}
                         placeholder="Nguyễn Văn A"
                       />
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-slate-700">Tôi muốn đăng ký là</label>
+                    <label className={`block text-sm font-medium ${darkMode ? 'text-slate-300' : 'text-slate-700'}`}>{t[lang].selectRole}</label>
                     <div className="mt-1.5 flex gap-3">
                       <button
                         type="button"
                         onClick={() => setSignupRole('candidate')}
                         className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl border text-sm font-semibold transition duration-150 ${
                           signupRole === 'candidate'
-                            ? 'border-indigo-600 bg-indigo-50 text-indigo-700'
-                            : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50'
+                            ? (darkMode ? 'border-indigo-500 bg-indigo-950/60 text-indigo-300' : 'border-indigo-600 bg-indigo-50 text-indigo-700')
+                            : (darkMode ? 'border-slate-700 bg-slate-800/40 text-slate-400 hover:bg-slate-800' : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50')
                         }`}
                       >
-                        <span>💼 Ứng viên</span>
+                        <span>💼 {lang === 'vi' ? 'Ứng viên' : 'Candidate'}</span>
                       </button>
                       <button
                         type="button"
                         onClick={() => setSignupRole('interviewer')}
                         className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl border text-sm font-semibold transition duration-150 ${
                           signupRole === 'interviewer'
-                            ? 'border-indigo-600 bg-indigo-50 text-indigo-700'
-                            : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50'
+                            ? (darkMode ? 'border-indigo-500 bg-indigo-950/60 text-indigo-300' : 'border-indigo-600 bg-indigo-50 text-indigo-700')
+                            : (darkMode ? 'border-slate-700 bg-slate-800/40 text-slate-400 hover:bg-slate-800' : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50')
                         }`}
                       >
-                        <span>🏢 Nhà tuyển dụng</span>
+                        <span>🏢 {lang === 'vi' ? 'Nhà tuyển dụng' : 'Recruiter'}</span>
                       </button>
                     </div>
                   </div>
@@ -367,7 +477,7 @@ export default function Auth({ onLoginSuccess, initialSignUp = false, onBackToLa
               )}
 
               <div>
-                <label className="block text-sm font-medium text-slate-700">Email</label>
+                <label className={`block text-sm font-medium ${darkMode ? 'text-slate-300' : 'text-slate-700'}`}>Email</label>
                 <div className="mt-1.5 relative rounded-md shadow-sm">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
                     <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -379,7 +489,11 @@ export default function Auth({ onLoginSuccess, initialSignUp = false, onBackToLa
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="block w-full pl-10 pr-3 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm placeholder-slate-400 bg-slate-50/50"
+                    className={`block w-full pl-10 pr-3 py-2.5 border rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm transition-colors duration-200 ${
+                      darkMode 
+                        ? 'bg-slate-800 border-slate-700 text-white placeholder-slate-505' 
+                        : 'bg-slate-50/50 border-slate-200 text-slate-900 placeholder-slate-400'
+                    }`}
                     placeholder="name@example.com"
                   />
                 </div>
@@ -388,7 +502,7 @@ export default function Auth({ onLoginSuccess, initialSignUp = false, onBackToLa
               {isSignUp ? (
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-slate-700">Mật khẩu</label>
+                    <label className={`block text-sm font-medium ${darkMode ? 'text-slate-300' : 'text-slate-700'}`}>{t[lang].password}</label>
                     <div className="mt-1.5 relative rounded-md shadow-sm">
                       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
                         <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -400,12 +514,16 @@ export default function Auth({ onLoginSuccess, initialSignUp = false, onBackToLa
                         required
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                        className="block w-full pl-10 pr-10 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm placeholder-slate-400 bg-slate-50/50"
+                        className={`block w-full pl-10 pr-10 py-2.5 border rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm transition-colors duration-200 ${
+                          darkMode 
+                            ? 'bg-slate-800 border-slate-700 text-white placeholder-slate-505' 
+                            : 'bg-slate-50/50 border-slate-200 text-slate-900 placeholder-slate-400'
+                        }`}
                       />
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
-                        className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600"
+                        className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-650 cursor-pointer"
                       >
                         {showPassword ? (
                           <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -422,7 +540,7 @@ export default function Auth({ onLoginSuccess, initialSignUp = false, onBackToLa
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-slate-700">Xác nhận mật khẩu</label>
+                    <label className={`block text-sm font-medium ${darkMode ? 'text-slate-350' : 'text-slate-700'}`}>{t[lang].confirmPassword}</label>
                     <div className="mt-1.5 relative rounded-md shadow-sm">
                       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
                         <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -434,12 +552,16 @@ export default function Auth({ onLoginSuccess, initialSignUp = false, onBackToLa
                         required
                         value={confirmPassword}
                         onChange={(e) => setConfirmPassword(e.target.value)}
-                        className="block w-full pl-10 pr-10 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm placeholder-slate-400 bg-slate-50/50"
+                        className={`block w-full pl-10 pr-10 py-2.5 border rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm transition-colors duration-200 ${
+                          darkMode 
+                            ? 'bg-slate-800 border-slate-700 text-white placeholder-slate-505' 
+                            : 'bg-slate-50/50 border-slate-200 text-slate-900 placeholder-slate-400'
+                        }`}
                       />
                       <button
                         type="button"
                         onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                        className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600"
+                        className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-655 cursor-pointer"
                       >
                         {showConfirmPassword ? (
                           <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -458,8 +580,8 @@ export default function Auth({ onLoginSuccess, initialSignUp = false, onBackToLa
               ) : (
                 <div>
                   <div className="flex justify-between items-center">
-                    <label className="block text-sm font-medium text-slate-700">Mật khẩu</label>
-                    <a href="#" className="text-sm font-semibold text-indigo-600 hover:text-indigo-500">Quên mật khẩu?</a>
+                    <label className={`block text-sm font-medium ${darkMode ? 'text-slate-300' : 'text-slate-700'}`}>{t[lang].password}</label>
+                    <a href="#" className="text-sm font-semibold text-indigo-650 hover:text-indigo-500">{t[lang].forgotPassword}</a>
                   </div>
                   <div className="mt-1.5 relative rounded-md shadow-sm">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
@@ -472,12 +594,16 @@ export default function Auth({ onLoginSuccess, initialSignUp = false, onBackToLa
                       required
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      className="block w-full pl-10 pr-10 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm placeholder-slate-400 bg-slate-50/50"
+                      className={`block w-full pl-10 pr-10 py-2.5 border rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm transition-colors duration-200 ${
+                        darkMode 
+                          ? 'bg-slate-800 border-slate-700 text-white placeholder-slate-505' 
+                          : 'bg-slate-50/50 border-slate-200 text-slate-900 placeholder-slate-400'
+                      }`}
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600"
+                      className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-650 cursor-pointer"
                     >
                       {showPassword ? (
                         <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -500,13 +626,13 @@ export default function Auth({ onLoginSuccess, initialSignUp = false, onBackToLa
                   type="checkbox"
                   checked={isSignUp ? agreeTerms : rememberMe}
                   onChange={(e) => isSignUp ? setAgreeTerms(e.target.checked) : setRememberMe(e.target.checked)}
-                  className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-slate-300 rounded"
+                  className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-slate-300 rounded cursor-pointer"
                 />
-                <label htmlFor="remember_or_agree" className="ml-2 block text-sm text-slate-700 select-none">
+                <label htmlFor="remember_or_agree" className={`ml-2 block text-sm select-none ${darkMode ? 'text-slate-300' : 'text-slate-700'}`}>
                   {isSignUp ? (
-                    <span>Tôi đồng ý với <span className="text-indigo-600 font-semibold hover:underline cursor-pointer">điều khoản sử dụng</span>.</span>
+                    <span>{lang === 'vi' ? 'Tôi đồng ý với ' : 'I agree to the '}<span className="text-indigo-600 font-semibold hover:underline cursor-pointer">{lang === 'vi' ? 'điều khoản sử dụng' : 'terms of use'}</span>.</span>
                   ) : (
-                    'Ghi nhớ đăng nhập'
+                    t[lang].rememberMe
                   )}
                 </label>
               </div>
@@ -515,9 +641,9 @@ export default function Auth({ onLoginSuccess, initialSignUp = false, onBackToLa
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full flex items-center justify-center py-2.5 px-4 border border-transparent rounded-xl shadow-sm text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full flex items-center justify-center py-2.5 px-4 border border-transparent rounded-xl shadow-sm text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                 >
-                  <span>{loading ? 'Đang xử lý...' : (isSignUp ? 'Đăng ký' : 'Đăng nhập')}</span>
+                  <span>{loading ? t[lang].loadingText : (isSignUp ? t[lang].registerTitle : t[lang].loginTitle)}</span>
                   {!loading && (
                     <svg className="w-4 h-4 ml-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h3a3 3 0 013 3v1" />
@@ -530,10 +656,12 @@ export default function Auth({ onLoginSuccess, initialSignUp = false, onBackToLa
             <div className="mt-6">
               <div className="relative">
                 <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-slate-200" />
+                  <div className={`w-full border-t ${darkMode ? 'border-slate-800' : 'border-slate-200'}`} />
                 </div>
                 <div className="relative flex justify-center text-sm">
-                  <span className="px-2 bg-white text-slate-500">Hoặc đăng nhập với</span>
+                  <span className={`px-2 transition-colors duration-300 ${darkMode ? 'bg-slate-900 text-slate-400' : 'bg-white text-slate-500'}`}>
+                    {isSignUp ? t[lang].orSeparatorRegister : t[lang].orSeparator}
+                  </span>
                 </div>
               </div>
 
@@ -541,7 +669,11 @@ export default function Auth({ onLoginSuccess, initialSignUp = false, onBackToLa
                 <button
                   type="button"
                   onClick={handleGoogleLogin}
-                  className="w-full inline-flex items-center justify-center py-2.5 px-4 rounded-xl border border-slate-200 bg-white text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50 transition duration-150 ease-in-out"
+                  className={`w-full inline-flex items-center justify-center py-2.5 px-4 rounded-xl border text-sm font-medium shadow-sm transition duration-150 ease-in-out cursor-pointer ${
+                    darkMode 
+                      ? 'border-slate-700 bg-slate-800 text-slate-200 hover:bg-slate-700' 
+                      : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50'
+                  }`}
                 >
                   <svg className="h-5 w-5 mr-2" viewBox="0 0 24 24">
                     <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -549,20 +681,20 @@ export default function Auth({ onLoginSuccess, initialSignUp = false, onBackToLa
                     <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22-.03-.63z"/>
                     <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
                   </svg>
-                  {isSignUp ? 'Đăng ký bằng Google' : 'Đăng nhập với Google'}
+                  {t[lang].signInGoogle}
                 </button>
               </div>
             </div>
 
             <div className="mt-6 text-center">
-              <p className="text-sm text-slate-600">
-                {isSignUp ? 'Bạn đã có tài khoản?' : 'Bạn chưa có tài khoản?'}{' '}
+              <p className={`text-sm ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+                {isSignUp ? t[lang].alreadyHaveAccount : t[lang].dontHaveAccount}{' '}
                 <button
                   type="button"
                   onClick={() => setIsSignUp(!isSignUp)}
-                  className="font-semibold text-indigo-600 hover:text-indigo-500 focus:outline-none"
+                  className="font-bold text-indigo-650 hover:text-indigo-500 focus:outline-none cursor-pointer"
                 >
-                  {isSignUp ? 'Đăng nhập' : 'Đăng ký ngay'}
+                  {isSignUp ? t[lang].loginTitle : t[lang].signUpNow}
                 </button>
               </p>
             </div>
@@ -573,53 +705,61 @@ export default function Auth({ onLoginSuccess, initialSignUp = false, onBackToLa
       {/* Modern custom Google account chooser modal */}
       {showGoogleChooser && (
         <div className="fixed z-50 inset-0 overflow-y-auto bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl border border-slate-100 flex flex-col items-center">
+          <div className={`rounded-2xl max-w-md w-full p-6 shadow-xl border flex flex-col items-center transition-colors duration-300 ${
+            darkMode ? 'bg-slate-800 border-slate-700 text-white' : 'bg-white border-slate-100 text-slate-800'
+          }`}>
             <svg className="h-10 w-10 mb-4" viewBox="0 0 24 24">
               <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
               <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
               <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22-.03-.63z"/>
               <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
             </svg>
-            <h3 className="text-lg font-bold text-slate-800 text-center">Chọn tài khoản</h3>
-            <p className="text-xs text-slate-500 mt-1 mb-5">để tiếp tục đến Viet-Interview</p>
+            <h3 className={`text-lg font-bold text-center ${darkMode ? 'text-white' : 'text-slate-800'}`}>{t[lang].googleChooserTitle}</h3>
+            <p className={`text-xs mt-1 mb-5 ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>{lang === 'vi' ? 'để tiếp tục đến Viet-Interview' : 'to continue to Viet-Interview'}</p>
 
             {showNewGoogleForm ? (
               <form onSubmit={handleRegisterNewGoogleAccount} className="w-full space-y-4">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider">Họ và Tên Google</label>
+                  <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider">{lang === 'vi' ? 'Họ và Tên Google' : 'Google Name'}</label>
                   <input
                     type="text"
                     required
                     value={newGoogleName}
                     onChange={(e) => setNewGoogleName(e.target.value)}
                     placeholder="Nguyễn Văn A"
-                    className="mt-1 block w-full px-3 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50"
+                    className={`mt-1 block w-full px-3 py-2 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
+                      darkMode ? 'bg-slate-700 border-slate-600 text-white' : 'bg-slate-50 border-slate-200'
+                    }`}
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider">Địa chỉ Gmail</label>
+                  <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider">{lang === 'vi' ? 'Địa chỉ Gmail' : 'Gmail Address'}</label>
                   <input
                     type="email"
                     required
                     value={newGoogleEmail}
                     onChange={(e) => setNewGoogleEmail(e.target.value)}
                     placeholder="example@gmail.com"
-                    className="mt-1 block w-full px-3 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50"
+                    className={`mt-1 block w-full px-3 py-2 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
+                      darkMode ? 'bg-slate-700 border-slate-600 text-white' : 'bg-slate-50 border-slate-200'
+                    }`}
                   />
                 </div>
                 <div className="flex gap-2 justify-end pt-2">
                   <button
                     type="button"
                     onClick={() => setShowNewGoogleForm(false)}
-                    className="px-3 py-1.5 border border-slate-200 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-50"
+                    className={`px-3 py-1.5 border rounded-xl text-sm font-semibold transition ${
+                      darkMode ? 'border-slate-700 bg-slate-700 text-slate-300 hover:bg-slate-600' : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50'
+                    }`}
                   >
-                    Quay lại
+                    {lang === 'vi' ? 'Quay lại' : 'Back'}
                   </button>
                   <button
                     type="submit"
-                    className="px-4 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-semibold shadow-sm"
+                    className="px-4 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-semibold shadow-sm cursor-pointer"
                   >
-                    Tạo & Đăng Nhập
+                    {lang === 'vi' ? 'Tạo & Đăng Nhập' : 'Create & Sign In'}
                   </button>
                 </div>
               </form>
@@ -629,13 +769,15 @@ export default function Auth({ onLoginSuccess, initialSignUp = false, onBackToLa
                   <div
                     key={acc.id}
                     onClick={() => handleSelectGoogleAccount(acc)}
-                    className="flex items-center gap-3 p-3 rounded-xl border border-slate-200 cursor-pointer hover:bg-slate-50 transition duration-150"
+                    className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition duration-150 ${
+                      darkMode ? 'border-slate-700 hover:bg-slate-700' : 'border-slate-200 hover:bg-slate-50'
+                    }`}
                   >
                     <div className="w-9 h-9 rounded-full bg-slate-100 flex items-center justify-center text-lg shadow-inner">
                       {acc.avatar}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="text-sm font-semibold text-slate-800 truncate">{acc.name}</div>
+                      <div className={`text-sm font-semibold truncate ${darkMode ? 'text-white' : 'text-slate-800'}`}>{acc.name}</div>
                       <div className="text-xs text-slate-500 truncate">{acc.email}</div>
                     </div>
                     {acc.role === 'interviewer' && (
@@ -651,9 +793,13 @@ export default function Auth({ onLoginSuccess, initialSignUp = false, onBackToLa
                     setNewGoogleName('');
                     setNewGoogleEmail('');
                   }}
-                  className="w-full flex items-center justify-center gap-2 p-3 border border-dashed border-slate-300 rounded-xl bg-slate-50 text-sm font-semibold text-indigo-600 hover:bg-slate-100/70 hover:border-indigo-400 transition duration-150 mt-4"
+                  className={`w-full flex items-center justify-center gap-2 p-3 border border-dashed rounded-xl text-sm font-semibold transition duration-150 mt-4 cursor-pointer ${
+                    darkMode 
+                      ? 'border-indigo-500/50 bg-indigo-950/20 text-indigo-400 hover:bg-indigo-950/30' 
+                      : 'border-slate-300 bg-slate-50 text-indigo-600 hover:bg-slate-100/70 hover:border-indigo-400'
+                  }`}
                 >
-                  <span>👤 Sử dụng một tài khoản khác (Tạo mới)</span>
+                  <span>👤 {lang === 'vi' ? 'Sử dụng một tài khoản khác' : 'Use another mock account'}</span>
                 </button>
               </div>
             )}
@@ -665,9 +811,9 @@ export default function Auth({ onLoginSuccess, initialSignUp = false, onBackToLa
                   setShowGoogleChooser(false);
                   setShowNewGoogleForm(false);
                 }}
-                className="text-sm font-semibold text-slate-500 hover:text-slate-700"
+                className={`text-sm font-semibold ${darkMode ? 'text-slate-400 hover:text-slate-300' : 'text-slate-500 hover:text-slate-700'}`}
               >
-                Hủy bỏ
+                {lang === 'vi' ? 'Hủy bỏ' : 'Cancel'}
               </button>
               <button
                 type="button"
@@ -675,15 +821,15 @@ export default function Auth({ onLoginSuccess, initialSignUp = false, onBackToLa
                   onLoginSuccess({
                     id: '00000000-0000-0000-0000-000000000000',
                     email: 'guest@vietinterview.com',
-                    full_name: 'Đức Tiến',
+                    full_name: lang === 'vi' ? 'Ứng Viên Khách' : 'Guest Candidate',
                     role: 'candidate',
                     tier: 'free'
                   });
                   setShowGoogleChooser(false);
                 }}
-                className="text-sm font-semibold text-indigo-600 hover:text-indigo-500"
+                className="text-sm font-semibold text-indigo-600 hover:text-indigo-500 cursor-pointer"
               >
-                Dùng tài khoản Khách
+                {lang === 'vi' ? 'Dùng tài khoản Khách' : 'Use Guest Account'}
               </button>
             </div>
           </div>
