@@ -14,7 +14,7 @@ import {
 
 const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:5000';
 
-export default function CVProfile({ userId = '00000000-0000-0000-0000-000000000000' }) {
+export default function CVProfile({ userId = '00000000-0000-0000-0000-000000000000', user = null }) {
   const [cvs, setCvs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [cvInput, setCvInput] = useState('');
@@ -176,7 +176,7 @@ export default function CVProfile({ userId = '00000000-0000-0000-0000-0000000000
       </Container>
 
       {/* Uploaded CVs list */}
-      <Container header={<Header variant="h2" actions={<Badge color="blue">{cvs.length} CV</Badge>}>Hồ Sơ Của Tôi</Header>}>
+      <Container header={<Header variant="h2" actions={<Badge color="blue">{cvs.length} CV</Badge>}>Hồ sơ CV đã tải lên (TopCV Style)</Header>}>
         {loading ? (
           <Box variant="p" style={{ textAlign: 'center' }}>
             <Spinner size="large" />
@@ -189,40 +189,151 @@ export default function CVProfile({ userId = '00000000-0000-0000-0000-0000000000
           <Grid gridDefinition={cvs.map(() => ({ colspan: 4 }))}>
             {cvs.map(cv => {
               const filename = cv.file_url.split('/').pop();
+              const formattedDate = new Date(cv.uploaded_at).toLocaleDateString('vi-VN', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric'
+              });
               return (
                 <div
                   key={cv.id}
                   style={{
-                    border: '1px solid #e2e8f0',
-                    borderRadius: '10px',
-                    padding: '16px',
-                    background: '#ffffff',
                     display: 'flex',
                     flexDirection: 'column',
-                    justifyContent: 'between',
                     gap: '12px',
-                    boxShadow: '0 1px 3px rgba(0,0,0,0.05)'
+                    padding: '8px',
+                    background: '#f8fafc',
+                    borderRadius: '12px',
+                    border: '1px solid #e2e8f0',
+                    boxShadow: '0 1px 3px rgba(0,0,0,0.02)',
+                    transition: 'all 0.3s'
                   }}
                 >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                    <div style={{ fontSize: '32px' }}>📄</div>
-                    <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flexGrow: 1 }}>
-                      <div style={{ fontWeight: 'bold', fontSize: '13px', color: '#1e293b' }} title={filename}>
-                        {filename}
+                  {/* Stylized Miniature CV Template */}
+                  <div
+                    style={{
+                      border: '1px solid #cbd5e1',
+                      borderRadius: '8px',
+                      background: '#ffffff',
+                      padding: '12px',
+                      boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)',
+                      width: '100%',
+                      aspectRatio: '1 / 1.4',
+                      overflow: 'hidden',
+                      position: 'relative',
+                      fontSize: '8px',
+                      lineHeight: '1.4',
+                      color: '#334155',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '8px',
+                      borderTop: '5px solid #00b14f'
+                    }}
+                  >
+                    {/* CV Header */}
+                    <div style={{ display: 'flex', gap: '8px', borderBottom: '1px solid #f1f5f9', paddingBottom: '6px' }}>
+                      <div 
+                        style={{ 
+                          width: '32px', 
+                          height: '32px', 
+                          borderRadius: '50%', 
+                          background: '#f1f5f9', 
+                          display: 'flex', 
+                          alignItems: 'center', 
+                          justifyContent: 'center',
+                          fontSize: '16px',
+                          overflow: 'hidden',
+                          border: '1px solid #cbd5e1',
+                          flexShrink: 0
+                        }}
+                      >
+                        {user?.avatar_url ? (
+                          <img src={user.avatar_url} alt="avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        ) : (
+                          user?.avatar || '👤'
+                        )}
                       </div>
-                      <div style={{ fontSize: '11px', color: '#64748b', marginTop: '4px' }}>
-                        Tải lên: {new Date(cv.uploaded_at).toLocaleDateString()}
+                      <div style={{ flexGrow: 1, minWidth: 0 }}>
+                        <div style={{ fontWeight: '700', fontSize: '9px', color: '#0f172a', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                          {user?.full_name || 'Phó Đức Tiến'}
+                        </div>
+                        <div style={{ color: '#00b14f', fontWeight: '600', fontSize: '7px' }}>
+                          {user?.role === 'interviewer' ? 'Senior Technical Interviewer' : 'Developer Intern'}
+                        </div>
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2px', color: '#64748b', fontSize: '6px', marginTop: '2px' }}>
+                          <div style={{ whiteSpace: 'nowrap' }}>📅 26/02/2004</div>
+                          <div style={{ whiteSpace: 'nowrap' }}>📞 0819748812</div>
+                          <div style={{ gridColumn: 'span 2', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>✉️ {user?.email || 'ductien.dev@gmail.com'}</div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* CV Content Sections */}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', overflow: 'hidden', flexGrow: 1 }}>
+                      {/* Profiles */}
+                      <div>
+                        <div style={{ fontWeight: '700', color: '#00b14f', borderBottom: '1px solid #f1f5f9', paddingBottom: '1px', fontSize: '7px', letterSpacing: '0.5px' }}>PROFILES</div>
+                        <div style={{ color: '#475569', fontSize: '6.5px', marginTop: '2px' }}>
+                          Sinh viên ngành Công nghệ thông tin định hướng phát triển phần mềm và tối ưu hóa hệ thống.
+                        </div>
+                      </div>
+
+                      {/* Educations */}
+                      <div>
+                        <div style={{ fontWeight: '700', color: '#00b14f', borderBottom: '1px solid #f1f5f9', paddingBottom: '1px', fontSize: '7px', letterSpacing: '0.5px' }}>EDUCATIONS</div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '6.5px', marginTop: '2px', fontWeight: '600', color: '#334155' }}>
+                          <span>Đại học Thủ Dầu Một</span>
+                          <span style={{ color: '#64748b', fontWeight: 'normal' }}>2022 - 2027</span>
+                        </div>
+                        <div style={{ color: '#64748b', fontSize: '6px' }}>Ngành Công nghệ thông tin</div>
+                      </div>
+
+                      {/* Skills */}
+                      <div>
+                        <div style={{ fontWeight: '700', color: '#00b14f', borderBottom: '1px solid #f1f5f9', paddingBottom: '1px', fontSize: '7px', letterSpacing: '0.5px' }}>SKILLS</div>
+                        <ul style={{ paddingLeft: '8px', margin: '2px 0 0 0', listStyleType: 'disc', fontSize: '6.5px', color: '#475569' }}>
+                          <li>Web Development (React, Node.js)</li>
+                          <li>Android App Development & Git</li>
+                        </ul>
+                      </div>
+
+                      {/* Projects */}
+                      <div>
+                        <div style={{ fontWeight: '700', color: '#00b14f', borderBottom: '1px solid #f1f5f9', paddingBottom: '1px', fontSize: '7px', letterSpacing: '0.5px' }}>PROJECTS</div>
+                        <div style={{ fontSize: '6.5px', marginTop: '2px', fontWeight: '600', color: '#334155' }}>X-Interview Platform (Team Leader)</div>
+                        <div style={{ color: '#64748b', fontSize: '6px' }}>Hệ thống luyện phỏng vấn tích hợp AI thông minh.</div>
                       </div>
                     </div>
                   </div>
 
+                  {/* CV Metadata */}
+                  <div style={{ padding: '0 4px', flexGrow: 1, minWidth: 0 }}>
+                    <div 
+                      style={{ 
+                        fontWeight: '700', 
+                        fontSize: '13px', 
+                        color: '#1e293b',
+                        whiteSpace: 'nowrap',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis'
+                      }}
+                      title={filename}
+                    >
+                      {filename.length > 22 ? filename.substring(0, 19) + '...' : filename}
+                    </div>
+                    <div style={{ fontSize: '11px', color: '#64748b', marginTop: '4px' }}>
+                      Cập nhật {formattedDate}
+                    </div>
+                  </div>
+
+                  {/* Actions Row */}
                   <div
                     style={{
                       display: 'flex',
                       gap: '8px',
-                      borderTop: '1px solid #f1f5f9',
-                      paddingTop: '12px',
-                      justifyContent: 'flex-end'
+                      borderTop: '1px solid #e2e8f0',
+                      paddingTop: '10px',
+                      justifyContent: 'space-between'
                     }}
                   >
                     <a
@@ -230,16 +341,19 @@ export default function CVProfile({ userId = '00000000-0000-0000-0000-0000000000
                       target="_blank"
                       rel="noopener noreferrer"
                       style={{
-                        padding: '6px 12px',
+                        flex: 1,
+                        textAlign: 'center',
+                        padding: '6px 0',
                         fontSize: '12px',
-                        color: '#4f46e5',
-                        border: '1px solid #e0e7ff',
+                        color: '#00b14f',
+                        border: '1px solid #00b14f',
                         borderRadius: '6px',
-                        background: '#e0e7ff',
+                        background: '#ffffff',
                         textDecoration: 'none',
                         fontWeight: '600',
                         display: 'inline-flex',
                         alignItems: 'center',
+                        justifyContent: 'center',
                         gap: '4px',
                         cursor: 'pointer'
                       }}
@@ -252,16 +366,19 @@ export default function CVProfile({ userId = '00000000-0000-0000-0000-0000000000
                       target="_blank"
                       rel="noopener noreferrer"
                       style={{
-                        padding: '6px 12px',
+                        flex: 1,
+                        textAlign: 'center',
+                        padding: '6px 0',
                         fontSize: '12px',
-                        color: '#374151',
-                        border: '1px solid #e5e7eb',
+                        color: '#ffffff',
+                        border: '1px solid #00b14f',
                         borderRadius: '6px',
-                        background: '#f3f4f6',
+                        background: '#00b14f',
                         textDecoration: 'none',
                         fontWeight: '600',
                         display: 'inline-flex',
                         alignItems: 'center',
+                        justifyContent: 'center',
                         gap: '4px',
                         cursor: 'pointer'
                       }}

@@ -220,7 +220,7 @@ function App() {
         );
       case 'cv_profile':
         return (
-          <CVProfile userId={user?.id} />
+          <CVProfile userId={user?.id} user={user} />
         );
       case 'blog':
         return (
