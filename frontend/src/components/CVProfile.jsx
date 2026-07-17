@@ -187,31 +187,91 @@ export default function CVProfile({ userId = '00000000-0000-0000-0000-0000000000
           </Box>
         ) : (
           <Grid gridDefinition={cvs.map(() => ({ colspan: 4 }))}>
-            {cvs.map(cv => (
-              <div
-                key={cv.id}
-                style={{
-                  border: '1px solid #e2e8f0',
-                  borderRadius: '10px',
-                  padding: '16px',
-                  background: '#ffffff',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '12px',
-                  boxShadow: '0 1px 3px rgba(0,0,0,0.05)'
-                }}
-              >
-                <div style={{ fontSize: '24px' }}>📄</div>
-                <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flexGrow: 1 }}>
-                  <div style={{ fontWeight: 'bold', fontSize: '13px', color: '#1e293b' }} title={cv.file_url.split('/').pop()}>
-                    {cv.file_url.split('/').pop()}
+            {cvs.map(cv => {
+              const filename = cv.file_url.split('/').pop();
+              return (
+                <div
+                  key={cv.id}
+                  style={{
+                    border: '1px solid #e2e8f0',
+                    borderRadius: '10px',
+                    padding: '16px',
+                    background: '#ffffff',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'between',
+                    gap: '12px',
+                    boxShadow: '0 1px 3px rgba(0,0,0,0.05)'
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <div style={{ fontSize: '32px' }}>📄</div>
+                    <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flexGrow: 1 }}>
+                      <div style={{ fontWeight: 'bold', fontSize: '13px', color: '#1e293b' }} title={filename}>
+                        {filename}
+                      </div>
+                      <div style={{ fontSize: '11px', color: '#64748b', marginTop: '4px' }}>
+                        Tải lên: {new Date(cv.uploaded_at).toLocaleDateString()}
+                      </div>
+                    </div>
                   </div>
-                  <div style={{ fontSize: '11px', color: '#64748b', marginTop: '4px' }}>
-                    Tải lên ngày: {new Date(cv.uploaded_at).toLocaleDateString()}
+
+                  <div
+                    style={{
+                      display: 'flex',
+                      gap: '8px',
+                      borderTop: '1px solid #f1f5f9',
+                      paddingTop: '12px',
+                      justifyContent: 'flex-end'
+                    }}
+                  >
+                    <a
+                      href={cv.file_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{
+                        padding: '6px 12px',
+                        fontSize: '12px',
+                        color: '#4f46e5',
+                        border: '1px solid #e0e7ff',
+                        borderRadius: '6px',
+                        background: '#e0e7ff',
+                        textDecoration: 'none',
+                        fontWeight: '600',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '4px',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      👁️ Xem
+                    </a>
+                    <a
+                      href={cv.file_url}
+                      download={filename}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{
+                        padding: '6px 12px',
+                        fontSize: '12px',
+                        color: '#374151',
+                        border: '1px solid #e5e7eb',
+                        borderRadius: '6px',
+                        background: '#f3f4f6',
+                        textDecoration: 'none',
+                        fontWeight: '600',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '4px',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      📥 Tải về
+                    </a>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </Grid>
         )}
       </Container>
