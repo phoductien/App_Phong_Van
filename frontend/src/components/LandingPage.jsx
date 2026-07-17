@@ -1,4 +1,32 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+
+function AnimatedCounter({ target, duration = 1500 }) {
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    let start = 0;
+    const end = parseInt(target, 10);
+    if (isNaN(end) || end <= 0) return;
+
+    const totalSteps = 60;
+    const stepTime = Math.max(Math.floor(duration / totalSteps), 15);
+    const increment = Math.ceil(end / totalSteps);
+
+    const timer = setInterval(() => {
+      start += increment;
+      if (start >= end) {
+        clearInterval(timer);
+        setCount(end);
+      } else {
+        setCount(start);
+      }
+    }, stepTime);
+
+    return () => clearInterval(timer);
+  }, [target, duration]);
+
+  return <span>{count.toLocaleString('vi-VN')}</span>;
+}
 
 export default function LandingPage({ onNavigateToAuth }) {
   const [activeFaq, setActiveFaq] = useState(null);
@@ -258,14 +286,14 @@ export default function LandingPage({ onNavigateToAuth }) {
       <section className="py-12 bg-white">
         <div className="max-w-6xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
           {[
-            { value: '20,000+', label: 'Câu hỏi' },
-            { value: '10,000+', label: 'Lượt luyện tập' },
-            { value: '35,000+', label: 'Việc làm' },
-            { value: '157+', label: 'Top công ty' }
+            { numeric: 20000, label: 'Câu hỏi' },
+            { numeric: 10000, label: 'Lượt luyện tập' },
+            { numeric: 35000, label: 'Việc làm' },
+            { numeric: 157, label: 'Top công ty' }
           ].map((stat, idx) => (
             <div key={idx} className="space-y-1 group cursor-pointer">
               <div className="text-3xl sm:text-4xl font-extrabold text-indigo-600 group-hover:scale-110 group-hover:text-indigo-800 transition-all duration-300">
-                {stat.value}
+                <AnimatedCounter target={stat.numeric} />+
               </div>
               <div className="text-sm font-semibold text-slate-400 group-hover:text-slate-600 transition-colors duration-300">
                 {stat.label}
