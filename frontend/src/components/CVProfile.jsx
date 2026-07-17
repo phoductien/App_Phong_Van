@@ -203,7 +203,7 @@ export default function CVProfile({ userId = '00000000-0000-0000-0000-0000000000
       </Container>
 
       {/* Uploaded CVs list */}
-      <Container header={<Header variant="h2" actions={<Badge color="blue">{cvs.length} CV</Badge>}>Hồ sơ CV đã tải lên (TopCV Style)</Header>}>
+      <Container header={<Header variant="h2" actions={<Badge color="blue">{cvs.length} CV</Badge>}>Hồ sơ CV đã tải lên</Header>}>
         {loading ? (
           <Box variant="p" style={{ textAlign: 'center' }}>
             <Spinner size="large" />
@@ -255,16 +255,20 @@ export default function CVProfile({ userId = '00000000-0000-0000-0000-0000000000
                     }}
                   >
                     {displayUrl.toLowerCase().endsWith('.pdf') ? (
-                      <div style={{ width: '100%', height: '100%', position: 'relative' }}>
+                      <div style={{ width: '100%', height: '100%', position: 'relative', overflow: 'hidden' }}>
                         <iframe
                           src={`${displayUrl}#toolbar=0&navpanes=0&scrollbar=0`}
                           style={{
-                            width: '100%',
+                            width: 'calc(100% + 18px)',
                             height: '100%',
                             border: 'none',
-                            pointerEvents: 'none'
+                            pointerEvents: 'none',
+                            position: 'absolute',
+                            top: 0,
+                            left: 0
                           }}
                           title={filename}
+                          scrolling="no"
                         />
                         <div 
                           style={{ 
