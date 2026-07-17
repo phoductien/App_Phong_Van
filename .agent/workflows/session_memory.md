@@ -17,6 +17,7 @@
   - Tích hợp linh kiện `AnimatedCounter` giúp tự động tăng số các số liệu thống kê (20,000+ Câu hỏi, 10,000+ Lượt luyện tập, 35,000+ Việc làm, 157+ Công ty) chạy từ 0 đến giới hạn khi tải trang Landing.
   - Loại bỏ phần dải logo thương hiệu đối tác (VNG, Grab, Shopee, MoMo, FPT) theo yêu cầu tinh giản của người dùng.
   - Hiện thực hóa tính năng chuyển đổi giao diện sáng/tối (Light/Dark Theme) thực tế và chuyển đổi ngôn ngữ song ngữ Việt/Anh (Vietnamese/English) trên trang Đăng ký / Đăng nhập.
+  - Tích hợp lắng nghe sự kiện thay đổi hash của URL (hashchange với #/auth và #/) để hỗ trợ nút Back/Forward (mũi tên quay lại) của trình duyệt hoạt động hoàn hảo, đồng thời loại bỏ nút Trang chủ thừa ở màn hình đăng nhập.
 
 ## 2. CẤU TRÚC THƯ MỤC THỰC TẾ ĐÃ TRIỂN KHAI
 - `docs/PHASE_1_ARCHITECTURE.md`: Tài liệu cấu trúc hệ thống, port và sơ đồ luồng dữ liệu.
