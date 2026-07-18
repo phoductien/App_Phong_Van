@@ -26,7 +26,8 @@ node setup.js
 Sau khi quá trình cài đặt tự động hoàn tất, bạn thực hiện tiếp:
 
 1. Mở file `backend/.env` và điền `GEMINI_API_KEY` của bạn để sử dụng AI thật.
-2. Khởi chạy Backend và Frontend ở 2 terminal riêng biệt:
+2. **Khởi tạo Cơ sở dữ liệu (Nếu sử dụng Supabase thật)**: Nếu bạn điền `SUPABASE_URL` và `SUPABASE_KEY` để kết nối cơ sở dữ liệu thật, hãy sao chép toàn bộ nội dung trong tệp [supabase/schema.sql](file:///d:/ThucTapDN/App_Phong_Van/supabase/schema.sql) và chạy trên **Supabase SQL Editor** để tạo toàn bộ bảng, RLS và dữ liệu mẫu.
+3. Khởi chạy Backend và Frontend ở 2 terminal riêng biệt:
    * **Terminal 1 (Backend API):**
      ```bash
      cd backend
