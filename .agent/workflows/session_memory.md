@@ -33,6 +33,8 @@
   - Đồng bộ hóa vai trò khi tự tạo tài khoản Google giả lập mới để test: tự động gán vai trò (`candidate` hoặc `interviewer`) khớp đúng với cổng đăng nhập mà người dùng đang đứng, ngăn chặn sự nhầm lẫn chéo khi kiểm thử cục bộ.
   - Sửa lỗi không chèn được công ty mới vào Supabase do thiếu chính sách RLS: Bổ sung chính sách `INSERT` (Allow public insert access to companies) cho bảng `companies` trong tệp `supabase/schema.sql` để cho phép crawler/recruiter tạo công ty động từ client.
   - Cập nhật tài liệu `README.md` để bổ sung hướng dẫn chạy tệp cấu trúc cơ sở dữ liệu `supabase/schema.sql` trên Supabase SQL Editor khi thiết lập kết nối Database thực tế.
+  - Phân tách phân quyền đăng nhập/đăng ký của Doanh nghiệp: Ẩn hoàn toàn nút "Đăng nhập bằng Google" tại cổng đăng nhập của Doanh nghiệp (`#/auth/recruiter`), chỉ cho phép xác thực bằng Email/Mật khẩu truyền thống và đảm bảo tính duy nhất của email hệ thống để không bị trùng lặp tài khoản giữa hai vai trò.
+
 
 
 
