@@ -37,6 +37,7 @@
   - Tối ưu hóa phân tích vai trò sau Google OAuth: Loại bỏ kiểm tra từ khóa thô trong email (`session.user.email.includes('interviewer')`) gây lỗi gán nhầm vai trò, thay thế bằng cơ chế xác minh chính xác qua `oauth_login_portal` của `localStorage` kết hợp độ trễ dọn dẹp (`setTimeout` 1000ms) để giải quyết xung đột bất đồng bộ giữa `getSession` và `onAuthStateChange`.
   - Khắc phục lỗi thiếu ghi nhận cổng trong `Auth.jsx`: Bổ sung lệnh `localStorage.setItem('oauth_login_portal', portal)` vào hàm `handleGoogleLogin` trong `Auth.jsx` trước khi bắt đầu Google OAuth để thông tin cổng không bị trống.
   - Sửa lỗi `Database error saving new user` trên Supabase: Cải tiến trigger function `public.handle_new_user()` để tự động dọn dẹp các bản ghi profile mồ côi có cùng email trong bảng `profiles` trước khi chèn, ngăn chặn lỗi trùng lặp ràng buộc UNIQUE của cơ sở dữ liệu khi đăng ký bằng Google.
+  - Xây dựng hệ thống Blog và Bình luận tương tác hoàn chỉnh: Nâng cấp tệp `Blog.jsx` để hiển thị 6 bài viết chuyên sâu về kỹ thuật (React 19, System Design, NIST Security) và kỹ năng (CV, Salary Negotiation). Hỗ trợ đọc chi tiết bài viết, tự động nhận diện tài khoản người dùng đăng nhập để bình luận hoặc cho phép nhập tên khách độc lập, đồng thời lưu trữ dữ liệu bình luận lâu dài qua `localStorage` (dự phòng theo cấu trúc `x_blog_comments_`).
 
 
 

@@ -284,7 +284,7 @@ function App() {
         );
       case 'blog':
         return (
-          <Blog />
+          <Blog user={user} />
         );
       case 'interview_session':
         return activeSession ? (
