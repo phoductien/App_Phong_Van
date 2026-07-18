@@ -86,25 +86,19 @@ function App() {
         
         const oauthPortal = localStorage.getItem('oauth_login_portal');
         let resolvedRole = 'candidate';
-        if (
-          metadata.role === 'interviewer' || 
-          oauthPortal === 'recruiter' ||
-          window.location.hash.startsWith('#/auth/recruiter') ||
-          session.user.email.includes('interviewer') || 
-          session.user.email.includes('recruiter')
-        ) {
-          resolvedRole = 'interviewer';
-          if (metadata.role !== 'interviewer') {
-            supabase.auth.updateUser({ data: { role: 'interviewer' } });
-          }
+        if (oauthPortal) {
+          resolvedRole = oauthPortal === 'recruiter' ? 'interviewer' : 'candidate';
         } else {
-          if (metadata.role !== 'candidate') {
-            supabase.auth.updateUser({ data: { role: 'candidate' } });
-          }
+          resolvedRole = metadata.role === 'interviewer' ? 'interviewer' : 'candidate';
         }
 
-        // Clean up
-        localStorage.removeItem('oauth_login_portal');
+        if (metadata.role !== resolvedRole) {
+          supabase.auth.updateUser({ data: { role: resolvedRole } });
+        }
+
+        setTimeout(() => {
+          localStorage.removeItem('oauth_login_portal');
+        }, 1000);
 
         setUser({
           id: session.user.id,
@@ -123,25 +117,19 @@ function App() {
         
         const oauthPortal = localStorage.getItem('oauth_login_portal');
         let resolvedRole = 'candidate';
-        if (
-          metadata.role === 'interviewer' || 
-          oauthPortal === 'recruiter' ||
-          window.location.hash.startsWith('#/auth/recruiter') ||
-          session.user.email.includes('interviewer') || 
-          session.user.email.includes('recruiter')
-        ) {
-          resolvedRole = 'interviewer';
-          if (metadata.role !== 'interviewer') {
-            supabase.auth.updateUser({ data: { role: 'interviewer' } });
-          }
+        if (oauthPortal) {
+          resolvedRole = oauthPortal === 'recruiter' ? 'interviewer' : 'candidate';
         } else {
-          if (metadata.role !== 'candidate') {
-            supabase.auth.updateUser({ data: { role: 'candidate' } });
-          }
+          resolvedRole = metadata.role === 'interviewer' ? 'interviewer' : 'candidate';
         }
 
-        // Clean up
-        localStorage.removeItem('oauth_login_portal');
+        if (metadata.role !== resolvedRole) {
+          supabase.auth.updateUser({ data: { role: resolvedRole } });
+        }
+
+        setTimeout(() => {
+          localStorage.removeItem('oauth_login_portal');
+        }, 1000);
 
         setUser({
           id: session.user.id,
