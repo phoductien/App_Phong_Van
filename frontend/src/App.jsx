@@ -84,9 +84,11 @@ function App() {
         const metadata = session.user.user_metadata || {};
         const fullName = metadata.full_name || metadata.name || session.user.email.split('@')[0];
         
+        const oauthPortal = localStorage.getItem('oauth_login_portal');
         let resolvedRole = 'candidate';
         if (
           metadata.role === 'interviewer' || 
+          oauthPortal === 'recruiter' ||
           window.location.hash.startsWith('#/auth/recruiter') ||
           session.user.email.includes('interviewer') || 
           session.user.email.includes('recruiter')
@@ -100,6 +102,9 @@ function App() {
             supabase.auth.updateUser({ data: { role: 'candidate' } });
           }
         }
+
+        // Clean up
+        localStorage.removeItem('oauth_login_portal');
 
         setUser({
           id: session.user.id,
@@ -116,9 +121,11 @@ function App() {
         const metadata = session.user.user_metadata || {};
         const fullName = metadata.full_name || metadata.name || session.user.email.split('@')[0];
         
+        const oauthPortal = localStorage.getItem('oauth_login_portal');
         let resolvedRole = 'candidate';
         if (
           metadata.role === 'interviewer' || 
+          oauthPortal === 'recruiter' ||
           window.location.hash.startsWith('#/auth/recruiter') ||
           session.user.email.includes('interviewer') || 
           session.user.email.includes('recruiter')
@@ -132,6 +139,9 @@ function App() {
             supabase.auth.updateUser({ data: { role: 'candidate' } });
           }
         }
+
+        // Clean up
+        localStorage.removeItem('oauth_login_portal');
 
         setUser({
           id: session.user.id,
