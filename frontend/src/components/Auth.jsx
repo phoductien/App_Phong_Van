@@ -181,10 +181,11 @@ export default function Auth({ onLoginSuccess, initialSignUp = false, onBackToLa
     if (supabase) {
       setLoading(true);
       setErrorMsg('');
+      const redirectToUrl = window.location.origin + '/' + window.location.hash;
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: window.location.origin
+          redirectTo: redirectToUrl
         }
       });
       if (error) {

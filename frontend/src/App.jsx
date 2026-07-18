@@ -85,8 +85,20 @@ function App() {
         const fullName = metadata.full_name || metadata.name || session.user.email.split('@')[0];
         
         let resolvedRole = 'candidate';
-        if (metadata.role === 'interviewer' || session.user.email.includes('interviewer') || session.user.email.includes('recruiter')) {
+        if (
+          metadata.role === 'interviewer' || 
+          window.location.hash.startsWith('#/auth/recruiter') ||
+          session.user.email.includes('interviewer') || 
+          session.user.email.includes('recruiter')
+        ) {
           resolvedRole = 'interviewer';
+          if (metadata.role !== 'interviewer') {
+            supabase.auth.updateUser({ data: { role: 'interviewer' } });
+          }
+        } else {
+          if (metadata.role !== 'candidate') {
+            supabase.auth.updateUser({ data: { role: 'candidate' } });
+          }
         }
 
         setUser({
@@ -105,8 +117,20 @@ function App() {
         const fullName = metadata.full_name || metadata.name || session.user.email.split('@')[0];
         
         let resolvedRole = 'candidate';
-        if (metadata.role === 'interviewer' || session.user.email.includes('interviewer') || session.user.email.includes('recruiter')) {
+        if (
+          metadata.role === 'interviewer' || 
+          window.location.hash.startsWith('#/auth/recruiter') ||
+          session.user.email.includes('interviewer') || 
+          session.user.email.includes('recruiter')
+        ) {
           resolvedRole = 'interviewer';
+          if (metadata.role !== 'interviewer') {
+            supabase.auth.updateUser({ data: { role: 'interviewer' } });
+          }
+        } else {
+          if (metadata.role !== 'candidate') {
+            supabase.auth.updateUser({ data: { role: 'candidate' } });
+          }
         }
 
         setUser({
