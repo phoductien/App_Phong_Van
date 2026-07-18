@@ -9,3 +9,7 @@
   git push origin main
   git push public_repo main --force
   ```
+- **Rule (Token Optimization & Commit Batching)**:
+  - To save tokens and execution costs, avoid committing and pushing after every minor file change.
+  - Instead, perform all required edits first, update the session memory (`.agent/workflows/session_memory.md`), and only perform a single consolidated `git commit` and `git push` to both remotes at the very end of your task/turn.
+

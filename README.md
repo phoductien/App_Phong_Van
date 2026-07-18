@@ -88,6 +88,10 @@ Sau khi quá trình cài đặt tự động hoàn tất, bạn thực hiện ti
 >      git push origin main
 >      git push public_repo main --force
 >      ```
+> 3. **Tối ưu hóa Token & Gộp Commit (Dành cho AI Agents)**:
+>    * Để tiết kiệm tài nguyên và chi phí, AI Agent nên hoàn thành tất cả các chỉnh sửa và cập nhật tài liệu bộ nhớ phiên làm việc (`.agent/workflows/session_memory.md`) trước.
+>    * Chỉ thực hiện một lần gộp `git commit` và `git push` duy nhất lên cả 2 remote ở cuối phiên làm việc thay vì chạy commit/push lặp đi lặp lại sau mỗi chỉnh sửa nhỏ.
+>
 
 ---
 
