@@ -25,6 +25,7 @@
   - Cấu hình chuyển hướng người dùng quay lại trang đăng nhập `#/auth` sau khi nhấn đăng xuất (ở cả vai trò Ứng viên và Doanh nghiệp).
   - Tích hợp hiệu ứng trượt hiện mềm mại (`animate-fade-in-up`) với tốc độ chậm hơn (1.0s) cho form đăng nhập/đăng ký mỗi khi trang được tải lại hoặc khi người dùng chuyển đổi giữa hai biểu mẫu nhờ cơ chế quản lý key độc lập.
   - Sửa lỗi cào tin và tạo đề thi phỏng vấn bên phía Nhà tuyển dụng: tích hợp API POST `/api/companies` để tự động khởi tạo công ty mới nếu chưa tồn tại trong cơ sở dữ liệu khi cào tin, đồng thời đồng bộ hóa cấp độ `easy` sang `ez` ở cả hai đầu API GET/POST `/api/questions` để vượt qua ràng buộc check constraint của bảng Supabase.
+  - Tích hợp cơ chế dự phòng cào tin (Crawler URL-based fallback parsing) ở backend để bóc tách thông tin công việc trực tiếp từ cấu trúc URL trong trường hợp request bị tường lửa/Cloudflare của trang nguồn chặn (như TopCV trả về lỗi 403), đảm bảo AI luôn tự sinh thành công 10 câu hỏi phỏng vấn chuẩn xác thay vì báo lỗi đỏ.
 
 ## 2. CẤU TRÚC THƯ MỤC THỰC TẾ ĐÃ TRIỂN KHAI
 - `docs/PHASE_1_ARCHITECTURE.md`: Tài liệu cấu trúc hệ thống, port và sơ đồ luồng dữ liệu.
