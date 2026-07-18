@@ -67,15 +67,42 @@ export default function InterviewerDashboard({
       const crawlData = await crawlRes.json();
       const parsedJd = crawlData.data;
 
-      const matchingCompany = companies.find(c => c.label.toLowerCase().includes(parsedJd.company_name.toLowerCase()));
-      if (matchingCompany) {
-        setSelectedCompany(matchingCompany);
+      // Register or find company dynamically
+      try {
+        const compRes = await fetch(`${API_BASE}/api/companies`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name: parsedJd.company_name })
+        });
+        if (compRes.ok) {
+          const compData = await compRes.json();
+          const compObj = { label: compData.data.name, value: compData.data.id };
+          setCompanies(prev => {
+            if (!prev.some(c => c.value === compObj.value)) {
+              return [...prev, compObj];
+            }
+            return prev;
+          });
+          setSelectedCompany(compObj);
+        } else {
+          const matchingCompany = companies.find(c => c.label.toLowerCase().includes(parsedJd.company_name.toLowerCase()));
+          if (matchingCompany) {
+            setSelectedCompany(matchingCompany);
+          }
+        }
+      } catch (cErr) {
+        console.error("Failed to sync company", cErr);
+        const matchingCompany = companies.find(c => c.label.toLowerCase().includes(parsedJd.company_name.toLowerCase()));
+        if (matchingCompany) {
+          setSelectedCompany(matchingCompany);
+        }
       }
       
       setTitle(`${parsedJd.company_name} - ${parsedJd.job_title}`);
+      const normLevel = parsedJd.level === 'ez' ? 'easy' : parsedJd.level;
       setLevel({
-        label: parsedJd.level === 'hard' ? 'Senior (hard)' : parsedJd.level === 'easy' ? 'Intern / Fresher (easy)' : 'Junior / Mid (medium)',
-        value: parsedJd.level
+        label: normLevel === 'hard' ? 'Senior (hard)' : normLevel === 'easy' ? 'Intern / Fresher (easy)' : 'Junior / Mid (medium)',
+        value: normLevel
       });
 
       const genRes = await fetch(`${API_BASE}/api/questions/generate-only`, {

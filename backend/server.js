@@ -506,32 +506,90 @@ app.get('/api/companies', async (req, res) => {
   return res.json(data);
 });
 
+// API: Create a company if not exists
+app.post('/api/companies', async (req, res) => {
+  const { name, industry_domain } = req.body;
+  if (!name) return res.status(400).json({ error: "Missing name" });
+
+  const domain = industry_domain || "Công nghệ thông tin";
+
+  if (isMock) {
+    let existing = mockCompanies.find(c => c.name.toLowerCase() === name.toLowerCase());
+    if (existing) {
+      return res.json({ success: true, data: existing });
+    }
+    const newComp = {
+      id: `company-${Date.now()}`,
+      name,
+      industry_domain: domain
+    };
+    mockCompanies.push(newComp);
+    return res.status(201).json({ success: true, data: newComp });
+  }
+
+  try {
+    const { data: existing, error: findErr } = await supabase
+      .from('companies')
+      .select('*')
+      .eq('name', name)
+      .maybeSingle();
+
+    if (existing) {
+      return res.json({ success: true, data: existing });
+    }
+
+    const { data, error } = await supabase
+      .from('companies')
+      .insert([{ name, industry_domain: domain }])
+      .select();
+
+    if (error) return res.status(400).json(error);
+    return res.status(201).json({ success: true, data: data[0] });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: err.message });
+  }
+});
+
 // API: Get list of question banks
 app.get('/api/questions', async (req, res) => {
   const { companyId, level } = req.query;
+
+  let dbLevel = level;
+  if (level === 'easy') dbLevel = 'ez';
 
   if (isMock) {
     let list = [...mockQuestionBanks];
     if (companyId) {
       list = list.filter(qb => qb.company_id === companyId);
     }
-    if (level) {
-      list = list.filter(qb => qb.level === level);
+    if (dbLevel) {
+      list = list.filter(qb => qb.level === dbLevel);
     }
-    return res.json(list);
+    const mappedList = list.map(qb => ({
+      ...qb,
+      level: qb.level === 'ez' ? 'easy' : qb.level
+    }));
+    return res.json(mappedList);
   }
 
   let query = supabase.from('question_banks').select('*, companies(*)');
   if (companyId) {
     query = query.eq('company_id', companyId);
   }
-  if (level) {
-    query = query.eq('level', level);
+  if (dbLevel) {
+    query = query.eq('level', dbLevel);
   }
 
   const { data, error } = await query;
   if (error) return res.status(400).json(error);
-  return res.json(data);
+
+  const mappedData = data.map(qb => ({
+    ...qb,
+    level: qb.level === 'ez' ? 'easy' : qb.level
+  }));
+
+  return res.json(mappedData);
 });
 
 // API: Save a question bank
@@ -541,11 +599,13 @@ app.post('/api/questions', async (req, res) => {
     return res.status(400).json({ error: "Missing required fields" });
   }
 
+  const dbLevel = level === 'easy' ? 'ez' : level;
+
   if (isMock) {
     const newQb = {
       id: `qb-${Date.now()}`,
       company_id: companyId,
-      level,
+      level: dbLevel,
       title,
       questions
     };
@@ -555,7 +615,7 @@ app.post('/api/questions', async (req, res) => {
 
   const { data, error } = await supabase
     .from('question_banks')
-    .insert([{ interviewer_id: interviewerId || null, company_id: companyId, level, title, questions }])
+    .insert([{ interviewer_id: interviewerId || null, company_id: companyId, level: dbLevel, title, questions }])
     .select();
 
   if (error) return res.status(400).json(error);
