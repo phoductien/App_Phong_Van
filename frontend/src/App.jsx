@@ -465,9 +465,6 @@ function App() {
                 setRole('candidate');
                 window.location.hash = '#/auth';
               }
-            } else if (detail.id === 'switch_to_candidate') {
-              setRole('candidate');
-              setActiveTab('home');
             } else if (detail.id.startsWith('recruiter_')) {
               setActiveTab('interviewer');
               if (detail.id === 'recruiter_dashboard') setRecruiterTab('live_rooms');
@@ -483,8 +480,6 @@ function App() {
             { type: 'link', text: '📝 Đăng tin tuyển dụng', id: 'recruiter_jobs_new' },
             { type: 'link', text: '📚 Ngân hàng câu hỏi tuyển dụng', id: 'recruiter_questions' },
             { type: 'link', text: '👥 Danh sách ứng viên', id: 'recruiter_candidates' },
-            { type: 'divider' },
-            { type: 'link', text: '👤 Chế độ: Ứng viên 🔄', id: 'switch_to_candidate' },
             { type: 'divider' },
             { type: 'link', text: '🚪 Đăng xuất', id: 'logout' }
           ]}
