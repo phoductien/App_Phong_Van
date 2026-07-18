@@ -148,12 +148,21 @@ function App() {
     return () => subscription.unsubscribe();
   }, []);
 
+  const [prevUserExist, setPrevUserExist] = useState(false);
+
   useEffect(() => {
     if (user && user.role) {
-      setRole(user.role);
-      setActiveTab(user.role === 'interviewer' ? 'interviewer' : 'home');
+      setRole(prevRole => {
+        if (prevRole !== user.role || !prevUserExist) {
+          setActiveTab(user.role === 'interviewer' ? 'interviewer' : 'home');
+        }
+        return user.role;
+      });
+      setPrevUserExist(true);
+    } else {
+      setPrevUserExist(false);
     }
-  }, [user]);
+  }, [user, prevUserExist]);
 
   const handleStartSession = (sessionInfo) => {
     setActiveSession(sessionInfo);
@@ -425,7 +434,35 @@ function App() {
         <main className="flex-1 overflow-y-auto p-8 bg-slate-50/10">
           <div className="max-w-6xl mx-auto">
             <Suspense fallback={<div style={{ display: 'flex', justifyContent: 'center', padding: '60px' }}><Spinner size="large" /></div>}>
-              {renderCandidateContent()}
+              <div className={activeTab === 'home' ? '' : 'hidden'}>
+                <HomeDashboard
+                  user={user}
+                  onNavigateToTab={(tabId) => setActiveTab(tabId)}
+                  onStartQuickInterview={handleStartQuickInterview}
+                  onStartInterviewWithJob={handleStartInterviewWithJob}
+                />
+              </div>
+              <div className={activeTab === 'candidate' ? '' : 'hidden'}>
+                <StartInterview onStartSession={handleStartSession} user={user} userId={user?.id} />
+              </div>
+              <div className={activeTab === 'question_bank' ? '' : 'hidden'}>
+                <QuestionBankViewer />
+              </div>
+              <div className={activeTab === 'jobs' ? '' : 'hidden'}>
+                <JobsDashboard onStartInterviewWithJob={handleStartInterviewWithJob} />
+              </div>
+              <div className={activeTab === 'pricing' ? '' : 'hidden'}>
+                <Pricing user={user} onUpgradeTier={(newTier) => setUser(prev => ({ ...prev, tier: newTier }))} />
+              </div>
+              <div className={activeTab === 'cv_profile' ? '' : 'hidden'}>
+                <CVProfile userId={user?.id} user={user} />
+              </div>
+              <div className={activeTab === 'blog' ? '' : 'hidden'}>
+                <Blog user={user} />
+              </div>
+              {activeTab === 'interview_session' && activeSession && (
+                <InterviewRoom user={user} session={activeSession} onLeaveSession={handleLeaveSession} />
+              )}
             </Suspense>
           </div>
         </main>

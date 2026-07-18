@@ -38,6 +38,8 @@
   - Khắc phục lỗi thiếu ghi nhận cổng trong `Auth.jsx`: Bổ sung lệnh `localStorage.setItem('oauth_login_portal', portal)` vào hàm `handleGoogleLogin` trong `Auth.jsx` trước khi bắt đầu Google OAuth để thông tin cổng không bị trống.
   - Sửa lỗi `Database error saving new user` trên Supabase: Cải tiến trigger function `public.handle_new_user()` để tự động dọn dẹp các bản ghi profile mồ côi có cùng email trong bảng `profiles` trước khi chèn, ngăn chặn lỗi trùng lặp ràng buộc UNIQUE của cơ sở dữ liệu khi đăng ký bằng Google.
   - Xây dựng hệ thống Blog và Bình luận tương tác hoàn chỉnh: Nâng cấp tệp `Blog.jsx` để hiển thị 6 bài viết chuyên sâu thực tế lấy nguồn từ các bài viết chất lượng cao của Viblo (phỏng vấn React JS, viết CV IT, System Design cho hàng triệu người dùng, an ninh thông tin chuẩn NIST, con đường sự nghiệp Software Engineer, đàm phán lương). Bổ sung nút bấm "Đọc bài gốc trên Viblo" liên kết đến URL bài viết thật đang hoạt động, hỗ trợ bình luận động lưu trữ bền vững qua `localStorage`.
+  - Tối ưu hóa chuyển đổi tab và giữ nguyên trạng thái làm việc: Chuyển đổi cơ chế hiển thị tab của ứng viên từ unmount/mount (`switch-case`) sang cơ chế hiển thị song song và ẩn/hiện bằng CSS (lớp `hidden` của Tailwind). Việc này giúp giữ nguyên trạng thái dữ liệu (đang đọc dở bài viết Blog, bộ lọc câu hỏi đang chọn, form CV đang điền) khi di chuyển qua lại giữa các tab.
+  - Ngăn chặn reset tab không mong muốn: Bổ sung biến trạng thái `prevUserExist` trong `App.jsx` để kiểm soát hiệu ứng phụ `useEffect` của `user`, đảm bảo tab hoạt động của ứng viên không bị tự động reset về trang chủ khi có cập nhật hồ sơ hoặc phiên làm việc Supabase chạy ngầm.
 
 
 
