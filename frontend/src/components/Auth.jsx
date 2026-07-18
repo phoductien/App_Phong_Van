@@ -370,7 +370,7 @@ export default function Auth({ onLoginSuccess, initialSignUp = false, onBackToLa
         </div>
 
         {/* Form content */}
-        <div className="w-full max-w-md mx-auto space-y-6">
+        <div key={isSignUp ? 'signup' : 'signin'} className="w-full max-w-md mx-auto space-y-6 animate-fade-in-up">
           <div>
             <h2 className={`text-3xl font-bold tracking-tight ${darkMode ? 'text-white' : 'text-slate-900'}`}>
               {isSignUp ? t[lang].registerTitle : t[lang].loginTitle}

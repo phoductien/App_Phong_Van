@@ -107,7 +107,9 @@ function App() {
         });
       } else {
         setUser(null);
-        setShowAuth(false);
+        if (event === 'SIGNED_OUT') {
+          window.location.hash = '#/auth';
+        }
       }
     });
 
@@ -383,8 +385,8 @@ function App() {
                     setUser(null);
                     setActiveSession(null);
                     setActiveTab('home');
-                    setShowAuth(false);
                     setRole('candidate');
+                    window.location.hash = '#/auth';
                   }
                 }}
                 className="p-1.5 text-slate-400 hover:text-red-500 rounded-lg hover:bg-slate-200/50 transition duration-150"
@@ -428,7 +430,7 @@ function App() {
                 setActiveSession(null);
                 setActiveTab('home');
                 setRole('candidate');
-                setShowAuth(false);
+                window.location.hash = '#/auth';
               }
             } else if (detail.id === 'switch_to_candidate') {
               setRole('candidate');
