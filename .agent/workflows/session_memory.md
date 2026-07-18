@@ -31,6 +31,8 @@
   - Khắc phục lỗi đăng nhập Google chuyển hướng sai trang Dashboard do Supabase tự động ghi đè URL hash bằng `#access_token=...`: Lưu trữ vai trò cổng hiện tại (`oauth_login_portal`) vào `localStorage` ngay trước khi kích hoạt luồng OAuth của Google, khôi phục tham số `redirectTo` về `window.location.origin` để khớp cấu hình whitelist của Supabase, sau đó bóc tách và đồng bộ ngược lên Supabase khi nhận callback thành công để chuyển tiếp chính xác đến Dashboard Doanh nghiệp.
   - Loại bỏ hoàn toàn tùy chọn và luồng xử lý "Chế độ: Ứng viên" ở Sidebar của Doanh nghiệp, bảo đảm Nhà tuyển dụng chỉ thao tác trong phạm vi các công cụ quản trị tuyển dụng.
   - Đồng bộ hóa vai trò khi tự tạo tài khoản Google giả lập mới để test: tự động gán vai trò (`candidate` hoặc `interviewer`) khớp đúng với cổng đăng nhập mà người dùng đang đứng, ngăn chặn sự nhầm lẫn chéo khi kiểm thử cục bộ.
+  - Sửa lỗi không chèn được công ty mới vào Supabase do thiếu chính sách RLS: Bổ sung chính sách `INSERT` (Allow public insert access to companies) cho bảng `companies` trong tệp `supabase/schema.sql` để cho phép crawler/recruiter tạo công ty động từ client.
+
 
 
 

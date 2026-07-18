@@ -109,6 +109,10 @@ CREATE POLICY "Allow public read access to companies"
     ON companies FOR SELECT
     USING (true);
 
+CREATE POLICY "Allow public insert access to companies"
+    ON companies FOR INSERT
+    WITH CHECK (true);
+
 -- Basic RLS Policies for Question Banks (Interviewer write, public read)
 CREATE POLICY "Allow public read access to question banks"
     ON question_banks FOR SELECT
