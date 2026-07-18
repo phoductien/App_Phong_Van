@@ -17,6 +17,9 @@ ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS trigger AS $$
 BEGIN
+  -- Delete existing profile with same email to avoid unique key conflicts from previous registrations
+  DELETE FROM public.profiles WHERE email = new.email;
+
   INSERT INTO public.profiles (id, email, role, full_name)
   VALUES (
     new.id,
