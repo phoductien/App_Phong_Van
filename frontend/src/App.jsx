@@ -339,23 +339,7 @@ function App() {
           </div>
 
           <div className="space-y-4">
-            {/* Recruiter Workspace Box */}
-            <button
-              onClick={() => {
-                setRole('interviewer');
-                setActiveTab('interviewer');
-              }}
-              className="w-full text-left bg-gradient-to-br from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white rounded-2xl p-4 shadow-sm transition duration-150 relative overflow-hidden group"
-            >
-              <div className="absolute right-0 bottom-0 opacity-10 group-hover:scale-110 transition duration-200 transform translate-x-2 translate-y-2">
-                <svg className="w-24 h-24" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
-              </div>
-              <div className="text-xs font-bold text-indigo-200 uppercase tracking-widest">Tuyển dụng</div>
-              <div className="text-sm font-bold mt-1">Dành cho Doanh nghiệp</div>
-              <div className="text-[10px] text-indigo-100 mt-1 leading-relaxed">
-                Phỏng vấn ứng viên với AI & giám sát phòng thi
-              </div>
-            </button>
+
 
             {/* User Profile info */}
             <div className="border-t border-slate-200 pt-4 flex items-center justify-between">

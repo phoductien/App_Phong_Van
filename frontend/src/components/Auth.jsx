@@ -18,6 +18,7 @@ if (supabaseUrl && supabaseAnonKey && supabaseUrl !== 'your_supabase_project_url
 export default function Auth({ onLoginSuccess, initialSignUp = false, onBackToLanding = null }) {
   const [isSignUp, setIsSignUp] = useState(initialSignUp);
   const [signupRole, setSignupRole] = useState('candidate');
+  const [signinRole, setSigninRole] = useState('candidate');
   const [lang, setLang] = useState('vi');
   const [darkMode, setDarkMode] = useState(false);
 
@@ -127,6 +128,21 @@ export default function Auth({ onLoginSuccess, initialSignUp = false, onBackToLa
   });
 
   const handleSelectGoogleAccount = (acc) => {
+    // Validate role mismatch
+    if (signinRole === 'candidate' && acc.role === 'interviewer') {
+      alert(lang === 'vi' 
+        ? 'Tài khoản Google này là tài khoản Nhà tuyển dụng. Vui lòng đăng nhập ở cổng Doanh nghiệp.' 
+        : 'This Google account is a Recruiter account. Please sign in via the Employer portal.'
+      );
+      return;
+    }
+    if (signinRole === 'interviewer' && acc.role === 'candidate') {
+      alert(lang === 'vi' 
+        ? 'Tài khoản Google này là tài khoản Ứng viên. Vui lòng đăng nhập ở cổng Ứng viên.' 
+        : 'This Google account is a Candidate account. Please sign in via the Candidate portal.'
+      );
+      return;
+    }
     onLoginSuccess(acc);
     setShowGoogleChooser(false);
   };
@@ -253,6 +269,23 @@ export default function Auth({ onLoginSuccess, initialSignUp = false, onBackToLa
           setErrorMsg(lang === 'vi' ? 'Mật khẩu nhập vào không chính xác.' : 'Incorrect password.');
           return;
         }
+
+        // Validate sign-in role mismatch
+        if (signinRole === 'candidate' && userMatch.role === 'interviewer') {
+          setErrorMsg(lang === 'vi' 
+            ? 'Tài khoản này là tài khoản Nhà tuyển dụng. Vui lòng đăng nhập ở cổng Doanh nghiệp.' 
+            : 'This is a Recruiter account. Please sign in via the Employer portal.'
+          );
+          return;
+        }
+        if (signinRole === 'interviewer' && userMatch.role === 'candidate') {
+          setErrorMsg(lang === 'vi' 
+            ? 'Tài khoản này là tài khoản Ứng viên. Vui lòng đăng nhập ở cổng Ứng viên.' 
+            : 'This is a Candidate account. Please sign in via the Candidate portal.'
+          );
+          return;
+        }
+
         setLoading(true);
         setTimeout(() => {
           setLoading(false);
@@ -266,6 +299,24 @@ export default function Auth({ onLoginSuccess, initialSignUp = false, onBackToLa
         }, 1000);
       } else {
         // Fallback auto-resolve logic for quick development login
+        const resolvedRole = (email.includes('interviewer') || email.includes('recruiter')) ? 'interviewer' : 'candidate';
+        
+        // Validate sign-in role mismatch for fallback
+        if (signinRole === 'candidate' && resolvedRole === 'interviewer') {
+          setErrorMsg(lang === 'vi' 
+            ? 'Tài khoản này là tài khoản Nhà tuyển dụng. Vui lòng đăng nhập ở cổng Doanh nghiệp.' 
+            : 'This is a Recruiter account. Please sign in via the Employer portal.'
+          );
+          return;
+        }
+        if (signinRole === 'interviewer' && resolvedRole === 'candidate') {
+          setErrorMsg(lang === 'vi' 
+            ? 'Tài khoản này là tài khoản Ứng viên. Vui lòng đăng nhập ở cổng Ứng viên.' 
+            : 'This is a Candidate account. Please sign in via the Candidate portal.'
+          );
+          return;
+        }
+
         setLoading(true);
         setTimeout(() => {
           setLoading(false);
@@ -273,7 +324,7 @@ export default function Auth({ onLoginSuccess, initialSignUp = false, onBackToLa
             id: 'user-' + Date.now(),
             email: email,
             full_name: email.split('@')[0],
-            role: email.includes('interviewer') ? 'interviewer' : 'candidate',
+            role: resolvedRole,
             tier: 'free'
           });
         }, 1000);
@@ -462,6 +513,44 @@ export default function Auth({ onLoginSuccess, initialSignUp = false, onBackToLa
                     </div>
                   </div>
                 </>
+              )}
+
+              {!isSignUp && (
+                <div>
+                  <label className={`block text-sm font-medium mb-1.5 ${darkMode ? 'text-slate-300' : 'text-slate-700'}`}>
+                    {lang === 'vi' ? 'Bạn đăng nhập với vai trò:' : 'Sign in as:'}
+                  </label>
+                  <div className="flex gap-3 mb-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSigninRole('candidate');
+                        setErrorMsg('');
+                      }}
+                      className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl border text-sm font-semibold transition duration-150 ${
+                        signinRole === 'candidate'
+                          ? (darkMode ? 'border-indigo-500 bg-indigo-950/60 text-indigo-300' : 'border-indigo-600 bg-indigo-50 text-indigo-700')
+                          : (darkMode ? 'border-slate-700 bg-slate-800/40 text-slate-400 hover:bg-slate-800' : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50')
+                      }`}
+                    >
+                      <span>💼 {lang === 'vi' ? 'Ứng viên' : 'Candidate'}</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSigninRole('interviewer');
+                        setErrorMsg('');
+                      }}
+                      className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl border text-sm font-semibold transition duration-150 ${
+                        signinRole === 'interviewer'
+                          ? (darkMode ? 'border-indigo-500 bg-indigo-950/60 text-indigo-300' : 'border-indigo-600 bg-indigo-50 text-indigo-700')
+                          : (darkMode ? 'border-slate-700 bg-slate-800/40 text-slate-400 hover:bg-slate-800' : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50')
+                      }`}
+                    >
+                      <span>🏢 {lang === 'vi' ? 'Doanh nghiệp' : 'Employer'}</span>
+                    </button>
+                  </div>
+                </div>
               )}
 
               <div>
