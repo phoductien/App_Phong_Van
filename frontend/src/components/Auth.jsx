@@ -159,7 +159,7 @@ export default function Auth({ onLoginSuccess, initialSignUp = false, onBackToLa
       name: newGoogleName,
       email: newGoogleEmail,
       avatar: '🌟',
-      role: newGoogleEmail.includes('interviewer') ? 'interviewer' : 'candidate'
+      role: signinRole
     };
 
     const updated = [...googleAccounts, newAcc];
