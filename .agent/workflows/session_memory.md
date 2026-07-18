@@ -28,7 +28,7 @@
   - Tích hợp cơ chế dự phòng cào tin (Crawler URL-based fallback parsing) ở backend để bóc tách thông tin công việc trực tiếp từ cấu trúc URL trong trường hợp request bị tường lửa/Cloudflare của trang nguồn chặn (như TopCV trả về lỗi 403), đảm bảo AI luôn tự sinh thành công 10 câu hỏi phỏng vấn chuẩn xác thay vì báo lỗi đỏ.
   - Phân tách hoàn toàn cổng đăng nhập của Ứng viên và Doanh nghiệp thành các trang riêng biệt: Cổng Ứng viên nằm ở subroute `#/auth` và Cổng Doanh nghiệp nằm ở `#/auth/recruiter`. Loại bỏ toàn bộ nút chọn vai trò trên biểu mẫu đăng nhập/đăng ký để đảm bảo giao diện độc lập hoàn toàn.
   - Tích hợp liên kết chuyển đổi cổng đăng nhập chéo nhanh ở chân biểu mẫu (Footer) và liên kết "🏢 Dành cho Nhà tuyển dụng" trên thanh điều hướng Landing Page để cải thiện luồng trải nghiệm người dùng (UX).
-  - Khắc phục lỗi đăng nhập Google chuyển hướng sai trang Dashboard: cấu hình tham số `redirectTo` chứa URL hash hiện tại (`/#/auth/recruiter` hoặc `/#/auth`) khi kích hoạt Google OAuth, đồng thời tự động cập nhật và lưu trữ metadata role (`interviewer` hoặc `candidate`) lên Supabase khi người dùng hoàn tất xác thực thông qua cổng tương ứng.
+  - Khắc phục lỗi đăng nhập Google chuyển hướng sai trang Dashboard do Supabase tự động ghi đè URL hash bằng `#access_token=...`: Lưu trữ vai trò cổng hiện tại (`oauth_login_portal`) vào `localStorage` ngay trước khi kích hoạt luồng OAuth của Google, sau đó bóc tách và đồng bộ ngược lên Supabase khi nhận callback thành công để chuyển tiếp chính xác đến Dashboard Doanh nghiệp.
   - Đồng bộ hóa vai trò khi tự tạo tài khoản Google giả lập mới để test: tự động gán vai trò (`candidate` hoặc `interviewer`) khớp đúng với cổng đăng nhập mà người dùng đang đứng, ngăn chặn sự nhầm lẫn chéo khi kiểm thử cục bộ.
 
 
