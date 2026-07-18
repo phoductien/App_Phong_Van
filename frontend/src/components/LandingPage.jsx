@@ -186,6 +186,13 @@ export default function LandingPage({ onNavigateToAuth }) {
           {/* Auth CTA Buttons */}
           <div className="flex items-center gap-3">
             <button 
+              onClick={() => onNavigateToAuth(false, true)} 
+              className="px-4 py-2 text-sm font-bold text-slate-500 hover:text-indigo-600 transition-colors duration-200"
+            >
+              🏢 Dành cho Nhà tuyển dụng
+            </button>
+            <div className="w-[1px] h-4 bg-slate-200"></div>
+            <button 
               onClick={() => onNavigateToAuth(false)} 
               className="px-4 py-2 text-sm font-bold text-slate-700 hover:text-indigo-600 hover:scale-105 active:scale-95 transition-all duration-200"
             >

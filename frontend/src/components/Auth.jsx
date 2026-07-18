@@ -15,12 +15,19 @@ if (supabaseUrl && supabaseAnonKey && supabaseUrl !== 'your_supabase_project_url
   }
 }
 
-export default function Auth({ onLoginSuccess, initialSignUp = false, onBackToLanding = null }) {
+export default function Auth({ onLoginSuccess, initialSignUp = false, onBackToLanding = null, portal = 'candidate' }) {
   const [isSignUp, setIsSignUp] = useState(initialSignUp);
-  const [signupRole, setSignupRole] = useState('candidate');
-  const [signinRole, setSigninRole] = useState('candidate');
+  const activeRole = portal === 'recruiter' ? 'interviewer' : 'candidate';
+  const [signupRole, setSignupRole] = useState(activeRole);
+  const [signinRole, setSigninRole] = useState(activeRole);
   const [lang, setLang] = useState('vi');
   const [darkMode, setDarkMode] = useState(false);
+
+  useEffect(() => {
+    const roleVal = portal === 'recruiter' ? 'interviewer' : 'candidate';
+    setSignupRole(roleVal);
+    setSigninRole(roleVal);
+  }, [portal]);
 
   const t = {
     vi: {
@@ -367,10 +374,16 @@ export default function Auth({ onLoginSuccess, initialSignUp = false, onBackToLa
         {/* Center Promotion */}
         <div className="my-auto z-10 max-w-lg space-y-6">
           <h1 className="text-4xl font-extrabold leading-tight">
-            {t[lang].promoTitle}
+            {portal === 'recruiter' 
+              ? (lang === 'vi' ? 'Hệ thống Đánh giá Ứng viên bằng AI' : 'AI-Powered Candidate Assessment System')
+              : t[lang].promoTitle}
           </h1>
           <p className="text-slate-300 text-base leading-relaxed">
-            {t[lang].promoDesc}
+            {portal === 'recruiter'
+              ? (lang === 'vi' 
+                  ? 'Đánh giá năng lực chuyên môn, kỹ năng mềm và phong cách làm việc của ứng viên chính xác thông qua các phòng phỏng vấn mô phỏng.' 
+                  : 'Assess candidate technical skills, soft skills, and communication style accurately via custom mock interview rooms.')
+              : t[lang].promoDesc}
           </p>
         </div>
 
@@ -425,9 +438,12 @@ export default function Auth({ onLoginSuccess, initialSignUp = false, onBackToLa
           <div>
             <h2 className={`text-3xl font-bold tracking-tight ${darkMode ? 'text-white' : 'text-slate-900'}`}>
               {isSignUp ? t[lang].registerTitle : t[lang].loginTitle}
+              {portal === 'recruiter' && ` — ${lang === 'vi' ? 'Doanh nghiệp' : 'Employer'}`}
             </h2>
             <p className={`mt-2 text-sm ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
-              {isSignUp ? t[lang].registerDesc : t[lang].loginDesc}
+              {portal === 'recruiter'
+                ? (isSignUp ? (lang === 'vi' ? 'Đăng ký tài khoản Nhà tuyển dụng của bạn' : 'Register your employer account') : (lang === 'vi' ? 'Đăng nhập vào cổng Doanh nghiệp của bạn' : 'Sign in to your Employer portal'))
+                : (isSignUp ? t[lang].registerDesc : t[lang].loginDesc)}
             </p>
           </div>
 
@@ -485,72 +501,7 @@ export default function Auth({ onLoginSuccess, initialSignUp = false, onBackToLa
                     </div>
                   </div>
 
-                  <div>
-                    <label className={`block text-sm font-medium ${darkMode ? 'text-slate-300' : 'text-slate-700'}`}>{t[lang].selectRole}</label>
-                    <div className="mt-1.5 flex gap-3">
-                      <button
-                        type="button"
-                        onClick={() => setSignupRole('candidate')}
-                        className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl border text-sm font-semibold transition duration-150 ${
-                          signupRole === 'candidate'
-                            ? (darkMode ? 'border-indigo-500 bg-indigo-950/60 text-indigo-300' : 'border-indigo-600 bg-indigo-50 text-indigo-700')
-                            : (darkMode ? 'border-slate-700 bg-slate-800/40 text-slate-400 hover:bg-slate-800' : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50')
-                        }`}
-                      >
-                        <span>💼 {lang === 'vi' ? 'Ứng viên' : 'Candidate'}</span>
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setSignupRole('interviewer')}
-                        className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl border text-sm font-semibold transition duration-150 ${
-                          signupRole === 'interviewer'
-                            ? (darkMode ? 'border-indigo-500 bg-indigo-950/60 text-indigo-300' : 'border-indigo-600 bg-indigo-50 text-indigo-700')
-                            : (darkMode ? 'border-slate-700 bg-slate-800/40 text-slate-400 hover:bg-slate-800' : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50')
-                        }`}
-                      >
-                        <span>🏢 {lang === 'vi' ? 'Nhà tuyển dụng' : 'Recruiter'}</span>
-                      </button>
-                    </div>
-                  </div>
                 </>
-              )}
-
-              {!isSignUp && (
-                <div>
-                  <label className={`block text-sm font-medium mb-1.5 ${darkMode ? 'text-slate-300' : 'text-slate-700'}`}>
-                    {lang === 'vi' ? 'Bạn đăng nhập với vai trò:' : 'Sign in as:'}
-                  </label>
-                  <div className="flex gap-3 mb-2">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setSigninRole('candidate');
-                        setErrorMsg('');
-                      }}
-                      className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl border text-sm font-semibold transition duration-150 ${
-                        signinRole === 'candidate'
-                          ? (darkMode ? 'border-indigo-500 bg-indigo-950/60 text-indigo-300' : 'border-indigo-600 bg-indigo-50 text-indigo-700')
-                          : (darkMode ? 'border-slate-700 bg-slate-800/40 text-slate-400 hover:bg-slate-800' : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50')
-                      }`}
-                    >
-                      <span>💼 {lang === 'vi' ? 'Ứng viên' : 'Candidate'}</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setSigninRole('interviewer');
-                        setErrorMsg('');
-                      }}
-                      className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl border text-sm font-semibold transition duration-150 ${
-                        signinRole === 'interviewer'
-                          ? (darkMode ? 'border-indigo-500 bg-indigo-950/60 text-indigo-300' : 'border-indigo-600 bg-indigo-50 text-indigo-700')
-                          : (darkMode ? 'border-slate-700 bg-slate-800/40 text-slate-400 hover:bg-slate-800' : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50')
-                      }`}
-                    >
-                      <span>🏢 {lang === 'vi' ? 'Doanh nghiệp' : 'Employer'}</span>
-                    </button>
-                  </div>
-                </div>
               )}
 
               <div>
@@ -774,6 +725,31 @@ export default function Auth({ onLoginSuccess, initialSignUp = false, onBackToLa
                   {isSignUp ? t[lang].loginTitle : t[lang].signUpNow}
                 </button>
               </p>
+            </div>
+
+            {/* Cross-portal Navigation Helper Link */}
+            <div className="mt-6 pt-4 border-t border-slate-100 dark:border-slate-800/60 text-center">
+              {portal === 'recruiter' ? (
+                <p className={`text-xs ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
+                  {lang === 'vi' ? 'Bạn là Ứng viên?' : 'Are you a Candidate?'}{' '}
+                  <a
+                    href="#/auth"
+                    className="font-bold text-indigo-650 hover:text-indigo-500 underline"
+                  >
+                    {lang === 'vi' ? 'Cổng đăng nhập Ứng viên' : 'Candidate Portal'}
+                  </a>
+                </p>
+              ) : (
+                <p className={`text-xs ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
+                  {lang === 'vi' ? 'Bạn là Doanh nghiệp?' : 'Are you an Employer?'}{' '}
+                  <a
+                    href="#/auth/recruiter"
+                    className="font-bold text-indigo-650 hover:text-indigo-500 underline"
+                  >
+                    {lang === 'vi' ? 'Cổng đăng nhập Doanh nghiệp' : 'Employer Portal'}
+                  </a>
+                </p>
+              )}
             </div>
           </div>
         </div>

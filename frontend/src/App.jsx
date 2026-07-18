@@ -43,12 +43,22 @@ function App() {
   const [recruiterTab, setRecruiterTab] = useState('live_rooms');
   const [showAuth, setShowAuth] = useState(false);
   const [authInitialSignUp, setAuthInitialSignUp] = useState(false);
+  const [authPortal, setAuthPortal] = useState('candidate'); // 'candidate' or 'recruiter'
 
   useEffect(() => {
     const handleHashChange = () => {
       const hash = window.location.hash;
-      if (hash.startsWith('#/auth')) {
+      if (hash.startsWith('#/auth/recruiter')) {
         setShowAuth(true);
+        setAuthPortal('recruiter');
+        if (hash.includes('signup=true')) {
+          setAuthInitialSignUp(true);
+        } else {
+          setAuthInitialSignUp(false);
+        }
+      } else if (hash.startsWith('#/auth')) {
+        setShowAuth(true);
+        setAuthPortal('candidate');
         if (hash.includes('signup=true')) {
           setAuthInitialSignUp(true);
         } else {
@@ -271,11 +281,16 @@ function App() {
             onLoginSuccess={(u) => setUser(u)} 
             initialSignUp={authInitialSignUp}
             onBackToLanding={() => { window.location.hash = '#/'; }}
+            portal={authPortal}
           />
         ) : (
           <LandingPage 
-            onNavigateToAuth={(isSignUp) => {
-              window.location.hash = isSignUp ? '#/auth?signup=true' : '#/auth';
+            onNavigateToAuth={(isSignUp, isRecruiter) => {
+              if (isRecruiter) {
+                window.location.hash = isSignUp ? '#/auth/recruiter?signup=true' : '#/auth/recruiter';
+              } else {
+                window.location.hash = isSignUp ? '#/auth?signup=true' : '#/auth';
+              }
             }}
           />
         )}
