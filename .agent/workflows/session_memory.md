@@ -35,6 +35,8 @@
   - Cập nhật tài liệu `README.md` để bổ sung hướng dẫn chạy tệp cấu trúc cơ sở dữ liệu `supabase/schema.sql` trên Supabase SQL Editor khi thiết lập kết nối Database thực tế.
   - Phân tách phân quyền đăng nhập/đăng ký của Doanh nghiệp: Ẩn hoàn toàn nút "Đăng nhập bằng Google" tại cổng đăng nhập của Doanh nghiệp (`#/auth/recruiter`), chỉ cho phép xác thực bằng Email/Mật khẩu truyền thống và đảm bảo tính duy nhất của email hệ thống để không bị trùng lặp tài khoản giữa hai vai trò.
   - Tối ưu hóa phân tích vai trò sau Google OAuth: Loại bỏ kiểm tra từ khóa thô trong email (`session.user.email.includes('interviewer')`) gây lỗi gán nhầm vai trò, thay thế bằng cơ chế xác minh chính xác qua `oauth_login_portal` của `localStorage` kết hợp độ trễ dọn dẹp (`setTimeout` 1000ms) để giải quyết xung đột bất đồng bộ giữa `getSession` và `onAuthStateChange`.
+  - Khắc phục lỗi thiếu ghi nhận cổng trong `Auth.jsx`: Bổ sung lệnh `localStorage.setItem('oauth_login_portal', portal)` vào hàm `handleGoogleLogin` trong `Auth.jsx` trước khi bắt đầu Google OAuth để thông tin cổng không bị trống.
+
 
 
 

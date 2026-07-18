@@ -181,6 +181,7 @@ export default function Auth({ onLoginSuccess, initialSignUp = false, onBackToLa
     if (supabase) {
       setLoading(true);
       setErrorMsg('');
+      localStorage.setItem('oauth_login_portal', portal);
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
