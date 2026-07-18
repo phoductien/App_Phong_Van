@@ -22,6 +22,8 @@
   - Bổ sung mục cảnh báo quan trọng trong `README.md` hướng dẫn các thành viên khác không đẩy code trực tiếp lên nhánh `main` (phải đi qua Pull Request) và cách đẩy code song song lên cả 2 remote repository (`origin` và `public_repo`).
   - Viết kịch bản khởi tạo tự động `setup.js` đa nền tảng ở thư mục gốc giúp tạo các file `.env` mẫu và tự động chạy `npm install` cho cả 2 nhánh Frontend & Backend chỉ bằng 1 lệnh duy nhất.
   - Cập nhật sơ đồ cấu trúc mã nguồn trong tài liệu `README.md` để bổ sung trực quan các tệp tin mới tạo (`setup.js`, `backend/.env.example`, `frontend/.env.example`).
+  - Cấu hình chuyển hướng người dùng quay lại trang đăng nhập `#/auth` sau khi nhấn đăng xuất (ở cả vai trò Ứng viên và Doanh nghiệp).
+  - Tích hợp hiệu ứng trượt hiện mềm mại (`animate-fade-in-up`) cho form đăng nhập/đăng ký mỗi khi trang được tải lại hoặc khi người dùng chuyển đổi giữa hai biểu mẫu nhờ cơ chế quản lý key độc lập.
 
 ## 2. CẤU TRÚC THƯ MỤC THỰC TẾ ĐÃ TRIỂN KHAI
 - `docs/PHASE_1_ARCHITECTURE.md`: Tài liệu cấu trúc hệ thống, port và sơ đồ luồng dữ liệu.
