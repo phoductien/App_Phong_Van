@@ -624,16 +624,49 @@ app.post('/api/questions', async (req, res) => {
 
 // API: Start an interview session
 app.post('/api/sessions/start', async (req, res) => {
-  const { candidateId, cvId, companyId, level } = req.body;
-  if (!candidateId || !companyId || !level) {
+  const { candidateId, cvId, companyId, companyName, positionTitle, level } = req.body;
+  if (!candidateId || (!companyId && !companyName) || !level) {
     return res.status(400).json({ error: "Missing required fields" });
   }
 
+  const targetPosition = positionTitle || 'Software Engineer';
+
   if (isMock) {
-    let qBank = mockQuestionBanks.find(qb => qb.company_id === companyId && qb.level === level);
+    let resolvedCompanyId = companyId;
+    let resolvedCompanyName = companyName;
+    if (!resolvedCompanyId) {
+      resolvedCompanyId = `c-custom-${Date.now()}`;
+      resolvedCompanyName = companyName || "Công ty tùy chỉnh";
+      mockCompanies.push({
+        id: resolvedCompanyId,
+        name: resolvedCompanyName,
+        industry_domain: "Technology & Software"
+      });
+    } else {
+      const existing = mockCompanies.find(c => c.id === resolvedCompanyId);
+      resolvedCompanyName = existing ? existing.name : "Company";
+    }
+
+    let qBank = mockQuestionBanks.find(qb => qb.company_id === resolvedCompanyId && qb.level === level && qb.title.toLowerCase().includes(targetPosition.toLowerCase()));
     if (!qBank) {
-      // Generate fallback question bank dynamically
-      qBank = getFallbackQuestionBank(companyId, level);
+      qBank = {
+        id: `qb-${Date.now()}`,
+        company_id: resolvedCompanyId,
+        level: level,
+        title: `${resolvedCompanyName} - ${targetPosition} Quiz (${level.toUpperCase()})`,
+        questions: [
+          `1. [${level.toUpperCase()}] Giới thiệu tổng quan về kỹ năng làm việc ở vị trí ${targetPosition} tại ${resolvedCompanyName}?`,
+          `2. [${level.toUpperCase()}] Nêu một lỗi phổ biến bạn hay gặp phải ở vai trò ${targetPosition} này và cách khắc phục?`,
+          `3. [${level.toUpperCase()}] Làm thế nào để kiểm tra tính ổn định của hệ thống cho dự án ${targetPosition}?`,
+          `4. [${level.toUpperCase()}] Nêu điểm khác biệt của bạn so với các ứng viên khác cho vị trí ${targetPosition}?`,
+          `5. [${level.toUpperCase()}] Hãy trình bày hiểu biết của bạn về văn hóa làm việc tại ${resolvedCompanyName}?`,
+          `6. [${level.toUpperCase()}] Giải thích các công nghệ cốt lõi thường được dùng cho vai trò ${targetPosition}?`,
+          `7. [${level.toUpperCase()}] Bạn thiết kế quy trình xử lý lỗi tự động như thế nào khi làm ${targetPosition}?`,
+          `8. [${level.toUpperCase()}] Làm cách nào để tối ưu hóa hiệu quả công việc ở vị trí ${targetPosition}?`,
+          `9. [${level.toUpperCase()}] Làm thế nào để bảo mật thông tin dự án ${targetPosition} tốt nhất?`,
+          `10. [${level.toUpperCase()}] Bạn có câu hỏi nào dành cho người phỏng vấn tại ${resolvedCompanyName} không?`
+        ]
+      };
       mockQuestionBanks.push(qBank);
     }
 
@@ -657,76 +690,134 @@ app.post('/api/sessions/start', async (req, res) => {
   }
 
   // Production Supabase flow
-  const { data: qBanks, error: qError } = await supabase
-    .from('question_banks')
-    .select('*')
-    .eq('company_id', companyId)
-    .eq('level', level)
-    .limit(1);
+  try {
+    let resolvedCompanyId = companyId;
+    let resolvedCompanyName = companyName;
 
-  let qBank;
-
-  if (qError || !qBanks || qBanks.length === 0) {
-    try {
-      const { data: companyData, error: coErr } = await supabase
+    // 1. Resolve companyId if it is not provided (custom company name)
+    if (!resolvedCompanyId) {
+      const { data: existingCompanies, error: feErr } = await supabase
         .from('companies')
-        .select('name')
-        .eq('id', companyId)
+        .select('id')
+        .ilike('name', `%${companyName}%`)
         .limit(1);
-      
-      const companyName = (!coErr && companyData && companyData.length > 0) 
-        ? companyData[0].name 
-        : "Đối tác Tuyển dụng";
 
-      const fallbackTitle = `${companyName} Quiz (${level.toUpperCase()})`;
-      const fallbackQuestions = [
-        `1. [${level.toUpperCase()}] Giới thiệu tổng quan về kỹ năng của bạn liên quan đến công ty ${companyName}?`,
-        `2. [${level.toUpperCase()}] Nêu một lỗi phổ biến bạn hay gặp phải ở vị trí này và cách khắc phục?`,
-        `3. [${level.toUpperCase()}] Làm thế nào để kiểm tra tính ổn định của hệ thống?`,
-        `4. [${level.toUpperCase()}] Nêu điểm khác biệt của bạn so với các ứng viên khác?`,
-        `5. [${level.toUpperCase()}] Hãy trình bày hiểu biết của bạn về văn hóa làm việc tại ${companyName}?`,
-        `6. [${level.toUpperCase()}] Giải thích các công nghệ cốt lõi thường được dùng cho vị trí này?`,
-        `7. [${level.toUpperCase()}] Bạn thiết kế quy trình xử lý lỗi tự động như thế nào?`,
-        `8. [${level.toUpperCase()}] Làm cách nào để tối ưu hóa quy trình làm việc?`,
-        `9. [${level.toUpperCase()}] Làm thế nào để bảo mật thông tin dự án tốt nhất?`,
-        `10. [${level.toUpperCase()}] Bạn có câu hỏi nào dành cho người phỏng vấn không?`
-      ];
+      if (!feErr && existingCompanies && existingCompanies.length > 0) {
+        resolvedCompanyId = existingCompanies[0].id;
+      } else {
+        const { data: newCompany, error: ncErr } = await supabase
+          .from('companies')
+          .insert([{ name: companyName, industry_domain: "Technology & Software" }])
+          .select();
+        
+        if (ncErr || !newCompany || newCompany.length === 0) {
+          const { data: fallbackCompanies } = await supabase.from('companies').select('id').limit(1);
+          resolvedCompanyId = fallbackCompanies[0].id;
+        } else {
+          resolvedCompanyId = newCompany[0].id;
+        }
+      }
+    }
+
+    // 2. Fetch the company name if we only have companyId
+    if (!resolvedCompanyName) {
+      const { data: coData } = await supabase.from('companies').select('name').eq('id', resolvedCompanyId).limit(1);
+      resolvedCompanyName = (coData && coData.length > 0) ? coData[0].name : "Đối tác Tuyển dụng";
+    }
+
+    // 3. Search for existing question bank with this company_id, level, and title matching the position
+    const { data: qBanks, error: qError } = await supabase
+      .from('question_banks')
+      .select('*')
+      .eq('company_id', resolvedCompanyId)
+      .eq('level', level)
+      .ilike('title', `%${targetPosition}%`)
+      .limit(1);
+
+    let qBank;
+
+    if (qError || !qBanks || qBanks.length === 0) {
+      let parsedContent = null;
+      const apiKey = process.env.GEMINI_API_KEY;
+
+      if (apiKey) {
+        try {
+          const genAI = new GoogleGenerativeAI(apiKey);
+          const model = genAI.getGenerativeModel({
+            model: "gemini-1.5-flash",
+            generationConfig: { responseMimeType: "application/json" }
+          });
+
+          const prompt = `You are a professional hiring manager and technical interviewer.
+Generate a list of exactly 10 interview questions for the company "${resolvedCompanyName}" and position "${targetPosition}".
+Difficulty Level: "${level || 'medium'}"
+
+Return a JSON object containing:
+- title: string (e.g. "VNG Corporation - React Developer Interview")
+- questions: array of exactly 10 strings (each being a clear, comprehensive interview question)`;
+
+          const result = await model.generateContent(prompt);
+          const response = await result.response;
+          parsedContent = JSON.parse(response.text().trim());
+        } catch (err) {
+          console.error("Gemini sessions/start generation error:", err.message);
+        }
+      }
+
+      if (!parsedContent) {
+        parsedContent = {
+          title: `${resolvedCompanyName} - ${targetPosition} Quiz (${level.toUpperCase()})`,
+          questions: [
+            `1. [${level.toUpperCase()}] Giới thiệu tổng quan về kỹ năng làm việc ở vị trí ${targetPosition} tại ${resolvedCompanyName}?`,
+            `2. [${level.toUpperCase()}] Nêu một lỗi phổ biến bạn hay gặp phải ở vai trò ${targetPosition} này và cách khắc phục?`,
+            `3. [${level.toUpperCase()}] Làm thế nào để kiểm tra tính ổn định của hệ thống cho dự án ${targetPosition}?`,
+            `4. [${level.toUpperCase()}] Nêu điểm khác biệt của bạn so với các ứng viên khác cho vị trí ${targetPosition}?`,
+            `5. [${level.toUpperCase()}] Hãy trình bày hiểu biết của bạn về văn hóa làm việc tại ${resolvedCompanyName}?`,
+            `6. [${level.toUpperCase()}] Giải thích các công nghệ cốt lõi thường được dùng cho vai trò ${targetPosition}?`,
+            `7. [${level.toUpperCase()}] Bạn thiết kế quy trình xử lý lỗi tự động như thế nào khi làm ${targetPosition}?`,
+            `8. [${level.toUpperCase()}] Làm cách nào để tối ưu hóa hiệu quả công việc ở vị trí ${targetPosition}?`,
+            `9. [${level.toUpperCase()}] Làm thế nào để bảo mật thông tin dự án ${targetPosition} tốt nhất?`,
+            `10. [${level.toUpperCase()}] Bạn có câu hỏi nào dành cho người phỏng vấn tại ${resolvedCompanyName} không?`
+          ]
+        };
+      }
 
       const { data: newQBs, error: insErr } = await supabase
         .from('question_banks')
         .insert([{
-          company_id: companyId,
+          company_id: resolvedCompanyId,
           level: level,
-          title: fallbackTitle,
-          questions: fallbackQuestions
+          title: parsedContent.title,
+          questions: parsedContent.questions
         }])
         .select();
 
       if (insErr || !newQBs || newQBs.length === 0) {
-        return res.status(404).json({ error: "Không tìm thấy bộ đề câu hỏi và không thể tự động khởi tạo." });
+        return res.status(404).json({ error: insErr ? insErr.message : "Không tìm thấy bộ đề câu hỏi và không thể tự động khởi tạo." });
       }
       qBank = newQBs[0];
-    } catch (dbErr) {
-      console.error(dbErr);
-      return res.status(500).json({ error: "Lỗi kết nối cơ sở dữ liệu khi tự động khởi tạo bộ đề." });
+    } else {
+      qBank = qBanks[0];
     }
-  } else {
-    qBank = qBanks[0];
+
+    const { data: sessionData, error: sError } = await supabase
+      .from('interview_sessions')
+      .insert([{ candidate_id: candidateId, cv_id: cvId || null, question_bank_id: qBank.id }])
+      .select();
+
+    if (sError) return res.status(400).json(sError);
+
+    const session = sessionData[0];
+    return res.status(201).json({
+      sessionId: session.id,
+      questions: qBank.questions,
+      currentQuestionIndex: 0,
+      firstQuestion: qBank.questions[0]
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: err.message });
   }
-  const { data: sessionData, error: sError } = await supabase
-    .from('interview_sessions')
-    .insert([{ candidate_id: candidateId, cv_id: cvId || null, question_bank_id: qBank.id }])
-    .select();
-
-  if (sError) return res.status(400).json(sError);
-
-  const session = sessionData[0];
-  return res.status(201).json({
-    sessionId: session.id,
-    questions: qBank.questions,
-    currentQuestionIndex: 0,
-    firstQuestion: qBank.questions[0]
-  });
 });
 
 // API: Answer a question

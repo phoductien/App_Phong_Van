@@ -13,7 +13,8 @@ import {
   Grid,
   Box,
   ProgressBar,
-  Badge
+  Badge,
+  Toggle
 } from '@cloudscape-design/components';
 
 const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:5000';
@@ -29,6 +30,11 @@ export default function StartInterview({ onStartSession, user, userId = '0000000
   const [errorMsg, setErrorMsg] = useState('');
   const [completedSessionsCount, setCompletedSessionsCount] = useState(0);
   
+  // Custom company and position
+  const [isCustomCompany, setIsCustomCompany] = useState(false);
+  const [customCompanyName, setCustomCompanyName] = useState('');
+  const [positionTitle, setPositionTitle] = useState('');
+
   // Quick CV upload
   const [newCvUrl, setNewCvUrl] = useState('');
   const [uploading, setUploading] = useState(false);
@@ -110,13 +116,13 @@ export default function StartInterview({ onStartSession, user, userId = '0000000
 
   // Simulate CV analysis when CV and Company are both selected
   useEffect(() => {
-    if (selectedCv && selectedCompany) {
+    if (selectedCv && (isCustomCompany ? customCompanyName : selectedCompany)) {
       setAnalyzing(true);
       const timer = setTimeout(() => {
-        const nameLower = selectedCompany.label.toLowerCase();
-        const isCybersecurity = nameLower.includes('viettel') || nameLower.includes('ncs');
-        const isCloudDevOps = nameLower.includes('nvidia') || nameLower.includes('smart cloud');
-        const isSoftware = nameLower.includes('vng') || nameLower.includes('fpt software');
+        const nameLower = (isCustomCompany ? customCompanyName : selectedCompany.label).toLowerCase();
+        const posLower = positionTitle.toLowerCase();
+        const isCybersecurity = nameLower.includes('viettel') || nameLower.includes('ncs') || posLower.includes('security') || posLower.includes('cyber');
+        const isCloudDevOps = nameLower.includes('nvidia') || nameLower.includes('cloud') || posLower.includes('devops') || posLower.includes('sre') || posLower.includes('aws');
         
         let matchRate = 72;
         let skills = ['Git', 'REST API', 'SQL'];
@@ -130,10 +136,18 @@ export default function StartInterview({ onStartSession, user, userId = '0000000
           matchRate = 81;
           skills = ['Linux Security', 'Wireshark', 'Metasploit', 'Network Security', 'OWASP Top 10'];
           missing = ['SIEM tools', 'Incident Response playbooks'];
-        } else if (isSoftware) {
-          matchRate = 79;
-          skills = ['React.js', 'Node.js', 'Express', 'MongoDB', 'Javascript', 'HTML5/CSS3'];
-          missing = ['GraphQL', 'Microservices Architecture'];
+        } else if (posLower.includes('frontend') || posLower.includes('react')) {
+          matchRate = 82;
+          skills = ['React.js', 'Redux Toolkit', 'Javascript', 'HTML5/CSS3', 'Vite'];
+          missing = ['TypeScript', 'Next.js SSR'];
+        } else if (posLower.includes('tester') || posLower.includes('qc') || posLower.includes('test')) {
+          matchRate = 80;
+          skills = ['Selenium', 'Java', 'JUnit', 'API Testing', 'Postman', 'SQL'];
+          missing = ['JMeter Performance Testing', 'CI/CD Automation Integration'];
+        } else {
+          matchRate = 75;
+          skills = ['React.js', 'Node.js', 'Express', 'MongoDB', 'Javascript', 'Git'];
+          missing = ['Microservices Architecture', 'System Design'];
         }
 
         setCvAnalysis({
@@ -152,7 +166,7 @@ export default function StartInterview({ onStartSession, user, userId = '0000000
     } else {
       setCvAnalysis(null);
     }
-  }, [selectedCv, selectedCompany]);
+  }, [selectedCv, selectedCompany, isCustomCompany, customCompanyName, positionTitle]);
 
   // --- Device Check Stream Logic ---
   useEffect(() => {
@@ -314,8 +328,8 @@ export default function StartInterview({ onStartSession, user, userId = '0000000
 
   const handleStart = (e) => {
     e.preventDefault();
-    if (!selectedCompany || !selectedLevel) {
-      setErrorMsg('Vui lòng chọn Công ty và Vị trí/Cấp độ.');
+    if ((isCustomCompany ? !customCompanyName : !selectedCompany) || !positionTitle || !selectedLevel) {
+      setErrorMsg('Vui lòng chọn hoặc nhập đầy đủ thông tin Công ty, Vị trí ứng tuyển và Cấp độ.');
       return;
     }
 
@@ -346,7 +360,9 @@ export default function StartInterview({ onStartSession, user, userId = '0000000
         body: JSON.stringify({
           candidateId: userId,
           cvId: selectedCv ? selectedCv.value : null,
-          companyId: selectedCompany.value,
+          companyId: isCustomCompany ? null : selectedCompany.value,
+          companyName: isCustomCompany ? customCompanyName : selectedCompany.label,
+          positionTitle: positionTitle,
           level: selectedLevel.value
         })
       });
@@ -358,12 +374,12 @@ export default function StartInterview({ onStartSession, user, userId = '0000000
           questions: sessionInfo.questions,
           currentQuestionIndex: sessionInfo.currentQuestionIndex,
           firstQuestion: sessionInfo.firstQuestion,
-          companyName: selectedCompany.label,
+          companyName: isCustomCompany ? customCompanyName : selectedCompany.label,
           level: selectedLevel.value
         });
       } else {
         const errData = await res.json();
-        setErrorMsg(errData.error || 'Không tìm thấy bộ đề câu hỏi phù hợp cho công ty này.');
+        setErrorMsg(errData.error || 'Có lỗi xảy ra khi bắt đầu phòng phỏng vấn.');
         setShowCameraCheck(false);
       }
     } catch (err) {
@@ -472,8 +488,9 @@ export default function StartInterview({ onStartSession, user, userId = '0000000
               <div className="bg-slate-50 dark:bg-slate-800/40 p-4 rounded-xl border border-slate-150 dark:border-slate-850">
                 <h4 className="text-xs font-extrabold uppercase text-slate-450 tracking-wider mb-2">Thông tin buổi phỏng vấn</h4>
                 <ul className="text-xs space-y-1.5 text-slate-600 dark:text-slate-350 leading-relaxed">
-                  <li>🏢 <strong>Doanh nghiệp mục tiêu:</strong> {selectedCompany.label}</li>
-                  <li>🏆 <strong>Cấp độ phỏng vấn:</strong> {selectedLevel.label}</li>
+                  <li>🏢 <strong>Doanh nghiệp:</strong> {isCustomCompany ? customCompanyName : selectedCompany?.label}</li>
+                  <li>💻 <strong>Vị trí ứng tuyển:</strong> {positionTitle}</li>
+                  <li>🏆 <strong>Cấp độ phỏng vấn:</strong> {selectedLevel?.label}</li>
                   {selectedCv && <li>📄 <strong>CV sử dụng:</strong> {selectedCv.label}</li>}
                 </ul>
               </div>
@@ -519,11 +536,14 @@ export default function StartInterview({ onStartSession, user, userId = '0000000
                 setSelectedCv(null);
                 setSelectedCompany(null);
                 setSelectedLevel(null);
+                setCustomCompanyName('');
+                setPositionTitle('');
+                setIsCustomCompany(false);
               }}>Hủy</Button>
               <Button 
                 variant="primary" 
                 onClick={handleStart}
-                disabled={loading || !selectedCompany || !selectedLevel}
+                disabled={loading || (isCustomCompany ? !customCompanyName : !selectedCompany) || !positionTitle || !selectedLevel}
               >
                 Bắt Đầu Ngay
               </Button>
@@ -602,16 +622,51 @@ export default function StartInterview({ onStartSession, user, userId = '0000000
               />
             </FormField>
 
-            <FormField label="3. Chọn Công ty & Vị trí mục tiêu">
-              <Select
-                selectedOption={selectedCompany}
-                onChange={({ detail }) => setSelectedCompany(detail.selectedOption)}
-                options={companyOptions}
-                placeholder="Chọn công ty tuyển dụng..."
+            <FormField 
+              label="3. Doanh nghiệp mục tiêu"
+              description="Chọn một công ty có sẵn trong hệ thống hoặc tự nhập tên công ty khác"
+            >
+              <SpaceBetween direction="vertical" size="xs">
+                <Toggle
+                  checked={isCustomCompany}
+                  onChange={({ detail }) => {
+                    setIsCustomCompany(detail.checked);
+                    if (detail.checked) {
+                      setSelectedCompany(null);
+                    } else {
+                      setCustomCompanyName('');
+                    }
+                  }}
+                >
+                  Tôi muốn tự nhập tên doanh nghiệp khác
+                </Toggle>
+                
+                {isCustomCompany ? (
+                  <Input
+                    value={customCompanyName}
+                    onChange={({ detail }) => setCustomCompanyName(detail.value)}
+                    placeholder="Nhập tên công ty (Ví dụ: MoMo, Google, Shopee...)"
+                  />
+                ) : (
+                  <Select
+                    selectedOption={selectedCompany}
+                    onChange={({ detail }) => setSelectedCompany(detail.selectedOption)}
+                    options={companyOptions}
+                    placeholder="Chọn công ty tuyển dụng..."
+                  />
+                )}
+              </SpaceBetween>
+            </FormField>
+
+            <FormField label="4. Vị trí ứng tuyển (Target Position)">
+              <Input
+                value={positionTitle}
+                onChange={({ detail }) => setPositionTitle(detail.value)}
+                placeholder="Ví dụ: Frontend Developer, Automation QC, Business Analyst..."
               />
             </FormField>
 
-            <FormField label="4. Chọn Cấp độ Thử thách">
+            <FormField label="5. Chọn Cấp độ Thử thách">
               <Select
                 selectedOption={selectedLevel}
                 onChange={({ detail }) => setSelectedLevel(detail.selectedOption)}
@@ -675,7 +730,7 @@ export default function StartInterview({ onStartSession, user, userId = '0000000
             </SpaceBetween>
           ) : (
             <Box variant="p" color="text-muted" style={{ textAlign: 'center', padding: '40px 0' }}>
-              Vui lòng chọn cả <strong>CV</strong> và <strong>Công ty mục tiêu</strong> để kích hoạt phân tích trích xuất kỹ năng từ hệ thống X-Interview AI.
+              Vui lòng điền/chọn <strong>CV</strong>, <strong>Công ty mục tiêu</strong> và <strong>Vị trí ứng tuyển</strong> để kích hoạt phân tích trích xuất kỹ năng từ hệ thống X-Interview AI.
             </Box>
           )}
         </Container>
