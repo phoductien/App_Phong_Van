@@ -727,6 +727,21 @@ app.post('/api/sessions/start', async (req, res) => {
       resolvedCompanyName = "Đối tác Tuyển dụng";
     }
 
+    // 2.5 Check if candidate profile exists to avoid PostgreSQL foreign key constraint violations
+    if (candidateId && isValidUUID(candidateId)) {
+      const { data: profileCheck, error: pcErr } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('id', candidateId)
+        .limit(1);
+
+      if (pcErr || !profileCheck || profileCheck.length === 0) {
+        return res.status(400).json({
+          error: "Tài khoản ứng viên của bạn chưa được đồng bộ vào bảng Profiles của cơ sở dữ liệu. Vui lòng chạy lệnh SQL sau trong Supabase SQL Editor để đồng bộ:\n\nINSERT INTO public.profiles (id, email, role, full_name) SELECT id, email, 'candidate'::user_role, split_part(email, '@', 1) FROM auth.users ON CONFLICT (id) DO NOTHING;"
+        });
+      }
+    }
+
     // 3. Search for existing question bank with this company_id, level, and title matching the position
     const { data: qBanks, error: qError } = await supabase
       .from('question_banks')
