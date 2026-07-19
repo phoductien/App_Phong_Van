@@ -97,6 +97,10 @@ CREATE POLICY "Allow public insert access to profiles"
     ON profiles FOR INSERT
     WITH CHECK (true);
 
+CREATE POLICY "Allow public select access to profiles"
+    ON profiles FOR SELECT
+    USING (true);
+
 -- Basic RLS Policies for CV Vault
 CREATE POLICY "Allow candidates to manage their own CVs"
     ON cv_vault FOR ALL
