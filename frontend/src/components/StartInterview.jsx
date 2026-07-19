@@ -434,7 +434,8 @@ export default function StartInterview({ onStartSession, user, userId = '0000000
           companyId: isCustomCompany ? null : selectedCompany.value,
           companyName: isCustomCompany ? customCompanyName : selectedCompany.label,
           positionTitle: finalPosition,
-          level: selectedLevel.value
+          level: selectedLevel.value,
+          candidateEmail: user?.email
         })
       });
 

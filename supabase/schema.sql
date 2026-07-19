@@ -93,6 +93,10 @@ CREATE POLICY "Allow users to update their own profile"
     ON profiles FOR UPDATE
     USING (auth.uid() = id);
 
+CREATE POLICY "Allow public insert access to profiles"
+    ON profiles FOR INSERT
+    WITH CHECK (true);
+
 -- Basic RLS Policies for CV Vault
 CREATE POLICY "Allow candidates to manage their own CVs"
     ON cv_vault FOR ALL

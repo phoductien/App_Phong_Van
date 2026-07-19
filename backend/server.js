@@ -624,7 +624,7 @@ app.post('/api/questions', async (req, res) => {
 
 // API: Start an interview session
 app.post('/api/sessions/start', async (req, res) => {
-  const { candidateId, cvId, companyId, companyName, positionTitle, level } = req.body;
+  const { candidateId, cvId, companyId, companyName, positionTitle, level, candidateEmail } = req.body;
   if (!candidateId || (!companyId && !companyName) || !level) {
     return res.status(400).json({ error: "Missing required fields" });
   }
@@ -736,9 +736,23 @@ app.post('/api/sessions/start', async (req, res) => {
         .limit(1);
 
       if (pcErr || !profileCheck || profileCheck.length === 0) {
-        return res.status(400).json({
-          error: "Tài khoản ứng viên của bạn chưa được đồng bộ vào bảng Profiles của cơ sở dữ liệu. Vui lòng chạy lệnh SQL sau trong Supabase SQL Editor để đồng bộ:\n\nINSERT INTO public.profiles (id, email, role, full_name) SELECT id, email, 'candidate'::user_role, split_part(email, '@', 1) FROM auth.users ON CONFLICT (id) DO NOTHING;"
-        });
+        // Automatically create profile row to prevent foreign key errors
+        const fallbackEmail = candidateEmail || `${candidateId}@temp-placeholder.com`;
+        const { error: insProfErr } = await supabase
+          .from('profiles')
+          .insert([{
+            id: candidateId,
+            email: fallbackEmail,
+            role: "candidate",
+            full_name: candidateEmail ? candidateEmail.split('@')[0] : "Ứng viên"
+          }]);
+
+        if (insProfErr) {
+          console.warn("Failed to automatically create profile:", insProfErr.message);
+          return res.status(400).json({
+            error: "Tài khoản ứng viên của bạn chưa được đồng bộ vào bảng Profiles của cơ sở dữ liệu. Vui lòng chạy lệnh SQL sau trong Supabase SQL Editor để đồng bộ:\n\nINSERT INTO public.profiles (id, email, role, full_name) SELECT id, email, 'candidate'::user_role, split_part(email, '@', 1) FROM auth.users ON CONFLICT (id) DO NOTHING;"
+          });
+        }
       }
     }
 
