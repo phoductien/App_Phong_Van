@@ -111,6 +111,10 @@ CREATE POLICY "Allow public insert access to cv_vault"
     ON cv_vault FOR INSERT
     WITH CHECK (true);
 
+CREATE POLICY "Allow public select access to cv_vault"
+    ON cv_vault FOR SELECT
+    USING (true);
+
 -- Basic RLS Policies for Companies (Public read)
 CREATE POLICY "Allow public read access to companies"
     ON companies FOR SELECT
@@ -154,6 +158,15 @@ CREATE POLICY "Allow interviewers to manage all sessions"
 
 CREATE POLICY "Allow public insert access to interview_sessions"
     ON interview_sessions FOR INSERT
+    WITH CHECK (true);
+
+CREATE POLICY "Allow public select access to interview_sessions"
+    ON interview_sessions FOR SELECT
+    USING (true);
+
+CREATE POLICY "Allow public update access to interview_sessions"
+    ON interview_sessions FOR UPDATE
+    USING (true)
     WITH CHECK (true);
 
 -- 7. Seed Data for Companies (Real Vietnamese & Global Corporations)
