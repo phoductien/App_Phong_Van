@@ -49,6 +49,7 @@
     * Nâng cấp giao diện `QuestionBankViewer.jsx` thay thế ô tìm kiếm thủ công bằng bộ lọc danh sách vị trí ứng tuyển dạng Select Dropdown được trích xuất động từ database. Hỗ trợ tìm kiếm, lựa chọn chính xác vị trí và cấp độ mong muốn chạy mượt mà ngay trên Client.
   - Tối ưu hóa gợi ý của Gemini AI theo các nguồn tuyển dụng thực tế: Cải tiến cấu trúc Prompt gửi đến Gemini API trong các endpoint `/api/questions/generate-from-jd`, `/api/questions/generate-only` và `/api/sessions/start`. Yêu cầu AI luôn xây dựng và chọn lọc các câu hỏi phỏng vấn bám sát thực tế của từng vị trí/công ty, tương thích với ngân hàng câu hỏi chọn lọc từ các nguồn uy tín như LeetCode, GeeksforGeeks, TopCV và Viblo.
   - Cải thiện hiển thị lỗi chi tiết từ cơ sở dữ liệu: Cập nhật API `/api/sessions/start` bọc lỗi Supabase thô vào một đối tượng chứa trường `.error`. Đồng thời, cập nhật Frontend `StartInterview.jsx` để ưu tiên hiển thị chi tiết thông tin từ `errData.message` hoặc `errData.error` giúp người dùng biết được nguyên nhân thực sự khi khởi tạo phòng phỏng vấn thất bại thay vì thông báo lỗi chung chung.
+  - Sửa lỗi cú pháp UUID khi xử lý CV và Doanh nghiệp giả lập (Mock IDs): Cập nhật endpoint `/api/sessions/start` kiểm tra kỹ định dạng UUID của `cvId` và `companyId` trước khi thực hiện truy vấn hay chèn vào bảng PostgreSQL của Supabase. Nếu phát hiện ID giả lập (dạng chuỗi `cv-xxx` hoặc `c-custom-xxx`), hệ thống sẽ tự động gán `null` hoặc kích hoạt quy trình tạo doanh nghiệp mới để tránh lỗi `invalid input syntax for type uuid` của PostgreSQL.
 
 
 

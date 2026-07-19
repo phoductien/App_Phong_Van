@@ -694,8 +694,8 @@ app.post('/api/sessions/start', async (req, res) => {
     let resolvedCompanyId = companyId;
     let resolvedCompanyName = companyName;
 
-    // 1. Resolve companyId if it is not provided (custom company name)
-    if (!resolvedCompanyId) {
+    // 1. Resolve companyId if it is not provided or is an invalid UUID (custom company/mock name)
+    if (!resolvedCompanyId || !isValidUUID(resolvedCompanyId)) {
       const { data: existingCompanies, error: feErr } = await supabase
         .from('companies')
         .select('id')
@@ -720,9 +720,11 @@ app.post('/api/sessions/start', async (req, res) => {
     }
 
     // 2. Fetch the company name if we only have companyId
-    if (!resolvedCompanyName) {
+    if (!resolvedCompanyName && isValidUUID(resolvedCompanyId)) {
       const { data: coData } = await supabase.from('companies').select('name').eq('id', resolvedCompanyId).limit(1);
       resolvedCompanyName = (coData && coData.length > 0) ? coData[0].name : "Đối tác Tuyển dụng";
+    } else if (!resolvedCompanyName) {
+      resolvedCompanyName = "Đối tác Tuyển dụng";
     }
 
     // 3. Search for existing question bank with this company_id, level, and title matching the position
@@ -802,7 +804,11 @@ Return a JSON object containing:
 
     const { data: sessionData, error: sError } = await supabase
       .from('interview_sessions')
-      .insert([{ candidate_id: candidateId, cv_id: cvId || null, question_bank_id: qBank.id }])
+      .insert([{
+        candidate_id: candidateId,
+        cv_id: (cvId && isValidUUID(cvId)) ? cvId : null,
+        question_bank_id: qBank.id
+      }])
       .select();
 
     if (sError) return res.status(400).json({ error: sError.message });
