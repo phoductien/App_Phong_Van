@@ -1357,7 +1357,7 @@ Analyze the following job description for the company "${companyName}" and posit
 Difficulty Level: "${level || 'medium'}"
 Job Description: "${jobDescription}"
 
-Compile a high-fidelity list of exactly 10 typical technical and behavioral interview questions tailored to this job description.
+Compile a high-fidelity list of exactly 10 typical technical and behavioral interview questions tailored to this job description. The questions must match real-world, industry-standard interview questions compiled from leading programming blogs and recruitment portals (such as GeeksforGeeks, LeetCode, TopCV, and Viblo) to ensure they are practical and highly relevant.
 Return a JSON object containing:
 - title: string (e.g. "Viettel Cyber Security SOC Analyst Interview")
 - questions: array of exactly 10 strings (each being a clear, comprehensive interview question)`;
@@ -1524,7 +1524,7 @@ Analyze the following job description for the company "${companyName}" and posit
 Difficulty Level: "${level || 'medium'}"
 Job Description: "${jobDescription}"
 
-Compile a list of exactly 10 typical technical and behavioral interview questions tailored to this job description.
+Compile a list of exactly 10 typical technical and behavioral interview questions tailored to this job description. The questions must match real-world, industry-standard interview questions compiled from leading programming blogs and recruitment portals (such as GeeksforGeeks, LeetCode, TopCV, and Viblo) to ensure they are practical and highly relevant.
 Return a JSON object containing:
 - title: string (e.g. "Viettel Cyber Security SOC Analyst Interview")
 - questions: array of exactly 10 strings (each being a clear, comprehensive interview question)`;

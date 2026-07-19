@@ -46,7 +46,8 @@
   - Hỗ trợ chọn Doanh nghiệp tùy chỉnh và Vị trí ứng tuyển riêng biệt: Thiết kế lại form thiết lập trong `StartInterview.jsx` bổ sung nút chuyển đổi (Toggle) "Tôi muốn tự nhập tên doanh nghiệp khác" và trường nhập liệu văn bản "Vị trí ứng tuyển (Target Position)". Cập nhật API `/api/sessions/start` để nhận diện các tham số tùy biến này, tự động đồng bộ doanh nghiệp mới vào database và kích hoạt Gemini AI sinh 10 câu hỏi phỏng vấn chuẩn xác theo đúng công ty và vị trí ứng tuyển mong muốn của người dùng.
   - Mở rộng tập dữ liệu mẫu và bộ lọc tìm kiếm tại Ngân hàng Đề thi: 
     * Bổ sung hàng loạt bộ đề câu hỏi phỏng vấn mẫu đa dạng cho các công ty lớn (VNG, Viettel, NVIDIA, FPT Software) tương ứng với nhiều vị trí (Frontend, QA/QC Tester, SOC Analyst, Red Teamer, Python/C++, Solutions Architect...) và chia thành 3 cấp độ rõ ràng (ez, medium, hard) vào `supabase/schema.sql`.
-    * Nâng cấp giao diện `QuestionBankViewer.jsx` với bộ lọc Cấp độ phỏng vấn (All / ez / medium / hard) và thanh Tìm kiếm vị trí/kỹ năng trực quan chạy mượt mà ngay trên Client.
+    * Nâng cấp giao diện `QuestionBankViewer.jsx` with bộ lọc Cấp độ phỏng vấn (All / ez / medium / hard) và thanh Tìm kiếm vị trí/kỹ năng trực quan chạy mượt mà ngay trên Client.
+  - Tối ưu hóa gợi ý của Gemini AI theo các nguồn tuyển dụng thực tế: Cải tiến cấu trúc Prompt gửi đến Gemini API trong các endpoint `/api/questions/generate-from-jd`, `/api/questions/generate-only` và `/api/sessions/start`. Yêu cầu AI luôn xây dựng và chọn lọc các câu hỏi phỏng vấn bám sát thực tế của từng vị trí/công ty, tương thích với ngân hàng câu hỏi chọn lọc từ các nguồn uy tín như LeetCode, GeeksforGeeks, TopCV và Viblo.
 
 
 
