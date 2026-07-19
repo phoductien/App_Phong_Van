@@ -33,7 +33,11 @@ export default function StartInterview({ onStartSession, user, userId = '0000000
   // Custom company and position
   const [isCustomCompany, setIsCustomCompany] = useState(false);
   const [customCompanyName, setCustomCompanyName] = useState('');
-  const [positionTitle, setPositionTitle] = useState('');
+  
+  const [isCustomPosition, setIsCustomPosition] = useState(false);
+  const [customPositionTitle, setCustomPositionTitle] = useState('');
+  const [selectedPositionOption, setSelectedPositionOption] = useState(null);
+  const [positionOptions, setPositionOptions] = useState([]);
 
   // Quick CV upload
   const [newCvUrl, setNewCvUrl] = useState('');
@@ -114,13 +118,68 @@ export default function StartInterview({ onStartSession, user, userId = '0000000
     loadData();
   }, [userId]);
 
+  // Load positions dynamically for the selected company
+  useEffect(() => {
+    if (!selectedCompany) {
+      setPositionOptions([]);
+      setSelectedPositionOption(null);
+      return;
+    }
+
+    async function loadPositions() {
+      try {
+        const res = await fetch(`${API_BASE}/api/questions?companyId=${selectedCompany.value}`);
+        if (res.ok) {
+          const data = await res.json();
+          const uniquePositions = Array.from(new Set(data.map(qb => {
+            const parts = qb.title.split(' - ');
+            if (parts.length > 1) {
+              return parts[1].replace(/\s*(Quiz|Interview|Quiz\s*\(.*\))\s*$/i, '').trim();
+            }
+            return qb.title;
+          })));
+          const formatted = uniquePositions.map(pos => ({ label: pos, value: pos }));
+          setPositionOptions(formatted);
+          if (formatted.length > 0) {
+            setSelectedPositionOption(formatted[0]);
+            setIsCustomPosition(false);
+          } else {
+            setSelectedPositionOption(null);
+            setIsCustomPosition(true); // Default to custom if company has no pre-existing roles
+          }
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    if (!isCustomCompany) {
+      loadPositions();
+    } else {
+      setPositionOptions([]);
+      setSelectedPositionOption(null);
+      setIsCustomPosition(true); // Custom company always requires typing position
+    }
+  }, [selectedCompany, isCustomCompany]);
+
+  // Get final resolved position title
+  const getResolvedPosition = () => {
+    if (isCustomCompany || isCustomPosition || !selectedPositionOption) {
+      return customPositionTitle;
+    }
+    return selectedPositionOption.value;
+  };
+
   // Simulate CV analysis when CV and Company are both selected
   useEffect(() => {
-    if (selectedCv && (isCustomCompany ? customCompanyName : selectedCompany)) {
+    const finalCompany = isCustomCompany ? customCompanyName : selectedCompany;
+    const finalPosition = getResolvedPosition();
+
+    if (selectedCv && finalCompany && finalPosition) {
       setAnalyzing(true);
       const timer = setTimeout(() => {
         const nameLower = (isCustomCompany ? customCompanyName : selectedCompany.label).toLowerCase();
-        const posLower = positionTitle.toLowerCase();
+        const posLower = finalPosition.toLowerCase();
         const isCybersecurity = nameLower.includes('viettel') || nameLower.includes('ncs') || posLower.includes('security') || posLower.includes('cyber');
         const isCloudDevOps = nameLower.includes('nvidia') || nameLower.includes('cloud') || posLower.includes('devops') || posLower.includes('sre') || posLower.includes('aws');
         
@@ -166,7 +225,7 @@ export default function StartInterview({ onStartSession, user, userId = '0000000
     } else {
       setCvAnalysis(null);
     }
-  }, [selectedCv, selectedCompany, isCustomCompany, customCompanyName, positionTitle]);
+  }, [selectedCv, selectedCompany, isCustomCompany, customCompanyName, isCustomPosition, selectedPositionOption, customPositionTitle]);
 
   // --- Device Check Stream Logic ---
   useEffect(() => {
@@ -328,7 +387,8 @@ export default function StartInterview({ onStartSession, user, userId = '0000000
 
   const handleStart = (e) => {
     e.preventDefault();
-    if ((isCustomCompany ? !customCompanyName : !selectedCompany) || !positionTitle || !selectedLevel) {
+    const finalPosition = getResolvedPosition();
+    if ((isCustomCompany ? !customCompanyName : !selectedCompany) || !finalPosition || !selectedLevel) {
       setErrorMsg('Vui lòng chọn hoặc nhập đầy đủ thông tin Công ty, Vị trí ứng tuyển và Cấp độ.');
       return;
     }
@@ -351,6 +411,8 @@ export default function StartInterview({ onStartSession, user, userId = '0000000
       setCameraStream(null);
     }
 
+    const finalPosition = getResolvedPosition();
+
     try {
       setLoading(true);
       setErrorMsg('');
@@ -362,7 +424,7 @@ export default function StartInterview({ onStartSession, user, userId = '0000000
           cvId: selectedCv ? selectedCv.value : null,
           companyId: isCustomCompany ? null : selectedCompany.value,
           companyName: isCustomCompany ? customCompanyName : selectedCompany.label,
-          positionTitle: positionTitle,
+          positionTitle: finalPosition,
           level: selectedLevel.value
         })
       });
@@ -489,7 +551,7 @@ export default function StartInterview({ onStartSession, user, userId = '0000000
                 <h4 className="text-xs font-extrabold uppercase text-slate-450 tracking-wider mb-2">Thông tin buổi phỏng vấn</h4>
                 <ul className="text-xs space-y-1.5 text-slate-600 dark:text-slate-350 leading-relaxed">
                   <li>🏢 <strong>Doanh nghiệp:</strong> {isCustomCompany ? customCompanyName : selectedCompany?.label}</li>
-                  <li>💻 <strong>Vị trí ứng tuyển:</strong> {positionTitle}</li>
+                  <li>💻 <strong>Vị trí ứng tuyển:</strong> {getResolvedPosition()}</li>
                   <li>🏆 <strong>Cấp độ phỏng vấn:</strong> {selectedLevel?.label}</li>
                   {selectedCv && <li>📄 <strong>CV sử dụng:</strong> {selectedCv.label}</li>}
                 </ul>
@@ -520,6 +582,8 @@ export default function StartInterview({ onStartSession, user, userId = '0000000
     );
   }
 
+  const finalPosition = getResolvedPosition();
+
   return (
     <Grid gridDefinition={[{ colspan: 7 }, { colspan: 5 }]}>
       <Container header={<Header variant="h2" description="Lập cấu hình phỏng vấn cá nhân hóa">Thiết Lập Phiên Luyện Tập</Header>}>
@@ -537,13 +601,15 @@ export default function StartInterview({ onStartSession, user, userId = '0000000
                 setSelectedCompany(null);
                 setSelectedLevel(null);
                 setCustomCompanyName('');
-                setPositionTitle('');
+                setCustomPositionTitle('');
+                setSelectedPositionOption(null);
                 setIsCustomCompany(false);
+                setIsCustomPosition(false);
               }}>Hủy</Button>
               <Button 
                 variant="primary" 
                 onClick={handleStart}
-                disabled={loading || (isCustomCompany ? !customCompanyName : !selectedCompany) || !positionTitle || !selectedLevel}
+                disabled={loading || (isCustomCompany ? !customCompanyName : !selectedCompany) || !finalPosition || !selectedLevel}
               >
                 Bắt Đầu Ngay
               </Button>
@@ -658,12 +724,46 @@ export default function StartInterview({ onStartSession, user, userId = '0000000
               </SpaceBetween>
             </FormField>
 
-            <FormField label="4. Vị trí ứng tuyển (Target Position)">
-              <Input
-                value={positionTitle}
-                onChange={({ detail }) => setPositionTitle(detail.value)}
-                placeholder="Ví dụ: Frontend Developer, Automation QC, Business Analyst..."
-              />
+            <FormField 
+              label="4. Vị trí ứng tuyển (Target Position)"
+              description="Chọn một vị trí đang có sẵn của công ty hoặc tự nhập vị trí mới"
+            >
+              <SpaceBetween direction="vertical" size="xs">
+                {!isCustomCompany && positionOptions.length > 0 && (
+                  <Toggle
+                    checked={isCustomPosition}
+                    onChange={({ detail }) => {
+                      setIsCustomPosition(detail.checked);
+                      if (detail.checked) {
+                        setSelectedPositionOption(null);
+                      } else {
+                        setCustomPositionTitle('');
+                        if (positionOptions.length > 0) {
+                          setSelectedPositionOption(positionOptions[0]);
+                        }
+                      }
+                    }}
+                  >
+                    Tôi muốn tự nhập vị trí ứng tuyển khác
+                  </Toggle>
+                )}
+
+                {(isCustomCompany || isCustomPosition || positionOptions.length === 0) ? (
+                  <Input
+                    value={customPositionTitle}
+                    onChange={({ detail }) => setCustomPositionTitle(detail.value)}
+                    placeholder="Ví dụ: Frontend Developer, Automation QC, Business Analyst..."
+                  />
+                ) : (
+                  <Select
+                    selectedOption={selectedPositionOption}
+                    onChange={({ detail }) => setSelectedPositionOption(detail.selectedOption)}
+                    options={positionOptions}
+                    filteringType="auto"
+                    placeholder="Chọn vị trí tuyển dụng..."
+                  />
+                )}
+              </SpaceBetween>
             </FormField>
 
             <FormField label="5. Chọn Cấp độ Thử thách">
