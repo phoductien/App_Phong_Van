@@ -43,6 +43,7 @@ export default function StartInterview({ onStartSession, user, userId = '0000000
   const [newCvUrl, setNewCvUrl] = useState('');
   const [uploading, setUploading] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
+  const [showUploadBox, setShowUploadBox] = useState(false);
 
   // Simulated CV analysis results
   const [cvAnalysis, setCvAnalysis] = useState(null);
@@ -99,6 +100,12 @@ export default function StartInterview({ onStartSession, user, userId = '0000000
           value: cv.id
         }));
         setCvOptions(formattedCvs);
+        if (formattedCvs.length > 0) {
+          setSelectedCv(formattedCvs[0]);
+          setShowUploadBox(false);
+        } else {
+          setShowUploadBox(true);
+        }
 
         const formattedComps = comps.map(c => ({
           label: c.name,
@@ -328,6 +335,7 @@ export default function StartInterview({ onStartSession, user, userId = '0000000
         setCvOptions(prev => [option, ...prev]);
         setSelectedCv(option);
         setNewCvUrl('');
+        setShowUploadBox(false);
       } else {
         setErrorMsg('Không thể lưu CV mới.');
       }
@@ -371,6 +379,7 @@ export default function StartInterview({ onStartSession, user, userId = '0000000
           setCvOptions(prev => [option, ...prev]);
           setSelectedCv(option);
           setSelectedFile(null);
+          setShowUploadBox(false);
         } else {
           const errData = await res.json();
           setErrorMsg(errData.error || 'Lỗi khi tải file CV lên.');
@@ -617,76 +626,158 @@ export default function StartInterview({ onStartSession, user, userId = '0000000
           }
         >
           <SpaceBetween direction="vertical" size="l">
-            {/* Quick CV Section */}
-            <div style={{ border: '1px dashed #d1d5db', padding: '16px', borderRadius: '8px', background: '#fafafa' }}>
-              <FormField label="1. Tải lên CV mới của bạn">
-                <SpaceBetween direction="vertical" size="s">
-                  {/* File Selector */}
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
-                    <input
-                      type="file"
-                      id="cv-file-upload"
-                      accept=".pdf,.doc,.docx"
-                      onChange={handleFileChange}
-                      style={{ display: 'none' }}
+            {/* CV Selection / Upload Section */}
+            {cvOptions.length > 0 ? (
+              <SpaceBetween direction="vertical" size="s">
+                <Toggle
+                  checked={showUploadBox}
+                  onChange={({ detail }) => {
+                    setShowUploadBox(detail.checked);
+                    if (detail.checked) {
+                      setSelectedCv(null); // Clear selected CV when switching to new upload
+                    } else if (cvOptions.length > 0) {
+                      setSelectedCv(cvOptions[0]); // Restore first CV when switching back
+                    }
+                  }}
+                >
+                  Tôi muốn tải lên CV mới
+                </Toggle>
+
+                {showUploadBox ? (
+                  /* Upload Box */
+                  <div style={{ border: '1px dashed #d1d5db', padding: '16px', borderRadius: '8px', background: '#fafafa' }}>
+                    <FormField label="Tải lên CV mới của bạn">
+                      <SpaceBetween direction="vertical" size="s">
+                        {/* File Selector */}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+                          <input
+                            type="file"
+                            id="cv-file-upload"
+                            accept=".pdf,.doc,.docx"
+                            onChange={handleFileChange}
+                            style={{ display: 'none' }}
+                          />
+                          <Button
+                            onClick={() => document.getElementById('cv-file-upload').click()}
+                            disabled={uploading}
+                            iconName="upload"
+                          >
+                            Chọn file từ thiết bị (.pdf, .doc, .docx)
+                          </Button>
+                          {selectedFile && (
+                            <span style={{ fontSize: '12px', fontWeight: '600', color: '#475569', maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                              📁 {selectedFile.name}
+                            </span>
+                          )}
+                          {selectedFile && (
+                            <Button
+                              onClick={handleUploadSelectedFile}
+                              disabled={uploading}
+                              variant="primary"
+                            >
+                              {uploading ? <Spinner size="normal" /> : 'Tải lên'}
+                            </Button>
+                          )}
+                        </div>
+
+                        <div style={{ position: 'relative', margin: '8px 0', textAlign: 'center' }}>
+                          <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center' }}>
+                            <div style={{ width: 'full', borderTop: '1px solid #e2e8f0', flexGrow: 1 }}></div>
+                          </div>
+                          <span style={{ position: 'relative', padding: '0 8px', backgroundColor: '#fafafa', fontSize: '10px', fontWeight: 'bold', color: '#94a3b8', textTransform: 'uppercase' }}>
+                            Hoặc nhập link trực tiếp
+                          </span>
+                        </div>
+
+                        <SpaceBetween direction="horizontal" size="xs">
+                          <div style={{ flexGrow: 1 }}>
+                            <Input
+                              value={newCvUrl}
+                              onChange={({ detail }) => setNewCvUrl(detail.value)}
+                              placeholder="https://supabase-storage-url.com/cv.pdf"
+                            />
+                          </div>
+                          <Button onClick={handleAddCv} disabled={uploading || !newCvUrl}>
+                            {uploading ? <Spinner size="normal" /> : 'Nhập Link'}
+                          </Button>
+                        </SpaceBetween>
+                      </SpaceBetween>
+                    </FormField>
+                  </div>
+                ) : (
+                  /* CV Dropdown */
+                  <FormField label="Chọn CV trong hồ sơ để phân tích">
+                    <Select
+                      selectedOption={selectedCv}
+                      onChange={({ detail }) => setSelectedCv(detail.selectedOption)}
+                      options={cvOptions}
+                      placeholder="Chọn CV đã lưu..."
                     />
-                    <Button
-                      onClick={() => document.getElementById('cv-file-upload').click()}
-                      disabled={uploading}
-                      iconName="upload"
-                    >
-                      Chọn file từ thiết bị (.pdf, .doc, .docx)
-                    </Button>
-                    {selectedFile && (
-                      <span style={{ fontSize: '12px', fontWeight: '600', color: '#475569', maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                        📁 {selectedFile.name}
-                      </span>
-                    )}
-                    {selectedFile && (
-                      <Button
-                        onClick={handleUploadSelectedFile}
-                        disabled={uploading}
-                        variant="primary"
-                      >
-                        {uploading ? <Spinner size="normal" /> : 'Tải lên'}
-                      </Button>
-                    )}
-                  </div>
-
-                  <div style={{ position: 'relative', margin: '8px 0', textAlign: 'center' }}>
-                    <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center' }}>
-                      <div style={{ width: 'full', borderTop: '1px solid #e2e8f0', flexGrow: 1 }}></div>
-                    </div>
-                    <span style={{ position: 'relative', padding: '0 8px', backgroundColor: '#fafafa', fontSize: '10px', fontWeight: 'bold', color: '#94a3b8', textTransform: 'uppercase' }}>
-                      Hoặc nhập link trực tiếp
-                    </span>
-                  </div>
-
-                  <SpaceBetween direction="horizontal" size="xs">
-                    <div style={{ flexGrow: 1 }}>
-                      <Input
-                        value={newCvUrl}
-                        onChange={({ detail }) => setNewCvUrl(detail.value)}
-                        placeholder="https://supabase-storage-url.com/cv.pdf"
+                  </FormField>
+                )}
+              </SpaceBetween>
+            ) : (
+              /* No saved CVs, always show Upload Box */
+              <div style={{ border: '1px dashed #d1d5db', padding: '16px', borderRadius: '8px', background: '#fafafa' }}>
+                <FormField label="Tải lên CV của bạn để phân tích và chuẩn bị câu hỏi">
+                  <SpaceBetween direction="vertical" size="s">
+                    {/* File Selector */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+                      <input
+                        type="file"
+                        id="cv-file-upload"
+                        accept=".pdf,.doc,.docx"
+                        onChange={handleFileChange}
+                        style={{ display: 'none' }}
                       />
+                      <Button
+                        onClick={() => document.getElementById('cv-file-upload').click()}
+                        disabled={uploading}
+                        iconName="upload"
+                      >
+                        Chọn file từ thiết bị (.pdf, .doc, .docx)
+                      </Button>
+                      {selectedFile && (
+                        <span style={{ fontSize: '12px', fontWeight: '600', color: '#475569', maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                          📁 {selectedFile.name}
+                        </span>
+                      )}
+                      {selectedFile && (
+                        <Button
+                          onClick={handleUploadSelectedFile}
+                          disabled={uploading}
+                          variant="primary"
+                        >
+                          {uploading ? <Spinner size="normal" /> : 'Tải lên'}
+                        </Button>
+                      )}
                     </div>
-                    <Button onClick={handleAddCv} disabled={uploading || !newCvUrl}>
-                      {uploading ? <Spinner size="normal" /> : 'Nhập Link'}
-                    </Button>
-                  </SpaceBetween>
-                </SpaceBetween>
-              </FormField>
-            </div>
 
-            <FormField label="2. Chọn CV trong hồ sơ để phân tích">
-              <Select
-                selectedOption={selectedCv}
-                onChange={({ detail }) => setSelectedCv(detail.selectedOption)}
-                options={cvOptions}
-                placeholder="Chọn CV đã lưu..."
-                empty="Không tìm thấy CV. Vui lòng thêm CV ở khung trên."
-              />
-            </FormField>
+                    <div style={{ position: 'relative', margin: '8px 0', textAlign: 'center' }}>
+                      <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center' }}>
+                        <div style={{ width: 'full', borderTop: '1px solid #e2e8f0', flexGrow: 1 }}></div>
+                      </div>
+                      <span style={{ position: 'relative', padding: '0 8px', backgroundColor: '#fafafa', fontSize: '10px', fontWeight: 'bold', color: '#94a3b8', textTransform: 'uppercase' }}>
+                        Hoặc nhập link trực tiếp
+                      </span>
+                    </div>
+
+                    <SpaceBetween direction="horizontal" size="xs">
+                      <div style={{ flexGrow: 1 }}>
+                        <Input
+                          value={newCvUrl}
+                          onChange={({ detail }) => setNewCvUrl(detail.value)}
+                          placeholder="https://supabase-storage-url.com/cv.pdf"
+                        />
+                      </div>
+                      <Button onClick={handleAddCv} disabled={uploading || !newCvUrl}>
+                        {uploading ? <Spinner size="normal" /> : 'Nhập Link'}
+                      </Button>
+                    </SpaceBetween>
+                  </SpaceBetween>
+                </FormField>
+              </div>
+            )}
 
             <FormField 
               label="3. Doanh nghiệp mục tiêu"
