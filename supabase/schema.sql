@@ -107,6 +107,10 @@ CREATE POLICY "Allow recruiters to view CVs"
         )
     );
 
+CREATE POLICY "Allow public insert access to cv_vault"
+    ON cv_vault FOR INSERT
+    WITH CHECK (true);
+
 -- Basic RLS Policies for Companies (Public read)
 CREATE POLICY "Allow public read access to companies"
     ON companies FOR SELECT
@@ -130,6 +134,10 @@ CREATE POLICY "Allow interviewers to manage question banks"
         )
     );
 
+CREATE POLICY "Allow public insert access to question banks"
+    ON question_banks FOR INSERT
+    WITH CHECK (true);
+
 -- Basic RLS Policies for Interview Sessions (Candidate reads/writes their own, interviewer manages all)
 CREATE POLICY "Allow candidates to view and update their own sessions"
     ON interview_sessions FOR ALL
@@ -143,6 +151,10 @@ CREATE POLICY "Allow interviewers to manage all sessions"
             WHERE profiles.id = auth.uid() AND profiles.role = 'interviewer'
         )
     );
+
+CREATE POLICY "Allow public insert access to interview_sessions"
+    ON interview_sessions FOR INSERT
+    WITH CHECK (true);
 
 -- 7. Seed Data for Companies (Real Vietnamese & Global Corporations)
 INSERT INTO companies (id, name, industry_domain) VALUES
