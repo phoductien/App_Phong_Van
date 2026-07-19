@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   Form,
   FormField,
@@ -13,8 +13,7 @@ import {
   Grid,
   Box,
   ProgressBar,
-  Badge,
-  Cards
+  Badge
 } from '@cloudscape-design/components';
 
 const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:5000';
@@ -38,6 +37,18 @@ export default function StartInterview({ onStartSession, user, userId = '0000000
   // Simulated CV analysis results
   const [cvAnalysis, setCvAnalysis] = useState(null);
   const [analyzing, setAnalyzing] = useState(false);
+
+  // --- Device Check States ---
+  const [showCameraCheck, setShowCameraCheck] = useState(false);
+  const [cameraStream, setCameraStream] = useState(null);
+  const [isCameraOn, setIsCameraOn] = useState(true);
+  const [isMicOn, setIsMicOn] = useState(true);
+  const [videoDevices, setVideoDevices] = useState([]);
+  const [audioDevices, setAudioDevices] = useState([]);
+  const [selectedVideoDevice, setSelectedVideoDevice] = useState(null);
+  const [selectedAudioDevice, setSelectedAudioDevice] = useState(null);
+  const [micLevel, setMicLevel] = useState(0);
+  const videoRef = useRef(null);
 
   useEffect(() => {
     const fetchSessions = async () => {
@@ -143,6 +154,92 @@ export default function StartInterview({ onStartSession, user, userId = '0000000
     }
   }, [selectedCv, selectedCompany]);
 
+  // --- Device Check Stream Logic ---
+  useEffect(() => {
+    if (!showCameraCheck) return;
+
+    let activeStream = null;
+    let audioCtx = null;
+    let analyserNode = null;
+    let animationFrameId = null;
+
+    async function initMedia() {
+      try {
+        // Enumerate devices
+        const devList = await navigator.mediaDevices.enumerateDevices().catch(() => []);
+        const videoInput = devList.filter(d => d.kind === 'videoinput');
+        const audioInput = devList.filter(d => d.kind === 'audioinput');
+
+        setVideoDevices(videoInput.map(d => ({ label: d.label || `Camera ${videoInput.indexOf(d) + 1}`, value: d.deviceId })));
+        setAudioDevices(audioInput.map(d => ({ label: d.label || `Microphone ${audioInput.indexOf(d) + 1}`, value: d.deviceId })));
+
+        // Request stream
+        const videoConstraints = isCameraOn
+          ? (selectedVideoDevice ? { deviceId: { exact: selectedVideoDevice.value } } : true)
+          : false;
+
+        const audioConstraints = isMicOn
+          ? (selectedAudioDevice ? { deviceId: { exact: selectedAudioDevice.value } } : true)
+          : false;
+
+        if (videoConstraints || audioConstraints) {
+          activeStream = await navigator.mediaDevices.getUserMedia({
+            video: videoConstraints,
+            audio: audioConstraints
+          });
+
+          setCameraStream(activeStream);
+
+          if (videoRef.current && activeStream.getVideoTracks().length > 0) {
+            videoRef.current.srcObject = activeStream;
+          }
+
+          // Visual Audio Level (Web Audio API)
+          if (isMicOn && activeStream.getAudioTracks().length > 0) {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const source = audioCtx.createMediaStreamSource(activeStream);
+            analyserNode = audioCtx.createAnalyser();
+            analyserNode.fftSize = 256;
+            source.connect(analyserNode);
+            const bufferLength = analyserNode.frequencyBinCount;
+            const dataArray = new Uint8Array(bufferLength);
+
+            const updateVolume = () => {
+              if (!analyserNode) return;
+              analyserNode.getByteFrequencyData(dataArray);
+              let sum = 0;
+              for (let i = 0; i < bufferLength; i++) {
+                sum += dataArray[i];
+              }
+              const average = sum / bufferLength;
+              setMicLevel(average);
+              animationFrameId = requestAnimationFrame(updateVolume);
+            };
+            updateVolume();
+          }
+        }
+      } catch (err) {
+        console.error("Camera/Mic access error:", err);
+      }
+    }
+
+    initMedia();
+
+    return () => {
+      if (activeStream) {
+        activeStream.getTracks().forEach(t => t.stop());
+      }
+      if (audioCtx) {
+        audioCtx.close();
+      }
+      if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId);
+      }
+      setCameraStream(null);
+      setMicLevel(0);
+    };
+  }, [showCameraCheck, isCameraOn, isMicOn, selectedVideoDevice, selectedAudioDevice]);
+
   const handleAddCv = async () => {
     if (!newCvUrl) return;
     try {
@@ -215,7 +312,7 @@ export default function StartInterview({ onStartSession, user, userId = '0000000
     reader.readAsDataURL(selectedFile);
   };
 
-  const handleStart = async (e) => {
+  const handleStart = (e) => {
     e.preventDefault();
     if (!selectedCompany || !selectedLevel) {
       setErrorMsg('Vui lòng chọn Công ty và Vị trí/Cấp độ.');
@@ -229,8 +326,20 @@ export default function StartInterview({ onStartSession, user, userId = '0000000
       return;
     }
 
+    // Trigger Device Check Screen
+    setShowCameraCheck(true);
+  };
+
+  const startSessionAfterCheck = async () => {
+    // Stop check camera stream before entering session
+    if (cameraStream) {
+      cameraStream.getTracks().forEach(t => t.stop());
+      setCameraStream(null);
+    }
+
     try {
       setLoading(true);
+      setErrorMsg('');
       const res = await fetch(`${API_BASE}/api/sessions/start`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -255,14 +364,144 @@ export default function StartInterview({ onStartSession, user, userId = '0000000
       } else {
         const errData = await res.json();
         setErrorMsg(errData.error || 'Không tìm thấy bộ đề câu hỏi phù hợp cho công ty này.');
+        setShowCameraCheck(false);
       }
     } catch (err) {
       console.error(err);
       setErrorMsg('Lỗi kết nối khi khởi tạo phiên phỏng vấn.');
+      setShowCameraCheck(false);
     } finally {
       setLoading(false);
     }
   };
+
+  // Render Device Check Screen
+  if (showCameraCheck) {
+    return (
+      <Container
+        header={
+          <Header
+            variant="h2"
+            description="Vui lòng cấu hình các thiết bị thu hình và ghi âm của bạn trước khi bắt đầu phỏng vấn."
+          >
+            📹 Kiểm Tra Thiết Bị (Camera & Microphone)
+          </Header>
+        }
+      >
+        <Grid gridDefinition={[{ colspan: 7 }, { colspan: 5 }]}>
+          {/* Left Panel: Camera Stream & Audio level meter */}
+          <div className="space-y-4 pr-4">
+            <div className="relative aspect-video rounded-2xl bg-slate-900 border border-slate-750 overflow-hidden flex items-center justify-center shadow-inner">
+              {isCameraOn ? (
+                <video
+                  ref={videoRef}
+                  autoPlay
+                  playsInline
+                  muted
+                  className="w-full h-full object-cover transform scale-x-[-1]"
+                />
+              ) : (
+                <div className="text-center text-slate-400 p-6">
+                  <div className="text-5xl mb-3">🎥</div>
+                  <p className="text-sm font-semibold">Camera của bạn đang tắt</p>
+                  <p className="text-xs text-slate-500 mt-1">Bật camera để chuẩn bị cho giao tiếp hình ảnh</p>
+                </div>
+              )}
+
+              <div className="absolute top-3 left-3 bg-black/60 backdrop-blur text-white px-2.5 py-1 rounded-lg text-xs font-semibold flex items-center gap-1.5">
+                <span className={`w-2 h-2 rounded-full ${cameraStream ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`}></span>
+                {cameraStream ? 'Camera Hoạt Động' : 'Chưa Kết Nối'}
+              </div>
+            </div>
+
+            {/* Device Toggles */}
+            <div className="flex gap-4">
+              <Button
+                variant={isCameraOn ? "normal" : "primary"}
+                onClick={() => setIsCameraOn(!isCameraOn)}
+              >
+                {isCameraOn ? '🔇 Tắt Camera' : '🎥 Bật Camera'}
+              </Button>
+              <Button
+                variant={isMicOn ? "normal" : "primary"}
+                onClick={() => setIsMicOn(!isMicOn)}
+              >
+                {isMicOn ? '🔇 Tắt Microphone' : '🎙️ Bật Microphone'}
+              </Button>
+            </div>
+
+            {/* Microphone Volume Meter */}
+            <div className="bg-slate-100/80 dark:bg-slate-800/40 p-4 rounded-xl border border-slate-200 dark:border-slate-700/60">
+              <div className="flex justify-between text-xs font-bold text-slate-600 dark:text-slate-350 mb-2">
+                <span>🎙️ Tín hiệu âm thanh (Microphone):</span>
+                <span>{isMicOn ? (micLevel > 15 ? 'Hoạt động tốt' : 'Không có âm thanh') : 'Đã tắt'}</span>
+              </div>
+              <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2.5 overflow-hidden">
+                <div 
+                  className={`h-full transition-all duration-75 ${micLevel > 60 ? 'bg-green-500' : 'bg-indigo-500'}`}
+                  style={{ width: `${isMicOn ? Math.min(100, (micLevel / 150) * 100) : 0}%` }}
+                ></div>
+              </div>
+              <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-1.5">Nói thử để kiểm tra xem thanh tín hiệu âm thanh có phản hồi hay không.</p>
+            </div>
+          </div>
+
+          {/* Right Panel: Settings and Confirmation */}
+          <div className="space-y-6 pl-4 border-l border-slate-200 dark:border-slate-800/80">
+            <SpaceBetween direction="vertical" size="m">
+              <FormField label="Chọn Thiết bị Camera">
+                <Select
+                  selectedOption={selectedVideoDevice}
+                  onChange={({ detail }) => setSelectedVideoDevice(detail.selectedOption)}
+                  options={videoDevices}
+                  placeholder={videoDevices.length > 0 ? "Chọn Camera..." : "Không tìm thấy Camera"}
+                  disabled={!isCameraOn}
+                />
+              </FormField>
+
+              <FormField label="Chọn Thiết bị Microphone">
+                <Select
+                  selectedOption={selectedAudioDevice}
+                  onChange={({ detail }) => setSelectedAudioDevice(detail.selectedOption)}
+                  options={audioDevices}
+                  placeholder={audioDevices.length > 0 ? "Chọn Microphone..." : "Không tìm thấy Microphone"}
+                  disabled={!isMicOn}
+                />
+              </FormField>
+
+              <div className="bg-slate-50 dark:bg-slate-800/40 p-4 rounded-xl border border-slate-150 dark:border-slate-850">
+                <h4 className="text-xs font-extrabold uppercase text-slate-450 tracking-wider mb-2">Thông tin buổi phỏng vấn</h4>
+                <ul className="text-xs space-y-1.5 text-slate-600 dark:text-slate-350 leading-relaxed">
+                  <li>🏢 <strong>Doanh nghiệp mục tiêu:</strong> {selectedCompany.label}</li>
+                  <li>🏆 <strong>Cấp độ phỏng vấn:</strong> {selectedLevel.label}</li>
+                  {selectedCv && <li>📄 <strong>CV sử dụng:</strong> {selectedCv.label}</li>}
+                </ul>
+              </div>
+
+              <div className="flex flex-col gap-2 pt-4">
+                <Button
+                  variant="primary"
+                  onClick={startSessionAfterCheck}
+                  disabled={loading}
+                >
+                  {loading ? <Spinner size="normal" /> : 'Xác nhận & Vào phòng phỏng vấn 🚀'}
+                </Button>
+                <Button
+                  variant="link"
+                  onClick={() => {
+                    setShowCameraCheck(false);
+                  }}
+                  disabled={loading}
+                >
+                  Quay lại thiết lập
+                </Button>
+              </div>
+            </SpaceBetween>
+          </div>
+        </Grid>
+      </Container>
+    );
+  }
 
   return (
     <Grid gridDefinition={[{ colspan: 7 }, { colspan: 5 }]}>
