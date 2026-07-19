@@ -1,14 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Table,
   Box,
   SpaceBetween,
-  Button,
   Container,
   Header,
   Select,
   Badge,
-  Grid
+  Input
 } from '@cloudscape-design/components';
 
 const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:5000';
@@ -18,6 +16,10 @@ export default function QuestionBankViewer() {
   const [selectedCompany, setSelectedCompany] = useState(null);
   const [questionBanks, setQuestionBanks] = useState([]);
   const [loading, setLoading] = useState(false);
+
+  // Filters
+  const [selectedLevel, setSelectedLevel] = useState({ label: "Tất cả cấp độ", value: "all" });
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     async function loadCompanies() {
@@ -58,6 +60,14 @@ export default function QuestionBankViewer() {
     loadQuestions();
   }, [selectedCompany]);
 
+  const filteredQuestionBanks = questionBanks.filter(qb => {
+    const matchLevel = selectedLevel.value === "all" || qb.level === selectedLevel.value;
+    const matchSearch = !searchQuery || 
+      qb.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (qb.questions && qb.questions.some(q => q.toLowerCase().includes(searchQuery.toLowerCase())));
+    return matchLevel && matchSearch;
+  });
+
   return (
     <SpaceBetween size="l" direction="vertical">
       <Container
@@ -65,69 +75,98 @@ export default function QuestionBankViewer() {
           <Header
             variant="h2"
             description="Tra cứu ngân hàng đề thi tuyển dụng chính thức của các doanh nghiệp đối tác"
-            actions={
-              <div style={{ width: '280px' }}>
-                <Select
-                  selectedOption={selectedCompany}
-                  onChange={({ detail }) => setSelectedCompany(detail.selectedOption)}
-                  options={companies}
-                  placeholder="Lọc theo Công ty..."
-                />
-              </div>
-            }
           >
             Ngân Hàng Đề Thi Tuyển Dụng
           </Header>
         }
       >
-        {loading ? (
-          <Box variant="p" style={{ textAlign: 'center', padding: '20px 0' }}>
-            Đang tải danh sách câu hỏi...
-          </Box>
-        ) : questionBanks.length === 0 ? (
-          <Box variant="p" color="text-muted" style={{ textAlign: 'center', padding: '40px 0' }}>
-            Chưa có bộ câu hỏi tuyển dụng nào được lưu cho công ty này. Bạn có thể tự tạo bộ câu hỏi ở tab <strong>Quản trị bộ đề</strong>.
-          </Box>
-        ) : (
-          <SpaceBetween size="l" direction="vertical">
-            {questionBanks.map((qb, idx) => (
-              <Container
-                key={qb.id || idx}
-                header={
-                  <Header
-                    variant="h3"
-                    actions={
-                      <Badge color={qb.level === 'hard' ? 'red' : qb.level === 'medium' ? 'blue' : 'green'}>
-                        Cấp độ: {qb.level.toUpperCase()}
-                      </Badge>
-                    }
-                  >
-                    {qb.title}
-                  </Header>
-                }
-              >
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
-                  {qb.questions && qb.questions.map((q, qIdx) => (
-                    <div
-                      key={qIdx}
-                      style={{
-                        padding: '12px 16px',
-                        borderRadius: '6px',
-                        background: '#f8fafc',
-                        border: '1px solid #e2e8f0',
-                        fontSize: '13px',
-                        lineHeight: '1.5',
-                        color: '#334155'
-                      }}
+        <SpaceBetween size="l" direction="vertical">
+          {/* Filter Bar */}
+          <div style={{ display: 'flex', gap: '15px', flexWrap: 'wrap', alignItems: 'center', backgroundColor: '#f1f5f9', padding: '16px', borderRadius: '8px' }}>
+            <div style={{ flex: '1 1 200px' }}>
+              <Box variant="awsui-key-label">Lọc theo doanh nghiệp:</Box>
+              <Select
+                selectedOption={selectedCompany}
+                onChange={({ detail }) => setSelectedCompany(detail.selectedOption)}
+                options={companies}
+                placeholder="Chọn công ty..."
+              />
+            </div>
+            
+            <div style={{ flex: '1 1 180px' }}>
+              <Box variant="awsui-key-label">Cấp độ phỏng vấn:</Box>
+              <Select
+                selectedOption={selectedLevel}
+                onChange={({ detail }) => setSelectedLevel(detail.selectedOption)}
+                options={[
+                  { label: "Tất cả cấp độ", value: "all" },
+                  { label: "Intern / Fresher (ez)", value: "ez" },
+                  { label: "Junior (medium)", value: "medium" },
+                  { label: "Senior (hard)", value: "hard" }
+                ]}
+              />
+            </div>
+
+            <div style={{ flex: '2 1 250px' }}>
+              <Box variant="awsui-key-label">Tìm kiếm vị trí / kỹ năng:</Box>
+              <Input
+                value={searchQuery}
+                onChange={({ detail }) => setSearchQuery(detail.value)}
+                placeholder="Ví dụ: Frontend, DevOps, Pentest, QA..."
+                clearable
+              />
+            </div>
+          </div>
+
+          {loading ? (
+            <Box variant="p" style={{ textAlign: 'center', padding: '20px 0' }}>
+              Đang tải danh sách câu hỏi...
+            </Box>
+          ) : filteredQuestionBanks.length === 0 ? (
+            <Box variant="p" color="text-muted" style={{ textAlign: 'center', padding: '40px 0' }}>
+              Không tìm thấy bộ câu hỏi nào khớp với bộ lọc hiện tại.
+            </Box>
+          ) : (
+            <SpaceBetween size="l" direction="vertical">
+              {filteredQuestionBanks.map((qb, idx) => (
+                <Container
+                  key={qb.id || idx}
+                  header={
+                    <Header
+                      variant="h3"
+                      actions={
+                        <Badge color={qb.level === 'hard' ? 'red' : qb.level === 'medium' ? 'blue' : 'green'}>
+                          Cấp độ: {qb.level.toUpperCase()}
+                        </Badge>
+                      }
                     >
-                      {q}
-                    </div>
-                  ))}
-                </div>
-              </Container>
-            ))}
-          </SpaceBetween>
-        )}
+                      {qb.title}
+                    </Header>
+                  }
+                >
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
+                    {qb.questions && qb.questions.map((q, qIdx) => (
+                      <div
+                        key={qIdx}
+                        style={{
+                          padding: '12px 16px',
+                          borderRadius: '6px',
+                          background: '#f8fafc',
+                          border: '1px solid #e2e8f0',
+                          fontSize: '13px',
+                          lineHeight: '1.5',
+                          color: '#334155'
+                        }}
+                      >
+                        {q}
+                      </div>
+                    ))}
+                  </div>
+                </Container>
+              ))}
+            </SpaceBetween>
+          )}
+        </SpaceBetween>
       </Container>
     </SpaceBetween>
   );

@@ -221,5 +221,171 @@ INSERT INTO question_banks (id, company_id, level, title, questions) VALUES
             "9. Infrastructure as Code (IaC) là gì và lợi ích của việc sử dụng Terraform?",
             "10. Giải thích quy trình CI/CD hoàn chỉnh để đưa mã nguồn từ GitHub lên Kubernetes?"
         ]'::jsonb
+    ),
+    -- --- Viettel Cyber Security (VCS) ---
+    (
+        '11111111-2222-3333-4444-666666666666',
+        '11111111-1111-1111-1111-111111111111',
+        'ez',
+        'Viettel Cyber Security - SOC Operator Intern Quiz',
+        '[
+            "1. Cảnh báo (Alert) từ hệ thống SIEM là gì và bạn sẽ làm gì đầu tiên khi nhận được nó?",
+            "2. Sự khác nhau cơ bản giữa địa chỉ IP Public và IP Private?",
+            "3. Port 80 và Port 443 dùng cho giao thức nào, sự khác biệt lớn nhất là gì?",
+            "4. Mã độc (Malware) có những loại phổ biến nào bạn biết?",
+            "5. Phishing email là gì và dấu hiệu nhận biết email lừa đảo?",
+            "6. Hệ điều hành Linux lệnh nào dùng để kiểm tra các kết nối mạng đang hoạt động?",
+            "7. Khái niệm tường lửa (Firewall) hoạt động ở tầng nào của mô hình OSI?",
+            "8. VPN là gì và tại sao doanh nghiệp cần sử dụng VPN?",
+            "9. Bạn hiểu thế nào về vai trò của một SOC Analyst trong doanh nghiệp?",
+            "10. Khi máy tính cá nhân bị nghi ngờ nhiễm mã độc, bước xử lý khẩn cấp đầu tiên là gì?"
+        ]'::jsonb
+    ),
+    (
+        '11111111-2222-3333-4444-777777777777',
+        '11111111-1111-1111-1111-111111111111',
+        'hard',
+        'Viettel Cyber Security - Expert Red Teamer & Lead Pentester Quiz',
+        '[
+            "1. Làm thế nào để bypass cơ chế AMSI (Antimalware Scan Interface) của Windows khi thực thi PowerShell scripts?",
+            "2. Giải thích quy trình tấn công Kerberoasting trong môi trường Active Directory và cách phòng chống?",
+            "3. Phân tích cách bạn phát hiện và khai thác lỗ hổng deserialization trong ứng dụng Java Enterprise?",
+            "4. Trình bày phương pháp bypass cơ chế bảo vệ WAF (Web Application Firewall) nâng cao?",
+            "5. Làm thế nào để thực hiện kỹ thuật DLL Side-Loading nhằm duy trì quyền truy cập trên hệ thống mục tiêu?",
+            "6. Kỹ thuật đào hầm mạng (Chisel, SSH Tunneling) qua các lớp mạng nội bộ (Pivotting) hoạt động như thế nào?",
+            "7. Giải thích lỗ hổng Zerologon (CVE-2020-1472) và tác động của nó đối với Domain Controller?",
+            "8. Làm thế nào để phân tích mã độc đã bị obfuscate và pack bằng kỹ thuật dịch ngược (Reverse Engineering)?",
+            "9. Phương thức tấn công chuỗi cung ứng (Supply Chain Attack) là gì và làm thế nào để giảm thiểu rủi ro?",
+            "10. Viết một kịch bản tấn công leo thang đặc quyền (Privilege Escalation) từ User thường lên SYSTEM trên Windows Server?"
+        ]'::jsonb
+    ),
+    -- --- VNG Corporation ---
+    (
+        '22222222-3333-4444-5555-777777777777',
+        '33333333-3333-3333-3333-333333333333',
+        'ez',
+        'VNG Corporation - Intern QA/QC Game Tester Quiz',
+        '[
+            "1. Khái niệm lỗi phần mềm (Bug) là gì và quy trình báo cáo lỗi (Bug Report) tiêu chuẩn gồm những thông tin nào?",
+            "2. Sự khác nhau giữa Regression Testing (Kiểm thử hồi quy) và Sanity Testing là gì?",
+            "3. Bạn hiểu thế nào là kiểm thử hộp đen (Black-box Testing) và kiểm thử hộp trắng?",
+            "4. Hãy thiết lập các Test Case để kiểm thử chức năng Đăng ký tài khoản mới?",
+            "5. Khi kiểm thử một game mobile, những yếu tố nào về trải nghiệm người dùng (UX) bạn cần đặc biệt chú ý?",
+            "6. Làm thế nào để tái hiện một lỗi không xảy ra thường xuyên (Intermittent Bug)?",
+            "7. Sự khác biệt giữa mức độ nghiêm trọng (Severity) và độ ưu tiên (Priority) của một bug?",
+            "8. Bạn sử dụng công cụ nào để quản lý tiến độ kiểm thử và log lỗi (ví dụ: Jira, Trello)?",
+            "9. Khi phát hiện game bị giật lag (Drop FPS), bạn sẽ phân tích nguyên nhân từ đâu đầu tiên?",
+            "10. Tại sao cần viết tài liệu Test Plan trước khi tiến hành kiểm thử một dự án?"
+        ]'::jsonb
+    ),
+    (
+        '22222222-3333-4444-5555-888888888888',
+        '33333333-3333-3333-3333-333333333333',
+        'hard',
+        'VNG Corporation - Senior React & System Architect Quiz',
+        '[
+            "1. Giải thích cơ chế Reconciliation và thuật toán Diffing của React 18?",
+            "2. Làm thế nào để tối ưu hóa hiệu năng render cho danh sách cực lớn (trên 10,000 phần tử) mà không gây giật khung hình?",
+            "3. Thiết kế kiến trúc chịu tải cho hệ thống Real-time Dashboard phục vụ 50,000 kết nối đồng thời?",
+            "4. Cách thức hoạt động của Server-Side Rendering (SSR) so với Static Site Generation (SSG) trong Next.js?",
+            "5. Làm thế nào để xử lý rò rỉ bộ nhớ (Memory Leak) trong ứng dụng Single Page Application lớn?",
+            "6. Giải thích cách triển khai cơ chế Distributed Lock sử dụng Redis để bảo vệ tài nguyên chia sẻ?",
+            "7. Bạn sẽ chia nhỏ mã nguồn (Code Splitting) và áp dụng Lazy Loading như thế nào để giảm 50% chỉ số FCP?",
+            "8. Giải thích nguyên lý hoạt động của CDN và các chiến lược cấu hình cache header (Cache-Control, ETag)?",
+            "9. Làm thế nào để đảm bảo tính nhất quán dữ liệu giữa Web Client và Database qua môi trường WebSocket có kết nối chập chờn?",
+            "10. Trình bày phương án thiết kế hệ thống Micro-frontend cho một portal doanh nghiệp gồm nhiều đội phát triển độc lập?"
+        ]'::jsonb
+    ),
+    -- --- NVIDIA Vietnam ---
+    (
+        '33333333-4444-5555-6666-888888888888',
+        '55555555-5555-5555-5555-555555555555',
+        'ez',
+        'NVIDIA Vietnam - Junior Python/C++ Developer Quiz',
+        '[
+            "1. Sự khác nhau giữa con trỏ (Pointer) và tham chiếu (Reference) trong C++?",
+            "2. Giải thích cơ chế quản lý bộ nhớ tự động (Garbage Collection) trong Python?",
+            "3. Khái niệm đa luồng (Multi-threading) và đa tiến trình (Multi-processing) khác nhau thế nào?",
+            "4. Lớp ảo (Virtual Class) và Hàm ảo (Virtual Function) trong C++ dùng để làm gì?",
+            "5. Giải thích từ khóa ''self'' trong các class của Python?",
+            "6. Cú pháp quản lý ngữ cảnh ''with'' trong Python hoạt động như thế nào và lợi ích của nó?",
+            "7. Làm thế nào để tối ưu hóa thời gian biên dịch (Compile time) của một dự án C++ lớn?",
+            "8. Trình bày các cấu trúc dữ liệu cơ bản: Array, Linked List, Stack, Queue và độ phức tạp truy xuất?",
+            "9. List Comprehension trong Python là gì? Cho ví dụ minh họa?",
+            "10. Giải thích tầm quan trọng của việc quản lý bộ nhớ thủ công và lỗi rò rỉ bộ nhớ (Memory Leak) trong C++?"
+        ]'::jsonb
+    ),
+    (
+        '33333333-4444-5555-6666-999999999999',
+        '55555555-5555-5555-5555-555555555555',
+        'hard',
+        'NVIDIA Vietnam - Senior SRE & GPU Optimization Expert Quiz',
+        '[
+            "1. Cơ chế giao tiếp bộ nhớ qua PCIe giữa CPU và GPU hoạt động thế nào, và làm sao để giảm thiểu bottleneck truyền tải dữ liệu?",
+            "2. Giải thích mô hình lập trình song song CUDA và cách thiết kế Thread Blocks, Grids để tận dụng tối đa GPU Cores?",
+            "3. Làm thế nào để tối ưu hóa việc phân bổ bộ nhớ dùng chung (Shared Memory) và bộ nhớ toàn cục (Global Memory) trên kiến trúc NVIDIA Ampere?",
+            "4. Trình bày cơ chế hoạt động của GPU Direct RDMA trong các cụm máy chủ AI lớn?",
+            "5. Làm thế nào để giám sát và chẩn đoán hiệu năng GPU thời gian thực sử dụng các công cụ như Nsight Systems và Nsight Compute?",
+            "6. Hãy thiết kế hệ thống tự động co giãn (Auto-scaling) cho các Kubernetes Node chứa GPU dựa trên chỉ số sử dụng GPU thực tế?",
+            "7. Giải thích sự khác biệt và tối ưu hiệu năng giữa tính toán độ chính xác đơn (FP32), độ chính xác nửa (FP16) và TensorFloat-32 (TF32)?",
+            "8. Làm thế nào để triển khai mô hình học sâu lớn (ví dụ: LLM) trên cụm đa GPU sử dụng kỹ thuật Tensor Parallelism và Pipeline Parallelism?",
+            "9. Bạn xử lý lỗi mất kết nối phần cứng GPU (GPU Dropped, XID Error) trên hệ thống đám mây tự động như thế nào?",
+            "10. Viết kịch bản tối ưu hóa mã nguồn CUDA kernel để giảm thiểu rò rỉ băng thông (Memory Bandwidth Saturation)?"
+        ]'::jsonb
+    ),
+    -- --- FPT Software (company_id: 44444444-4444-4444-4444-444444444444) ---
+    (
+        '44444444-5555-6666-7777-111111111111',
+        '44444444-4444-4444-4444-444444444444',
+        'ez',
+        'FPT Software - Junior Frontend Developer Intern Quiz',
+        '[
+            "1. HTML5 Semantic Elements là gì và tại sao chúng ta nên sử dụng chúng thay vì thẻ div?",
+            "2. Giải thích cơ chế CSS Box Model?",
+            "3. Sự khác nhau giữa flex-direction: row và flex-direction: column trong CSS Flexbox?",
+            "4. Giải thích cơ chế Event Bubbling và Event Capturing trong Javascript?",
+            "5. Giao thức HTTP/HTTPS hoạt động thế nào và SSL certificate đóng vai trò gì?",
+            "6. Sự khác biệt giữa từ khóa var, let và const trong ES6?",
+            "7. Giải thích sự khác biệt giữa cookie, localStorage và sessionStorage?",
+            "8. Callback function là gì và cách sử dụng nó trong các tác vụ bất đồng bộ?",
+            "9. Viết một đoạn CSS để căn giữa một phần tử tuyệt đối (absolute element) cả chiều ngang lẫn chiều dọc?",
+            "10. Responsive Web Design là gì và Media Queries đóng vai trò thế nào?"
+        ]'::jsonb
+    ),
+    (
+        '44444444-5555-6666-7777-222222222222',
+        '44444444-4444-4444-4444-444444444444',
+        'medium',
+        'FPT Software - Mid-Level QC Tester (Manual & Automation) Quiz',
+        '[
+            "1. Trình bày quy trình kiểm thử phần mềm (STLC) và các giai đoạn quan trọng nhất?",
+            "2. Sự khác biệt giữa Black-box Testing, White-box Testing và Gray-box Testing?",
+            "3. Làm thế nào để viết một kịch bản kiểm thử tự động (Automation Script) bằng Selenium WebDriver với mô hình Page Object Model (POM)?",
+            "4. Giải thích các mức độ kiểm thử: Unit Test, Integration Test, System Test, Acceptance Test?",
+            "5. Cách bạn thiết kế và thực thi kiểm thử bảo mật cơ bản cho các API Endpoint?",
+            "6. Sự khác biệt giữa kiểm thử tải (Load Testing) và kiểm thử độ bền chịu tải (Stress Testing)?",
+            "7. Làm thế nào để tích hợp các kịch bản kiểm thử tự động vào quy trình CI/CD sử dụng Jenkins hoặc GitHub Actions?",
+            "8. Kiểm thử hồi quy (Regression Testing) là gì và khi nào nên áp dụng kiểm thử tự động cho nó?",
+            "9. Bạn xử lý các phần tử động (Dynamic Elements) hoặc chờ đợi trang load xong (Implicit Wait, Explicit Wait) trong Selenium thế nào?",
+            "10. Giải thích cấu trúc của một câu lệnh SQL dùng để truy vấn kiểm tra dữ liệu giữa UI và Database?"
+        ]'::jsonb
+    ),
+    (
+        '44444444-5555-6666-7777-333333333333',
+        '44444444-4444-4444-4444-444444444444',
+        'hard',
+        'FPT Software - Solutions Architect & Principal Cloud Engineer Quiz',
+        '[
+            "1. Thiết kế kiến trúc đám mây đa vùng (Multi-region Cloud Architecture) có tính dự phòng cao và tự động khôi phục sau thảm họa (Disaster Recovery)?",
+            "2. Giải thích sự khác biệt giữa các mô hình dịch vụ đám mây: IaaS, PaaS, SaaS và Serverless? Khi nào lựa chọn mô hình nào?",
+            "3. Làm thế nào để bảo mật dữ liệu nhạy cảm ở trạng thái lưu trữ (Encryption at Rest) và trạng thái truyền tải (Encryption in Transit) trên AWS/Azure?",
+            "4. Thiết kế hệ thống Microservices sử dụng API Gateway, Service Mesh (Istio) và cơ chế bảo mật OAuth2/OIDC?",
+            "5. Làm thế nào để tối ưu hóa chi phí hạ tầng đám mây cho doanh nghiệp đang tiêu tốn $50,000 mỗi tháng?",
+            "6. Trình bày phương án di chuyển cơ sở dữ liệu lớn (Database Migration) từ On-Premises lên Cloud mà không gây gián đoạn dịch vụ (Zero-Downtime)?",
+            "7. Thiết kế hệ thống CI/CD hoàn chỉnh hỗ trợ triển khai tự động hạ tầng (IaC) bằng Terraform và mã nguồn ứng dụng bằng GitOps (ArgoCD)?",
+            "8. Giải thích các chiến lược xử lý dữ liệu lớn (Data Partitioning, Sharding) và lựa chọn giữa SQL vs NoSQL Database?",
+            "9. Cách xử lý sự cố nghẽn cổ chai (Bottleneck) về I/O hoặc CPU trên hệ thống phân tán phục vụ hàng triệu người dùng?",
+            "10. Trình bày nguyên lý thiết kế hệ thống theo tiêu chuẩn AWS Well-Architected Framework?"
+        ]'::jsonb
     )
 ON CONFLICT (id) DO NOTHING;
