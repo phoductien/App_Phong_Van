@@ -5,8 +5,7 @@ import {
   Container,
   Header,
   Select,
-  Badge,
-  Input
+  Badge
 } from '@cloudscape-design/components';
 
 const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:5000';
@@ -19,7 +18,7 @@ export default function QuestionBankViewer() {
 
   // Filters
   const [selectedLevel, setSelectedLevel] = useState({ label: "Tất cả cấp độ", value: "all" });
-  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedPosition, setSelectedPosition] = useState({ label: "Tất cả vị trí", value: "all" });
 
   useEffect(() => {
     async function loadCompanies() {
@@ -60,12 +59,33 @@ export default function QuestionBankViewer() {
     loadQuestions();
   }, [selectedCompany]);
 
+  // Reset filters when company changes
+  useEffect(() => {
+    setSelectedLevel({ label: "Tất cả cấp độ", value: "all" });
+    setSelectedPosition({ label: "Tất cả vị trí", value: "all" });
+  }, [selectedCompany]);
+
+  // Helper to extract clean position from title
+  const getPositionFromTitle = (title) => {
+    const parts = title.split(' - ');
+    if (parts.length > 1) {
+      return parts[1].replace(/\s*(Quiz|Interview|Quiz\s*\(.*\))\s*$/i, '').trim();
+    }
+    return title;
+  };
+
+  // Generate dynamic position options from loaded question banks
+  const uniquePositions = Array.from(new Set(questionBanks.map(qb => getPositionFromTitle(qb.title))));
+  const positionOptions = [
+    { label: "Tất cả vị trí", value: "all" },
+    ...uniquePositions.map(pos => ({ label: pos, value: pos }))
+  ];
+
   const filteredQuestionBanks = questionBanks.filter(qb => {
     const matchLevel = selectedLevel.value === "all" || qb.level === selectedLevel.value;
-    const matchSearch = !searchQuery || 
-      qb.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (qb.questions && qb.questions.some(q => q.toLowerCase().includes(searchQuery.toLowerCase())));
-    return matchLevel && matchSearch;
+    const qbPosition = getPositionFromTitle(qb.title);
+    const matchPosition = selectedPosition.value === "all" || qbPosition === selectedPosition.value;
+    return matchLevel && matchPosition;
   });
 
   return (
@@ -108,12 +128,13 @@ export default function QuestionBankViewer() {
             </div>
 
             <div style={{ flex: '2 1 250px' }}>
-              <Box variant="awsui-key-label">Tìm kiếm vị trí / kỹ năng:</Box>
-              <Input
-                value={searchQuery}
-                onChange={({ detail }) => setSearchQuery(detail.value)}
-                placeholder="Ví dụ: Frontend, DevOps, Pentest, QA..."
-                clearable
+              <Box variant="awsui-key-label">Lọc theo vị trí ứng tuyển:</Box>
+              <Select
+                selectedOption={selectedPosition}
+                onChange={({ detail }) => setSelectedPosition(detail.selectedOption)}
+                options={positionOptions}
+                filteringType="auto"
+                placeholder="Chọn vị trí..."
               />
             </div>
           </div>
