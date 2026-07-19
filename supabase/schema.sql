@@ -123,6 +123,10 @@ CREATE POLICY "Allow public select access to cv_vault"
     ON cv_vault FOR SELECT
     USING (true);
 
+CREATE POLICY "Allow public delete access to cv_vault"
+    ON cv_vault FOR DELETE
+    USING (true);
+
 -- Basic RLS Policies for Companies (Public read)
 CREATE POLICY "Allow public read access to companies"
     ON companies FOR SELECT
