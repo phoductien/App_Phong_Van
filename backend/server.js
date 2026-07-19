@@ -664,11 +664,55 @@ app.post('/api/sessions/start', async (req, res) => {
     .eq('level', level)
     .limit(1);
 
-  if (qError || !qBanks || qBanks.length === 0) {
-    return res.status(404).json({ error: "No question bank found for selected company & level" });
-  }
+  let qBank;
 
-  const qBank = qBanks[0];
+  if (qError || !qBanks || qBanks.length === 0) {
+    try {
+      const { data: companyData, error: coErr } = await supabase
+        .from('companies')
+        .select('name')
+        .eq('id', companyId)
+        .limit(1);
+      
+      const companyName = (!coErr && companyData && companyData.length > 0) 
+        ? companyData[0].name 
+        : "Đối tác Tuyển dụng";
+
+      const fallbackTitle = `${companyName} Quiz (${level.toUpperCase()})`;
+      const fallbackQuestions = [
+        `1. [${level.toUpperCase()}] Giới thiệu tổng quan về kỹ năng của bạn liên quan đến công ty ${companyName}?`,
+        `2. [${level.toUpperCase()}] Nêu một lỗi phổ biến bạn hay gặp phải ở vị trí này và cách khắc phục?`,
+        `3. [${level.toUpperCase()}] Làm thế nào để kiểm tra tính ổn định của hệ thống?`,
+        `4. [${level.toUpperCase()}] Nêu điểm khác biệt của bạn so với các ứng viên khác?`,
+        `5. [${level.toUpperCase()}] Hãy trình bày hiểu biết của bạn về văn hóa làm việc tại ${companyName}?`,
+        `6. [${level.toUpperCase()}] Giải thích các công nghệ cốt lõi thường được dùng cho vị trí này?`,
+        `7. [${level.toUpperCase()}] Bạn thiết kế quy trình xử lý lỗi tự động như thế nào?`,
+        `8. [${level.toUpperCase()}] Làm cách nào để tối ưu hóa quy trình làm việc?`,
+        `9. [${level.toUpperCase()}] Làm thế nào để bảo mật thông tin dự án tốt nhất?`,
+        `10. [${level.toUpperCase()}] Bạn có câu hỏi nào dành cho người phỏng vấn không?`
+      ];
+
+      const { data: newQBs, error: insErr } = await supabase
+        .from('question_banks')
+        .insert([{
+          company_id: companyId,
+          level: level,
+          title: fallbackTitle,
+          questions: fallbackQuestions
+        }])
+        .select();
+
+      if (insErr || !newQBs || newQBs.length === 0) {
+        return res.status(404).json({ error: "Không tìm thấy bộ đề câu hỏi và không thể tự động khởi tạo." });
+      }
+      qBank = newQBs[0];
+    } catch (dbErr) {
+      console.error(dbErr);
+      return res.status(500).json({ error: "Lỗi kết nối cơ sở dữ liệu khi tự động khởi tạo bộ đề." });
+    }
+  } else {
+    qBank = qBanks[0];
+  }
   const { data: sessionData, error: sError } = await supabase
     .from('interview_sessions')
     .insert([{ candidate_id: candidateId, cv_id: cvId || null, question_bank_id: qBank.id }])
