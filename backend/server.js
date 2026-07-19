@@ -805,7 +805,7 @@ Return a JSON object containing:
       .insert([{ candidate_id: candidateId, cv_id: cvId || null, question_bank_id: qBank.id }])
       .select();
 
-    if (sError) return res.status(400).json(sError);
+    if (sError) return res.status(400).json({ error: sError.message });
 
     const session = sessionData[0];
     return res.status(201).json({

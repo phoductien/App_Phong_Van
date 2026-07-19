@@ -441,7 +441,7 @@ export default function StartInterview({ onStartSession, user, userId = '0000000
         });
       } else {
         const errData = await res.json();
-        setErrorMsg(errData.error || 'Có lỗi xảy ra khi bắt đầu phòng phỏng vấn.');
+        setErrorMsg(errData.message || errData.error || 'Có lỗi xảy ra khi bắt đầu phòng phỏng vấn.');
         setShowCameraCheck(false);
       }
     } catch (err) {
